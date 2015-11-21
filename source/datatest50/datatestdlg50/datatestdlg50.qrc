@@ -1,0 +1,12 @@
+<RCC>
+  <qresource prefix="datatestdlg">
+    <file>images/delulogo.png</file>
+    <file>images/debug.png</file>
+    <file>images/data_save.png</file>
+    <file>images/close.png</file>
+    <file>images/open.png</file>
+    <file>images/success.png</file>
+    <file>images/failed.png</file>
+    <file>images/datatest.png</file>
+  </qresource>
+</RCC>
