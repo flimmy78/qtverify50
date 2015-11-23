@@ -232,7 +232,8 @@ void DataTestDlg50::showEvent(QShowEvent *event)
 
 	m_readComConfig = NULL;
 	m_readComConfig = new ReadComConfig();
-	m_readComConfig->getBalancePara(m_balMaxWht, m_balBottomWht); //获取天平最大容量和回水底量
+	m_readComConfig->getBalancePara(m_balMaxWht, m_balBottomWht); //获取大天平最大容量和回水底量
+	m_readComConfig->getBalancePara2(m_balMaxWht2, m_balBottomWht2); //获取小天平最大容量和回水底量
 
 	m_tempObj = NULL;
 	m_tempTimer = NULL;
@@ -399,7 +400,7 @@ void DataTestDlg50::initBalanceCom2()
 {
 	ComInfoStruct balanceStruct2 = m_readComConfig->ReadBalanceConfig2();
 	m_balanceObj2 = new BalanceComObject();
-	m_balanceObj2->setBalanceType(m_readComConfig->getBalanceType());
+	m_balanceObj2->setBalanceType(m_readComConfig->getBalanceType2());
 	m_balanceObj2->moveToThread(&m_balanceThread2);
 	m_balanceThread2.start();
 	m_balanceObj2->openBalanceCom(&balanceStruct2);
@@ -1028,7 +1029,7 @@ void DataTestDlg50::slotFreshSmallBalanceValue(const float& balValue)
 {
 	ui.lnEditSmallBalance->setText(QString::number(balValue, 'f', 3));
 
-	if (balValue > m_balMaxWht) //防止天平溢出
+	if (balValue > m_balMaxWht2) //防止天平溢出
 	{
 		m_controlObj->askControlRelay(m_portsetinfo.smallWaterOutNo, VALVE_OPEN);// 打开小天平放水阀	
 		m_controlObj->askControlRelay(m_portsetinfo.smallWaterInNo, VALVE_OPEN);// 打开小天平进水阀
