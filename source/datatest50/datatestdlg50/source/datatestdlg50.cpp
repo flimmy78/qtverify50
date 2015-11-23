@@ -66,7 +66,7 @@ void DataTestDlg50::closeEvent( QCloseEvent * event)
 		m_valveThread.exit();
 	}
 
-	if (m_controlObj2)  //阀门控制
+	if (m_controlObj2)  //阀门控制2
 	{
 		delete m_controlObj2;
 		m_controlObj2 = NULL;
@@ -81,7 +81,15 @@ void DataTestDlg50::closeEvent( QCloseEvent * event)
 
 		m_balanceThread.exit();
 	}
-	
+
+	if (m_balanceObj2)  //天平采集2
+	{
+		delete m_balanceObj2;
+		m_balanceObj2 = NULL;
+
+		m_balanceThread2.exit();
+	}
+
 	if (m_meterObj)  //热量表串口通讯
 	{
 		delete m_meterObj;
@@ -243,6 +251,9 @@ void DataTestDlg50::showEvent(QShowEvent *event)
 	m_balanceObj = NULL;
 	initBalanceCom();		//初始化天平串口
 
+	m_balanceObj2 = NULL;
+	initBalanceCom2();		//初始化天平串口2
+
 	m_meterObj = NULL;
 	initComOfHeatMeter();	//初始化热量表串口
 
@@ -380,7 +391,21 @@ void DataTestDlg50::initBalanceCom()
 	m_balanceObj->openBalanceCom(&balanceStruct);
 
 	//天平数值由上位机直接通过天平串口采集
-	connect(m_balanceObj, SIGNAL(balanceValueIsReady(const float &)), this, SLOT(slotFreshBalanceValue(const float &)));
+	connect(m_balanceObj, SIGNAL(balanceValueIsReady(const float &)), this, SLOT(slotFreshBigBalanceValue(const float &)));
+}
+
+//天平采集串口 上位机直接采集2
+void DataTestDlg50::initBalanceCom2()
+{
+	ComInfoStruct balanceStruct2 = m_readComConfig->ReadBalanceConfig2();
+	m_balanceObj2 = new BalanceComObject();
+	m_balanceObj2->setBalanceType(m_readComConfig->getBalanceType());
+	m_balanceObj2->moveToThread(&m_balanceThread2);
+	m_balanceThread2.start();
+	m_balanceObj2->openBalanceCom(&balanceStruct2);
+
+	//天平数值由上位机直接通过天平串口采集
+	connect(m_balanceObj2, SIGNAL(balanceValueIsReady(const float &)), this, SLOT(slotFreshSmallBalanceValue(const float &)));
 }
 
 /*
@@ -978,19 +1003,38 @@ void DataTestDlg50::slotFreshStdTempValue(const QString& stdTempStr)
 	}
 }
 
-//刷新天平数值
-void DataTestDlg50::slotFreshBalanceValue(const float& balValue)
+//刷新大天平数值
+void DataTestDlg50::slotFreshBigBalanceValue(const float& balValue)
 {
 	ui.lnEditBigBalance->setText(QString::number(balValue, 'f', 3));
-	
+
 	if (balValue > m_balMaxWht) //防止天平溢出
 	{
-		m_controlObj->askControlRelay(m_portsetinfo.waterOutNo, VALVE_OPEN);// 打开放水阀	
+		m_controlObj->askControlRelay(m_portsetinfo.bigWaterOutNo, VALVE_OPEN);// 打开大天平放水阀	
+		m_controlObj->askControlRelay(m_portsetinfo.bigWaterInNo, VALVE_OPEN);// 打开大天平进水阀
 		m_controlObj->askControlRelay(m_portsetinfo.waterInNo, VALVE_CLOSE);// 关闭进水阀
 		if (m_portsetinfo.version == OLD_CTRL_VERSION) //老控制板 无反馈
 		{
-			slotSetValveBtnStatus(m_portsetinfo.waterOutNo, VALVE_OPEN);
-			slotSetValveBtnStatus(m_portsetinfo.waterInNo, VALVE_CLOSE);
+			slotSetValveBtnStatus(m_portsetinfo.bigWaterOutNo, VALVE_OPEN);
+			slotSetValveBtnStatus(m_portsetinfo.bigWaterInNo, VALVE_OPEN);
+		}
+	}
+}
+
+//刷新小天平数值
+void DataTestDlg50::slotFreshSmallBalanceValue(const float& balValue)
+{
+	ui.lnEditSmallBalance->setText(QString::number(balValue, 'f', 3));
+
+	if (balValue > m_balMaxWht) //防止天平溢出
+	{
+		m_controlObj->askControlRelay(m_portsetinfo.smallWaterOutNo, VALVE_OPEN);// 打开小天平放水阀	
+		m_controlObj->askControlRelay(m_portsetinfo.smallWaterInNo, VALVE_OPEN);// 打开小天平进水阀
+		m_controlObj->askControlRelay(m_portsetinfo.waterInNo, VALVE_CLOSE);// 关闭进水阀
+		if (m_portsetinfo.version == OLD_CTRL_VERSION) //老控制板 无反馈
+		{
+			slotSetValveBtnStatus(m_portsetinfo.smallWaterOutNo, VALVE_OPEN);
+			slotSetValveBtnStatus(m_portsetinfo.smallWaterInNo, VALVE_OPEN);
 		}
 	}
 }
