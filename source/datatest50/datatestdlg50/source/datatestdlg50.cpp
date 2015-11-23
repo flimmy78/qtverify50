@@ -1017,7 +1017,9 @@ void DataTestDlg50::slotFreshBigBalanceValue(const float& balValue)
 		{
 			slotSetValveBtnStatus(m_portsetinfo.bigWaterOutNo, VALVE_OPEN);
 			slotSetValveBtnStatus(m_portsetinfo.bigWaterInNo, VALVE_OPEN);
+			slotSetValveBtnStatus(m_portsetinfo.waterInNo, VALVE_CLOSE);
 		}
+		closePump();
 	}
 }
 
@@ -1035,7 +1037,9 @@ void DataTestDlg50::slotFreshSmallBalanceValue(const float& balValue)
 		{
 			slotSetValveBtnStatus(m_portsetinfo.smallWaterOutNo, VALVE_OPEN);
 			slotSetValveBtnStatus(m_portsetinfo.smallWaterInNo, VALVE_OPEN);
+			slotSetValveBtnStatus(m_portsetinfo.smallWaterInNo, VALVE_CLOSE);
 		}
+		closePump();
 	}
 }
 
