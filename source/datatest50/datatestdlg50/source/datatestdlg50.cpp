@@ -1,14 +1,14 @@
 /***********************************************
-**  文件名:     datatestdlg.cpp
-**  功能:       采集与控制测试程序
+**  文件名:     datatestdlg50.cpp
+**  功能:       采集与控制测试程序，针对DN50，双天平、双控制板
 **  操作系统:   基于Trolltech Qt4.8.5的跨平台系统
-**  生成时间:   2014/6/12
+**  生成时间:   2015/11/23
 **  专业组:     德鲁计量软件组
 **  程序设计者: YS
 **  程序员:     YS
-**  版本历史:   2014/06 第一版
+**  版本历史:   2015/11 第一版
 **  内容包含:
-**  说明:		只用于测试采集与控制，不作为质量法检定的主界面(2014-07-15备注)
+**  说明:		
 **  更新记录:   
 ***********************************************/
 
@@ -64,6 +64,14 @@ void DataTestDlg50::closeEvent( QCloseEvent * event)
 		m_controlObj = NULL;
 
 		m_valveThread.exit();
+	}
+
+	if (m_controlObj2)  //阀门控制
+	{
+		delete m_controlObj2;
+		m_controlObj2 = NULL;
+
+		m_valveThread2.exit();
 	}
 
 	if (m_balanceObj)  //天平采集
@@ -228,6 +236,9 @@ void DataTestDlg50::showEvent(QShowEvent *event)
 
 	m_controlObj = NULL;
 	initControlCom();		//初始化控制串口
+
+	m_controlObj2 = NULL;
+	initControlCom2();		//初始化控制串口2
 
 	m_balanceObj = NULL;
 	initBalanceCom();		//初始化天平串口
@@ -400,6 +411,22 @@ void DataTestDlg50::initControlCom()
 	/*****************************************************************************************************/
 	//天平数值从控制板获取
 // 	connect(m_controlObj, SIGNAL(controlGetBalanceValueIsOk(const float&)), this, SLOT(slotFreshBalanceValue(const float &)));
+}
+
+/*
+** 开辟一个新线程，打开控制板通讯串口2
+*/
+void DataTestDlg50::initControlCom2()
+{
+	ComInfoStruct valveStruct2 = m_readComConfig->ReadValveConfig2();
+	m_controlObj2 = new ControlComObject();
+	m_controlObj2->setProtocolVersion(m_portsetinfo.version); //设置协议版本
+	m_controlObj2->moveToThread(&m_valveThread2);
+	m_valveThread2.start();
+	m_controlObj2->openControlCom(&valveStruct2);
+
+	connect(m_controlObj2, SIGNAL(controlRelayIsOk(const UINT8 &, const bool &)), this, SLOT(slotSetValveBtnStatus(const UINT8 &, const bool &)));
+	connect(m_controlObj2, SIGNAL(controlRegulateIsOk()), this, SLOT(slotSetRegulateOk()));
 }
 
 void DataTestDlg50::on_lnEditKp_returnPressed()
@@ -742,70 +769,58 @@ void DataTestDlg50::on_btnCloseCom_clicked()
 /*
 ** 控制继电器开断
 */
-void DataTestDlg50::on_btnWaterIn_clicked() //进水阀
+void DataTestDlg50::operateRelay()
 {
-	m_nowPortNo = m_portsetinfo.waterInNo;
-	m_controlObj->askControlRelay(m_nowPortNo, !m_valveStatus[m_nowPortNo]);
+	if (m_nowPortNo <= 8) //1#控制板
+	{
+		m_controlObj->askControlRelay(m_nowPortNo, !m_valveStatus[m_nowPortNo]);
+	}
+	else //2#控制板
+	{
+		m_controlObj2->askControlRelay(m_nowPortNo-8, !m_valveStatus[m_nowPortNo]);
+	}
 
 	if (m_portsetinfo.version == OLD_CTRL_VERSION) //老控制板 无反馈
 	{
 		slotSetValveBtnStatus(m_nowPortNo, !m_valveStatus[m_nowPortNo]);
 	}
+}
+
+void DataTestDlg50::on_btnWaterIn_clicked() //进水阀
+{
+	m_nowPortNo = m_portsetinfo.waterInNo;
+	operateRelay();
 }
 
 void DataTestDlg50::on_btnBigWaterIn_clicked() //大天平进水阀
 {
 	m_nowPortNo = m_portsetinfo.bigWaterInNo;
-	m_controlObj->askControlRelay(m_nowPortNo, !m_valveStatus[m_nowPortNo]);
-
-	if (m_portsetinfo.version == OLD_CTRL_VERSION) //老控制板 无反馈
-	{
-		slotSetValveBtnStatus(m_nowPortNo, !m_valveStatus[m_nowPortNo]);
-	}
+	operateRelay();
 }
 
 void DataTestDlg50::on_btnBigWaterOut_clicked() //大天平放水阀
 {
 	m_nowPortNo = m_portsetinfo.bigWaterOutNo;
-	m_controlObj->askControlRelay(m_nowPortNo, !m_valveStatus[m_nowPortNo]);
-
-	if (m_portsetinfo.version == OLD_CTRL_VERSION) //老控制板 无反馈
-	{
-		slotSetValveBtnStatus(m_nowPortNo, !m_valveStatus[m_nowPortNo]);
-	}
+	operateRelay();
 }
 
 void DataTestDlg50::on_btnSmallWaterIn_clicked() //小天平进水阀
 {
 	m_nowPortNo = m_portsetinfo.smallWaterInNo;
-	m_controlObj->askControlRelay(m_nowPortNo, !m_valveStatus[m_nowPortNo]);
-
-	if (m_portsetinfo.version == OLD_CTRL_VERSION) //老控制板 无反馈
-	{
-		slotSetValveBtnStatus(m_nowPortNo, !m_valveStatus[m_nowPortNo]);
-	}
+	operateRelay();
 }
 
 void DataTestDlg50::on_btnSmallWaterOut_clicked() //小天平放水阀
 {
 	m_nowPortNo = m_portsetinfo.smallWaterOutNo;
-	m_controlObj->askControlRelay(m_nowPortNo, !m_valveStatus[m_nowPortNo]);
-
-	if (m_portsetinfo.version == OLD_CTRL_VERSION) //老控制板 无反馈
-	{
-		slotSetValveBtnStatus(m_nowPortNo, !m_valveStatus[m_nowPortNo]);
-	}
+	operateRelay();
 }
 
 void DataTestDlg50::on_btnValveBig_clicked() //大流量阀
 {
 	m_nowPortNo = m_portsetinfo.bigNo;
-	m_controlObj->askControlRelay(m_nowPortNo, !m_valveStatus[m_nowPortNo]);
+	operateRelay();
 
-	if (m_portsetinfo.version == OLD_CTRL_VERSION) //老控制板 无反馈
-	{
-		slotSetValveBtnStatus(m_nowPortNo, !m_valveStatus[m_nowPortNo]);
-	}
 	m_maxRateGetted = false;
 	m_nowRegNo = m_portsetinfo.regflow1No;
 }
@@ -813,12 +828,8 @@ void DataTestDlg50::on_btnValveBig_clicked() //大流量阀
 void DataTestDlg50::on_btnValveMiddle1_clicked() //中流一阀
 {
 	m_nowPortNo = m_portsetinfo.middle1No;
-	m_controlObj->askControlRelay(m_nowPortNo, !m_valveStatus[m_nowPortNo]);
+	operateRelay();
 
-	if (m_portsetinfo.version == OLD_CTRL_VERSION) //老控制板 无反馈
-	{
-		slotSetValveBtnStatus(m_nowPortNo, !m_valveStatus[m_nowPortNo]);
-	}
 	m_maxRateGetted = false;
 	m_nowRegNo = m_portsetinfo.regflow2No;
 }
@@ -826,23 +837,13 @@ void DataTestDlg50::on_btnValveMiddle1_clicked() //中流一阀
 void DataTestDlg50::on_btnValveMiddle2_clicked() //中流二阀
 {
 	m_nowPortNo = m_portsetinfo.middle2No;
-	m_controlObj->askControlRelay(m_nowPortNo, !m_valveStatus[m_nowPortNo]);
-
-	if (m_portsetinfo.version == OLD_CTRL_VERSION) //老控制板 无反馈
-	{
-		slotSetValveBtnStatus(m_nowPortNo, !m_valveStatus[m_nowPortNo]);
-	}
+	operateRelay();
 }
 
 void DataTestDlg50::on_btnValveSmall_clicked() //小流量阀
 {
 	m_nowPortNo = m_portsetinfo.smallNo;
-	m_controlObj->askControlRelay(m_nowPortNo, !m_valveStatus[m_nowPortNo]);
-
-	if (m_portsetinfo.version == OLD_CTRL_VERSION) //老控制板 无反馈
-	{
-		slotSetValveBtnStatus(m_nowPortNo, !m_valveStatus[m_nowPortNo]);
-	}
+	operateRelay();
 }
 
 /*
