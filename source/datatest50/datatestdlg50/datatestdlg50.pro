@@ -17,11 +17,11 @@ OBJECTS_DIR = $(ADEHOME)/tmp/datatest50/datatestdlg50/obj
 UI_DIR = $(ADEHOME_INC)/include
 
 INCLUDEPATH  	=    ./      \
-									 include \ 
+									 ../../include \ 
 									 $$(ADEHOME_INC)/include	\
 									 $$(ADEHOME_INC)/include/qextserial
 
-HEADERS	+= $$(ADEHOME_INC)/include/datatestdlg50.h \
+HEADERS	+= ../../include/datatestdlg50.h \
 	
 SOURCES	+= source/datatestdlg50.cpp
 			 

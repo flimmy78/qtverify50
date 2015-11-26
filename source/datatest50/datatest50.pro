@@ -4,8 +4,9 @@ TARGET    = datatest50
 CONFIG += qt warn_on debug
 RC_FILE = datatest50.rc
 
-INCLUDEPATH	 +=  $$(ADEHOME_INC)/include  \
-                 $$(ADEHOME_INC)/include/qextserial
+INCLUDEPATH	 +=   ../include	\
+									$$(ADEHOME_INC)/include  \
+                 	$$(ADEHOME_INC)/include/qextserial
 
 QMAKE_LIBDIR += \
               $$(ADEHOME)/lib \

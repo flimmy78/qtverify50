@@ -18,11 +18,11 @@ OBJECTS_DIR = $(ADEHOME)/tmp/flowweight50/obj
 UI_DIR = $(ADEHOME_INC)/include
 
 INCLUDEPATH  	=    ./      \
-									 include \ 
+									 ../include \ 
 									 $$(ADEHOME_INC)/include	\
 									 $$(ADEHOME_INC)/include/qextserial
 
-HEADERS	+= $$(ADEHOME_INC)/include/flowweight50.h 
+HEADERS	+= ../include/flowweight50.h 
 	
 SOURCES	+= flowweight50.cpp  
 

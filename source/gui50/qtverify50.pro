@@ -50,7 +50,8 @@ OBJECTS_DIR = $(ADEHOME)/tmp/qtverify50/obj
 UI_DIR = $(ADEHOME_INC)/include
 
 
-INCLUDEPATH += 	./include	\
+INCLUDEPATH += 	./include	  \
+								../include  \
 								$${UI_DIR}	\
 								$$(ADEHOME_INC)/include		\
 								$$(ADEHOME_INC)/include/qextserial \
