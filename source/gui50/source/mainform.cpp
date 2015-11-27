@@ -25,7 +25,7 @@
 #include "masterslaveset.h"
 #include "algorithm.h"
 #include "flowweight50.h"
-// #include "flowstandard.h"
+#include "flowstandard50.h"
 // #include "totalweight.h"
 // #include "totalstandard.h"
 #include "calcverify.h"
@@ -70,7 +70,7 @@ MainForm::MainForm(bool licenseOK, int validDays, QWidget *parent, Qt::WFlags fl
 	m_portSet = NULL;
 	m_masterslave = NULL;
  	m_flowWeightDlg = NULL;
-// 	m_flowStandardDlg = NULL;
+ 	m_flowStandardDlg = NULL;
 // 	m_totalWeightDlg = NULL;
 // 	m_totalStandardDlg = NULL;
 	m_calcDlg = NULL;  
@@ -203,12 +203,12 @@ void MainForm::closeEvent( QCloseEvent * event)
 			m_flowWeightDlg = NULL;
 		}
 
-// 		if (m_flowStandardDlg)
-// 		{
-// 			delete m_flowStandardDlg;
-// 			m_flowStandardDlg = NULL;
-// 		}
-// 
+		if (m_flowStandardDlg)
+		{
+			delete m_flowStandardDlg;
+			m_flowStandardDlg = NULL;
+		}
+
 // 		if (m_totalWeightDlg)
 // 		{
 // 			delete m_totalWeightDlg;
@@ -463,22 +463,22 @@ void MainForm::on_actionFlowWeight_triggered()
 	}
 	m_flowWeightDlg->showMaximized();
 }
-/*
+
 //流量检定(标准表法)
 void MainForm::on_actionFlowStandard_triggered()
 {
 	if (NULL == m_flowStandardDlg)
 	{
-		m_flowStandardDlg = new FlowStandardDlg();
+		m_flowStandardDlg = new FlowStandardDlg50();
 	}
-	else //目的是执行FlowStandardDlg的构造函数
+	else //目的是执行FlowStandardDlg50的构造函数
 	{
 		delete m_flowStandardDlg;
 		m_flowStandardDlg = NULL;
-		m_flowStandardDlg = new FlowStandardDlg();
+		m_flowStandardDlg = new FlowStandardDlg50();
 	}
 	m_flowStandardDlg->showMaximized();
-}*/
+}
 
 //铂电阻检定(比较法)
 void MainForm::on_actionPtCompare_triggered()

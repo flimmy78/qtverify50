@@ -14,7 +14,7 @@ class SetPortFrm;
 class CMasterSlave;
 class CAlgorithm;
 class FlowWeightDlg50;
-// class FlowStandardDlg;
+class FlowStandardDlg50;
 // class TotalWeightDlg;
 // class TotalStandardDlg;
 class CalcDlg;
@@ -54,7 +54,7 @@ public:
 	CMasterSlave *m_masterslave; //主机-从机设置
 	QProcess *m_comProcess; //调用外部串口调试工具
 	FlowWeightDlg50 *m_flowWeightDlg;      //流量检定(质量法)
-// 	FlowStandardDlg50 *m_flowStandardDlg;  //流量检定(标准表法)
+ 	FlowStandardDlg50 *m_flowStandardDlg;  //流量检定(标准表法)
 // 	TotalWeightDlg50 *m_totalWeightDlg;    //总量检定(标准表法)
 // 	TotalStandardDlg50 *m_totalStandardDlg;//总量检定(标准表法)
 
@@ -96,7 +96,7 @@ public slots:
 
 	//Component Verify
 	void on_actionFlowWeight_triggered();
-// 	void on_actionFlowStandard_triggered();
+ 	void on_actionFlowStandard_triggered();
 	void on_actionPtCompare_triggered();
 	void on_actionPtPara_triggered();
 	void on_actionCalculator_triggered();

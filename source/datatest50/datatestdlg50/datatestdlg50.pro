@@ -14,7 +14,7 @@ LIBS += -lsystemsetdlg -lprotocol -lcomobject -lalgorithm -lqtexdb
 DESTDIR = $(ADEHOME)\tmp\datatest50\datatestdlg50\obj
 #MOC_DIR = $(ADEHOME)/tmp/datatest50/datatestdlg50/moc
 OBJECTS_DIR = $(ADEHOME)/tmp/datatest50/datatestdlg50/obj
-UI_DIR = $(ADEHOME_INC)/include
+UI_DIR = ../../include
 
 INCLUDEPATH  	=    ./      \
 									 ../../include \ 
