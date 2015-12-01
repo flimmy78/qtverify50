@@ -177,7 +177,7 @@ TotalWeightDlg50::TotalWeightDlg50(QWidget *parent, Qt::WFlags flags)
 	///////////////////////////////// 原showEvent()函数的内容 end
 
 	ui.lcdInTemper->display(50);
-	ui.lcdOutTemper->display(50);
+	ui.lcdOutTemper->display(40);
 }
 
 TotalWeightDlg50::~TotalWeightDlg50()
@@ -1130,6 +1130,8 @@ int TotalWeightDlg50::judgeBalanceAndCalcAvgTemperAndFlow(float targetV, bool bi
 			m_avgTFCount++;
 			m_pipeInTemper += ui.lcdInTemper->value();
 			m_pipeOutTemper += ui.lcdOutTemper->value();
+			m_stdInTemper += ui.lnEditInStdTemp->text().toFloat();
+			m_stdOutTemper += ui.lnEditOutStdTemp->text().toFloat();
 			second = 3.6*(targetV - ui.lcdBigBalance->text().toFloat())/nowFlow;
 			ui.labelHintPoint->setText(tr("NO. <font color=DarkGreen size=6><b>%1</b></font> flow point: <font color=DarkGreen size=6><b>%2</b></font> m3/h")\
 				.arg(m_nowOrder).arg(nowFlow));
@@ -1145,6 +1147,8 @@ int TotalWeightDlg50::judgeBalanceAndCalcAvgTemperAndFlow(float targetV, bool bi
 			m_avgTFCount++;
 			m_pipeInTemper += ui.lcdInTemper->value();
 			m_pipeOutTemper += ui.lcdOutTemper->value();
+			m_stdInTemper += ui.lnEditInStdTemp->text().toFloat();
+			m_stdOutTemper += ui.lnEditOutStdTemp->text().toFloat();
 			second = 3.6*(targetV - ui.lcdSmallBalance->text().toFloat())/nowFlow;
 			ui.labelHintPoint->setText(tr("NO. <font color=DarkGreen size=6><b>%1</b></font> flow point: <font color=DarkGreen size=6><b>%2</b></font> m3/h")\
 				.arg(m_nowOrder).arg(nowFlow));
@@ -1740,8 +1744,7 @@ int TotalWeightDlg50::startVerifyFlowPoint(int order)
 			{
 				m_meterTemper[m] = m_chkAlg->getMeterTempByPos(m_pipeInTemper, m_pipeOutTemper, m_meterPosMap[m]);//计算每个被检表的温度
 				m_meterDensity[m] = m_chkAlg->getDensityByQuery(m_meterTemper[m]);//计算每个被检表的密度
-				//计算每个被检表的体积标准值
-				m_meterStdValue[m] = m_chkAlg->getStdVolByPos((m_balEndV-m_balStartV), m_pipeInTemper, m_pipeOutTemper, m_meterPosMap[m]); 
+				m_meterStdValue[m] = m_chkAlg->calcStdEnergyByEnthalpy(m_stdInTemper, m_stdOutTemper, m_balEndV-m_balStartV, m_unit); //计算每个被检表的热量标准值
 
 				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_FLOW_POINT)->setText(QString::number(m_realFlow, 'f', 3));//流量点
 				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_METER_END)->setText("");//表终值
@@ -1765,14 +1768,12 @@ int TotalWeightDlg50::startVerifyFlowPoint(int order)
 */
 int TotalWeightDlg50::calcAllMeterError()
 {
+	int ret = 1;
 	for (int i=0; i<m_validMeterNum; i++)
 	{
-		if (calcMeterError(i) == 0)
-		{
-			return 0;
-		}
+		ret *= calcMeterError(i);
 	}
-	return 1; 
+	return ret; 
 }
 
 /*
@@ -1787,7 +1788,7 @@ int TotalWeightDlg50::calcMeterError(int idx)
 	float endV = ui.tableWidget->item(row, COLUMN_METER_END)->text().toFloat(&ok);
 	if (/*m_meterEndValue[idx] <= 0 ||*/ ui.tableWidget->item(row, COLUMN_METER_END)->text().isEmpty() || !ok)
 	{
-		ui.tableWidget->setCurrentCell(row, COLUMN_METER_END);
+// 		ui.tableWidget->setCurrentCell(row, COLUMN_METER_END);
 		return 0;
 	}
 	m_meterError[idx] = 100*(m_meterEndValue[idx] - m_meterStartValue[idx] - m_meterStdValue[idx])/m_meterStdValue[idx];//计算某个表的误差
@@ -1864,10 +1865,9 @@ int TotalWeightDlg50::calcVerifyResult()
 	else //有读表流量失败的（终值）
 	{
 		ui.labelHintProcess->setText(tr("please input end value of heat meter"));
-		ui.tableWidget->setCurrentCell(m_meterPosMap[0]-1, COLUMN_METER_END); //定位到第一个需要输入终值的地方
 	}
 
-	return true;
+	return ret;
 }
 
 void TotalWeightDlg50::exportReport()
@@ -2273,7 +2273,8 @@ void TotalWeightDlg50::on_tableWidget_cellChanged(int row, int column)
 		m_meterStartValue[idx] = ui.tableWidget->item(row, column)->text().toFloat(&ok);
 		if (!ok)
 		{
-// 			QMessageBox::warning(this, tr("Warning"), tr("Error: please input digits"));//输入错误！请输入数字
+// 			QMessageBox::warning(this, tr("Warning"), tr("Error: please input right digits"));//输入错误！请输入正确的数字
+// 			ui.tableWidget->setCurrentCell(row, COLUMN_METER_START);
 			return;
 		}
 		startVerifyFlowPoint(m_nowOrder);
@@ -2284,10 +2285,15 @@ void TotalWeightDlg50::on_tableWidget_cellChanged(int row, int column)
 		m_meterEndValue[idx] = ui.tableWidget->item(row, column)->text().toFloat(&ok);
 		if (!ok)
 		{
-// 			QMessageBox::warning(this, tr("Warning"), tr("Error: please input digits"));//输入错误！请输入数字
+// 			QMessageBox::warning(this, tr("Warning"), tr("Error: please input right digits"));//输入错误！请输入正确的数字
+// 			ui.tableWidget->setCurrentCell(row, COLUMN_METER_END);
 			return;
 		}
-		calcVerifyResult();
+// 		calcVerifyResult();
+		if (/*!m_autopick &&*/calcVerifyResult()==0 && meterPos<m_meterPosMap[m_validMeterNum-1])//手动输入、不是最后一个表终值,自动定位到下一个
+		{
+			ui.tableWidget->setCurrentCell(m_meterPosMap[idx+1]-1, column);
+		}
 	}
 }
 
