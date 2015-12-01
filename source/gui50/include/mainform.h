@@ -15,7 +15,7 @@ class CMasterSlave;
 class CAlgorithm;
 class FlowWeightDlg50;
 class FlowStandardDlg50;
-// class TotalWeightDlg;
+class TotalWeightDlg50;
 // class TotalStandardDlg;
 class CalcDlg;
 class CmbVerifyDlg;
@@ -55,7 +55,7 @@ public:
 	QProcess *m_comProcess; //调用外部串口调试工具
 	FlowWeightDlg50 *m_flowWeightDlg;      //流量检定(质量法)
  	FlowStandardDlg50 *m_flowStandardDlg;  //流量检定(标准表法)
-// 	TotalWeightDlg50 *m_totalWeightDlg;    //总量检定(标准表法)
+	TotalWeightDlg50 *m_totalWeightDlg;    //总量检定(标准表法)
 // 	TotalStandardDlg50 *m_totalStandardDlg;//总量检定(标准表法)
 
 	CalcDlg *m_calcDlg; //计算器检定
@@ -103,7 +103,7 @@ public slots:
 	void on_actionCombine_triggered();
 
 	//Total Verify
-// 	void on_actionTotalWeight_triggered();
+	void on_actionTotalWeight_triggered();
 // 	void on_actionTotalStandard_triggered();
 
 	//Data Query

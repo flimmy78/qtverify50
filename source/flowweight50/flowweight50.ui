@@ -1067,7 +1067,7 @@ t</string>
      </property>
      <property name="maximumSize">
       <size>
-       <width>400</width>
+       <width>360</width>
        <height>16777215</height>
       </size>
      </property>

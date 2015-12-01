@@ -26,7 +26,7 @@
 #include "algorithm.h"
 #include "flowweight50.h"
 #include "flowstandard50.h"
-// #include "totalweight.h"
+#include "totalweight50.h"
 // #include "totalstandard.h"
 #include "calcverify.h"
 #include "cmbverify.h"
@@ -71,7 +71,7 @@ MainForm::MainForm(bool licenseOK, int validDays, QWidget *parent, Qt::WFlags fl
 	m_masterslave = NULL;
  	m_flowWeightDlg = NULL;
  	m_flowStandardDlg = NULL;
-// 	m_totalWeightDlg = NULL;
+	m_totalWeightDlg = NULL;
 // 	m_totalStandardDlg = NULL;
 	m_calcDlg = NULL;  
 	m_cmbVerifyDlg = NULL;
@@ -209,12 +209,12 @@ void MainForm::closeEvent( QCloseEvent * event)
 			m_flowStandardDlg = NULL;
 		}
 
-// 		if (m_totalWeightDlg)
-// 		{
-// 			delete m_totalWeightDlg;
-// 			m_totalWeightDlg = NULL;
-// 		}
-// 
+		if (m_totalWeightDlg)
+		{
+			delete m_totalWeightDlg;
+			m_totalWeightDlg = NULL;
+		}
+
 // 		if (m_totalStandardDlg)
 // 		{
 // 			delete m_totalStandardDlg;
@@ -543,23 +543,23 @@ void MainForm::on_actionCombine_triggered()
 	}
 	m_cmbVerifyDlg->showMaximized();
 }
-/*
+
 //总量检定（质量法）
 void MainForm::on_actionTotalWeight_triggered()
 {
 	if (NULL == m_totalWeightDlg)
 	{
-		m_totalWeightDlg = new TotalWeightDlg();
+		m_totalWeightDlg = new TotalWeightDlg50();
 	}
-	else //目的是执行TotalWeightDlg的构造函数
+	else //目的是执行TotalWeightDlg50的构造函数
 	{
 		delete m_totalWeightDlg;
 		m_totalWeightDlg = NULL;
-		m_totalWeightDlg = new TotalWeightDlg();
+		m_totalWeightDlg = new TotalWeightDlg50();
 	}
 	m_totalWeightDlg->showMaximized();
 }
-
+/*
 //总量检定（标准表法）
 void MainForm::on_actionTotalStandard_triggered()
 {
