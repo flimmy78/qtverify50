@@ -1,0 +1,9 @@
+<RCC>
+  <qresource prefix="waterweight50">
+    <file>images/delulogo.png</file>
+    <file>images/btncheckoff.png</file>
+    <file>images/btncheckon.png</file>
+    <file>images/flowweight.png</file>
+    <file>images/waterweight.png</file>
+  </qresource>
+</RCC>
