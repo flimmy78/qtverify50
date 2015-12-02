@@ -47,6 +47,7 @@
 #include "adjustratedlg.h"
 #include "usermanagedlg.h"
 #include "logindialog.h"
+#include "waterweight50.h"
 
 MainForm::MainForm(bool licenseOK, int validDays, QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
@@ -73,6 +74,7 @@ MainForm::MainForm(bool licenseOK, int validDays, QWidget *parent, Qt::WFlags fl
  	m_flowStandardDlg = NULL;
 	m_totalWeightDlg = NULL;
 // 	m_totalStandardDlg = NULL;
+	m_waterWeight50 = NULL; //水表检定（质量法）
 	m_calcDlg = NULL;  
 	m_cmbVerifyDlg = NULL;
 	m_tvercompDlg = NULL;
@@ -221,6 +223,12 @@ void MainForm::closeEvent( QCloseEvent * event)
 // 			m_totalStandardDlg = NULL;
 // 		}
 
+		if (m_waterWeight50)
+		{
+			delete m_waterWeight50;
+			m_waterWeight50 = NULL;
+		}
+
 		if (m_calcDlg)
 		{
 			delete m_calcDlg;
@@ -316,6 +324,12 @@ void MainForm::on_actionComSet_triggered()
 	{
 		m_setcom = new SetComDlg();
 	}
+	else //目的是执行SetComDlg的构造函数
+	{
+		delete m_setcom;
+		m_setcom = NULL;
+		m_setcom = new SetComDlg();
+	}
 	m_setcom->show();
 }
 
@@ -323,6 +337,12 @@ void MainForm::on_actionPortSet_triggered()
 {
 	if (NULL == m_portSet)
 	{
+		m_portSet = new SetPortFrm();
+	}
+	else //目的是执行SetPortFrm的构造函数
+	{
+		delete m_portSet;
+		m_portSet = NULL;
 		m_portSet = new SetPortFrm();
 	}
 	m_portSet->show();
@@ -542,6 +562,22 @@ void MainForm::on_actionCombine_triggered()
 		m_cmbVerifyDlg = new CmbVerifyDlg();
 	}
 	m_cmbVerifyDlg->showMaximized();
+}
+
+//水表检定（质量法）
+void MainForm::on_actionWaterWeight_triggered()
+{
+	if (NULL == m_waterWeight50)
+	{
+		m_waterWeight50 = new WaterWeightDlg50();
+	}
+	else //目的是执行WaterWeightDlg50的构造函数
+	{
+		delete m_waterWeight50;
+		m_waterWeight50 = NULL;
+		m_waterWeight50 = new WaterWeightDlg50();
+	}
+	m_waterWeight50->showMaximized();
 }
 
 //总量检定（质量法）

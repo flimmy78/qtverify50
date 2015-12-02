@@ -2290,7 +2290,7 @@ void TotalWeightDlg50::on_tableWidget_cellChanged(int row, int column)
 			return;
 		}
 // 		calcVerifyResult();
-		if (/*!m_autopick &&*/calcVerifyResult()==0 && meterPos<m_meterPosMap[m_validMeterNum-1])//手动输入、不是最后一个表终值,自动定位到下一个
+		if (calcVerifyResult()==0 && meterPos<m_meterPosMap[m_validMeterNum-1])//不是最后一个表终值,自动定位到下一个
 		{
 			ui.tableWidget->setCurrentCell(m_meterPosMap[idx+1]-1, column);
 		}

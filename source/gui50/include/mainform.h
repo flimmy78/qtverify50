@@ -33,6 +33,7 @@ class ScanCodeDlg;
 class RegisterDlg;
 class AdjustRateDlg;
 class UserManageDlg;
+class WaterWeightDlg50;
 
 class MainForm : public QMainWindow
 {
@@ -62,6 +63,8 @@ public:
 	CmbVerifyDlg *m_cmbVerifyDlg; //组合检定
 	tvercompDlg *m_tvercompDlg; //温度检定(比较法)
 	tverparamDlg *m_tverparaDlg; //温度检定(参数法)
+
+	WaterWeightDlg50 *m_waterWeight50; //水表检定（质量法）
 
 	StdMtrParaSet *m_stdParaSet; //标准表参数设定
 	StdMtrCoeCorrect *m_stdCoeCorrect; //标准表系数标定
@@ -101,6 +104,9 @@ public slots:
 	void on_actionPtPara_triggered();
 	void on_actionCalculator_triggered();
 	void on_actionCombine_triggered();
+
+	//水表检定
+	void on_actionWaterWeight_triggered();
 
 	//Total Verify
 	void on_actionTotalWeight_triggered();
