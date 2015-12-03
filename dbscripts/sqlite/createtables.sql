@@ -715,6 +715,83 @@ from
 ;'
 );
 
+INSERT INTO T_Create_Query_View_Stmt
+(F_ID, F_DESC, F_STMT) values
+(
+4,
+ 'temp water_verify query result view', 
+ 'CREATE view V_Temp_Water_Query_Result as
+select
+  rec.F_ID F_RowId,
+  rec.F_TimeStamp,
+  substr(rec.F_TimeStamp,1,16) F_TimeStamp_short,
+  substr(rec.F_MeterNo,7,8) F_MeterNo,
+  rec.F_FlowPointIdx,
+  round(rec.F_FlowPoint,3) F_FlowPoint,
+  rec.F_MethodFlag,
+  rec.F_MeterValue0,
+  rec.F_MeterValue1,
+  round((rec.F_MeterValue1 - rec.F_MeterValue0), 2) F_MeterDispValue,
+  rec.F_BalWeight0,
+  rec.F_BalWeight1,
+  round((rec.F_BalWeight1 - rec.F_BalWeight0), 2) F_BalDisp,
+  rec.F_StdMeterV0,
+  rec.F_StdMeterV1,
+  round((rec.F_StdMeterV1 - rec.F_StdMeterV0), 2) F_StdDisp,
+  rec.F_PipeTemper,
+  rec.F_Density,
+  rec.F_StandValue,
+  rec.F_DispError,
+  rec.F_StdError,
+  rec.F_Grade,
+  (select F_Desc from T_User_Def_Tab u where u.F_id = rec.F_VerifyPerson)  F_VerifyPerson,
+  (select F_Desc from T_User_Def_Tab u where u.F_id = rec.F_CheckPerson)  F_CheckPerson,
+  rec.F_DeviceInfoID,
+  rec.F_VerifyDate,
+  rec.F_ValidDate,
+  rec.F_EnvTemper,
+  rec.F_EnvHumidity,
+  rec.F_AirPressure,
+  rec.F_FlowCoe,
+  rec.F_Result,
+  rec.F_MeterPosNo,
+  rec.F_Model,
+  mo.F_Name F_Model_en,
+  mo.F_Desc F_Model_zh,
+  st.f_name F_Standard,
+  tp.F_Desc F_PickCode_zh,
+  manu.F_Name F_ManufactDept_en,
+  manu.F_Desc F_ManufactDept_zh,
+  vdpt.F_Name F_VerifyDept_en,
+  vdpt.F_Desc F_VerifyDept_zh,
+  yesno.F_Name valid_en, 
+  yesno.F_Desc valid,
+  d.F_CertNO,
+  d.F_DeviceName,
+  d.F_DeviceNo,
+  d.F_DeviceModel,
+  d.F_Manufact,
+  d.F_DeviceGrade,
+  d.F_MeasureRange,
+  d.F_VerifyRule,
+  d.F_DeviceValidDate,
+  d.F_CertValidDate,
+  d.F_RuleValidDate
+	from
+	T_Temp_Query_Result rec left join
+	T_Meter_Model mo on rec.F_Model=mo.F_ID left join
+    T_Meter_Standard st on rec.F_Standard=st.F_ID left join
+	T_Meter_PickCode tp on rec.F_PickCode=tp.F_ID left join
+	T_Manufacture_Dept manu on rec.F_ManufactDept=manu.F_ID left join
+	T_Verify_Dept vdpt on rec.F_VerifyDept=vdpt.F_ID left join
+	T_Yes_No_Tab  yesno on rec.F_Result=yesno.F_ID left join
+    T_User_Def_Tab usert on rec.F_VerifyPerson=usert.F_ID left join
+	T_Verify_Device_Info d on rec.F_DeviceInfoID=d.F_ID
+	order by rec.F_MeterPosNo, rec.f_meterno, rec.f_timestamp
+;'
+);
+
+
 -----------------------------------------------------------------
 --                    PID创建语句表                     ----
 -----------------------------------------------------------------
