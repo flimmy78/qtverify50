@@ -90,9 +90,6 @@ public:
 	int m_oldMaxMeterNum;     //上次被检表的最大个数
 	int m_validMeterNum;          //实际被检表的个数
 	QMap<int, int> m_meterPosMap; //被检表下标与表位号的映射关系
-	QMap<int, float> m_gradeErrA;  //不同等级热表对应的标准误差参数A
-	QMap<int, float> m_gradeErrB;  //不同等级热表对应的标准误差参数B
-	QMap<int, float> m_mapNormalFlow;  //不同规格热表对应的常用流量
 
 	float *m_meterStartValue; //被检表的初值
 	float *m_meterEndValue;   //被检表的终值
@@ -109,7 +106,7 @@ public:
 	int *m_meterResult;       //检表结果 1:合格；0:不合格
 	MeterCoe_PTR *m_oldMeterCoe; //热量表原来的各流量点系数
 
-	Flow_Verify_Record_PTR m_recPtr; //有效的检定记录
+	Water_Verify_Record_PTR m_recPtr; //有效的检定记录
 	QString m_timeStamp; //时间戳 秒数
 	QString m_nowDate;  
 	QString m_validDate;
@@ -150,6 +147,7 @@ public:
 	int isDataCollectNormal();	//检查数据采集是否正常（天平、温度、电磁流量计等）
 	int isMeterPosValid(int meterPos); //判断表位号是否有效(该表位是否需要检表)
 	int getValidMeterNum();       //获取有效的检表个数()
+	float getStdError(int grade, float temper, float flow);
 
 	void showEvent(QShowEvent * event);
 	void closeEvent(QCloseEvent * event);
