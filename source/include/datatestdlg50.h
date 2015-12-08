@@ -74,6 +74,7 @@ public:
 
 	QMap<int, bool> m_regStatus; //<调节阀端口号，调节阀状态>
 	QMap<int, QPushButton*> m_regBtn;//<调节阀端口号，调节阀按钮>	
+	QMap<int, QLineEdit*> m_regLineEdit;//<调节阀端口号，调节阀开度显示行>	
 	int m_nowRegNo;  //当前调节阀端口号
 
 	ComThread m_balanceThread; //天平采集线程
@@ -133,6 +134,9 @@ public slots:
 	void on_btnSetFreq_clicked(); //设置频率
 	void on_btnRegulate1_clicked();
 	void on_btnRegulate2_clicked();
+	void on_btnRegulate3_clicked();
+	void on_btnRegulate4_clicked();
+	void setRegulate(int retNO, int opening);
 
 	void on_btnParaSet_clicked();
 	void on_btnExit_clicked();
@@ -276,6 +280,11 @@ private slots:
 	void slotSetRegulate();
 	void openPump();
 	void closePump();
+
+	void on_lineEditDN3_textChanged(const QString & text);
+	void on_lineEditDN10_textChanged(const QString & text);
+	void on_lineEditDN25_textChanged(const QString & text);
+	void on_lineEditDN50_textChanged(const QString & text);
 	/******************电动调节阀end***************************/
 };
 
