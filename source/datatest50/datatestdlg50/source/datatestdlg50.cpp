@@ -968,7 +968,7 @@ void DataTestDlg50::setRegulate(int regNO, int opening)
 	{
 		m_controlObj2->askControlRegulate(regNO-3, opening);
 	}
-
+/*
 	int sec = REGULATE_OPEN_TIME*opening/100;
 	float interval = (float)100/REGULATE_OPEN_TIME;
 	float value = 0;
@@ -978,6 +978,7 @@ void DataTestDlg50::setRegulate(int regNO, int opening)
 		value += interval;
 		wait(1000);
 	} while (sec--);
+	*/
 }
 
 void DataTestDlg50::on_btnRegulate1_clicked() //µ÷½Ú·§1-DN3

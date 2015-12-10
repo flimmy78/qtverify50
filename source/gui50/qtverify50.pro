@@ -21,15 +21,15 @@ LIBS += -lalgorithm -lsystemsetdlg -ldatatestdlg50 -lqaxserver -lmasterslaveset 
 				-lflowweight50 -lflowstandard50 -lwaterweight50 -ltotalweight50 #-ltotalstandard50 -lwaterweight -lwaterstandard
 
 # Input
-HEADERS += include/mainform.h	\
+HEADERS += include/mainform50.h	\
 					 include/qexcel.h   \
 					 include/register.h
 					 
-FORMS += 	ui/mainform.ui	\
+FORMS += 	ui/mainform50.ui	\
 				 	ui/register.ui
 				 
 SOURCES += source/main.cpp	\
-					 source/mainform.cpp	\
+					 source/mainform50.cpp	\
 					 source/qexcel.cpp    \
 					 source/register.cpp
 					 

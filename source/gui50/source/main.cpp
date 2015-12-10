@@ -8,7 +8,7 @@
 #include <QSettings>
 #include <QDir>
 
-#include "mainform.h"
+#include "mainform50.h"
 #include "logger.h"
 #include "logindialog.h"
 #include "qtexdb.h"
@@ -16,7 +16,7 @@
 #include "md5encode.h"
 #include "register.h"
 
-MainForm *g_mainform;
+MainForm50 *g_mainform;
 
 int main(int argc, char *argv[])
 {
@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
 
 	splash->showMessage(QObject::tr("setting up the mainwindow ..."), align, Qt::blue);
 	wait(200);
-	g_mainform = new MainForm(licensOK, validDays);
+	g_mainform = new MainForm50(licensOK, validDays);
 	
 // 	LoginDialog login;
 // 	if (login.exec() == QDialog::Accepted)
