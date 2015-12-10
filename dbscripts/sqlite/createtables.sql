@@ -299,31 +299,31 @@ create table T_Meter_Default_Params
 	F_Opening smallint,                     -- 调节阀开度
   constraint F_StandardID_fk foreign key(F_StandardID) references T_Meter_Standard(F_ID)
 );
-insert into T_Meter_Default_Params values(0,  0, 1.5, 1.6,   1.5,  40, 34, 0, 1, 50);
-insert into T_Meter_Default_Params values(1,  0, 1.5, 0.5,   0.45, 20, 33, 1, 2, 50);
-insert into T_Meter_Default_Params values(2,  0, 1.5, 0.16,  0.15, 10, 33, 2, 3, 50);
-insert into T_Meter_Default_Params values(3,  0, 1.5, 0.035, 0.03, 5,  33, 3, 4, 50);
-insert into T_Meter_Default_Params values(4,  1, 2.5, 2.6,   2.5,  50, 34, 0, 1, 50);
-insert into T_Meter_Default_Params values(5,  1, 2.5, 0.8,   0.75, 20, 33, 1, 2, 50);
-insert into T_Meter_Default_Params values(6,  1, 2.5, 0.3,   0.25, 10, 33, 2, 3, 50);
-insert into T_Meter_Default_Params values(7,  1, 2.5, 0.06,  0.05, 5,  33, 3, 4, 50);
-insert into T_Meter_Default_Params values(8,  2, 3.5, 3.6,   3.5,  50, 34, 0, 1, 50);
-insert into T_Meter_Default_Params values(9,  2, 3.5, 1.1,   1.05, 20, 33, 1, 2, 50);
-insert into T_Meter_Default_Params values(10, 2, 3.5, 0.4,   0.35, 10, 33, 2, 3, 50);
-insert into T_Meter_Default_Params values(11, 2, 3.5, 0.08,  0.07, 5,  33, 3, 4, 50);
+insert into T_Meter_Default_Params values(0,  0, 1.5, 30,   1.5,  40, 34, 0, 1, 50);
+insert into T_Meter_Default_Params values(1,  0, 1.5, 7,    0.45, 20, 33, 1, 2, 50);
+insert into T_Meter_Default_Params values(2,  0, 1.5, 1.05, 0.15, 10, 33, 2, 3, 50);
+insert into T_Meter_Default_Params values(3,  0, 1.5, 0.15, 0.03, 5,  33, 3, 4, 50);
+insert into T_Meter_Default_Params values(4,  1, 2.5, 30,   2.5,  50, 34, 0, 1, 50);
+insert into T_Meter_Default_Params values(5,  1, 2.5, 7,    0.75, 20, 33, 1, 2, 50);
+insert into T_Meter_Default_Params values(6,  1, 2.5, 1.05, 0.25, 10, 33, 2, 3, 50);
+insert into T_Meter_Default_Params values(7,  1, 2.5, 0.15, 0.05, 5,  33, 3, 4, 50);
+insert into T_Meter_Default_Params values(8,  2, 3.5, 30,   3.5,  50, 34, 0, 1, 50);
+insert into T_Meter_Default_Params values(9,  2, 3.5, 7,    1.05, 20, 33, 1, 2, 50);
+insert into T_Meter_Default_Params values(10, 2, 3.5, 1.05, 0.35, 10, 33, 2, 3, 50);
+insert into T_Meter_Default_Params values(11, 2, 3.5, 0.15, 0.07, 5,  33, 3, 4, 50);
 
-insert into T_Meter_Default_Params values(12, 3, 6.0, 12,    6.0,  150, 34, 0, 1, 50);
-insert into T_Meter_Default_Params values(13, 3, 6.0, 3.6,   1.8,  30,  33, 1, 2, 50);
-insert into T_Meter_Default_Params values(14, 3, 6.0, 1.2,   0.6,  20,  33, 2, 3, 50);
-insert into T_Meter_Default_Params values(15, 3, 6.0, 0.24,  0.12, 10,  33, 3, 4, 50);
-insert into T_Meter_Default_Params values(16, 4, 10,  20,    10,   350, 34, 0, 1, 50);
-insert into T_Meter_Default_Params values(17, 4, 10,  6,     3,    35,  33, 1, 2, 50);
-insert into T_Meter_Default_Params values(18, 4, 10,  2,     1,    25,  33, 2, 3, 50);
-insert into T_Meter_Default_Params values(19, 4, 10,  0.4,   0.2,  15,  33, 3, 4, 50);
+insert into T_Meter_Default_Params values(12, 3, 6.0, 30,    6.0,  150, 34, 0, 1, 50);
+insert into T_Meter_Default_Params values(13, 3, 6.0, 7,     1.8,  30,  33, 1, 2, 50);
+insert into T_Meter_Default_Params values(14, 3, 6.0, 1.05,  0.6,  20,  33, 2, 3, 50);
+insert into T_Meter_Default_Params values(15, 3, 6.0, 0.15,  0.12, 10,  33, 3, 4, 50);
+insert into T_Meter_Default_Params values(16, 4, 10,  30,    10,   350, 34, 0, 1, 50);
+insert into T_Meter_Default_Params values(17, 4, 10,  7,     3,    35,  33, 1, 2, 50);
+insert into T_Meter_Default_Params values(18, 4, 10,  1.05,  1,    25,  33, 2, 3, 50);
+insert into T_Meter_Default_Params values(19, 4, 10,  0.15,  0.2,  15,  33, 3, 4, 50);
 insert into T_Meter_Default_Params values(20, 5, 15,  30,    15,   450, 34, 0, 1, 50);
-insert into T_Meter_Default_Params values(21, 5, 15,  9.0,   4.5,  40,  33, 1, 2, 50);
-insert into T_Meter_Default_Params values(22, 5, 15,  3.0,   1.5,  30,  33, 2, 3, 50);
-insert into T_Meter_Default_Params values(23, 5, 15,  0.6,   0.3,  20,  33, 3, 4, 50);
+insert into T_Meter_Default_Params values(21, 5, 15,  7,     4.5,  40,  33, 1, 2, 50);
+insert into T_Meter_Default_Params values(22, 5, 15,  1.05,  1.5,  30,  33, 2, 3, 50);
+insert into T_Meter_Default_Params values(23, 5, 15,  0.15,  0.3,  20,  33, 3, 4, 50);
 
 ---------------------------------
 --表型号
