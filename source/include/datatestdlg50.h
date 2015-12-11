@@ -31,15 +31,6 @@ class ReadComConfig;
 ** 功能：数据采集与测试
 */
 
-#define WAIT_SECOND (m_pickCycleTime/1000)//等待调节阀到位并水流稳定时间(单位秒)
-#define PRECISION (0.03*targetRate)//流速设定误差限
-
-////////////////////增量式参数//////////////
-//#define PID_A
-//#define PID_B
-//#define PID_C
-///////////////////////////////////////////
-
 class DATATESTDLG_EXPORT DataTestDlg50 : public QWidget
 {
 	Q_OBJECT
@@ -186,13 +177,6 @@ public slots:
 	void on_lnEditInStdResist_textChanged(const QString & text);
 	void on_lnEditOutStdResist_textChanged(const QString & text);
 
-	void on_lnEditTargetRate_returnPressed();//设定目标流量
-	void on_lnEditMaxRate_returnPressed();//设定最大流速
-	void on_lnEditKp_returnPressed();
-	void on_lnEditKi_returnPressed();
-	void on_lnEditKd_returnPressed();
-	void on_lnEditCycleTime_returnPressed();
-
 	void slotAskStdTemperature();
 	void clearMeterDispInfo();
 	void setMeterComboxEnabled(bool flag);
@@ -232,41 +216,7 @@ private:
 	float getAccumFLowVolume(flow_rate_wdg idx);
 
 	/******************标准流量计end***************************/
-
-	/*******************电动调节阀******************************/
-	QTimer *m_setRegularTimer;
-	QTimer *m_recCurrentRateTimer;//记录当前流速计时器
-	float m_maxRate;
-	float m_pre_error;
-	float m_curr_error;
-	float m_integral;
-	int m_degree;
-	int m_pumpFreq;
-	int m_openRegulateTimes;
-	float m_targetRate;
-	float m_currentRate;
-
-	float m_Kp;
-	float m_Ki;
-	float m_Kd;
-	int m_pickCycleTime;//设定周期
-
-	QString m_timeStamp;
-	bool m_maxRateGetted;//是否已获取过最大流量值
-	bool m_ifGainTargetRate;//是否已达到目标流量值
-	PIDDataPtr m_pidDataPtr;
-	//-------增量式-------//
-	//int m_pickErrTimes;//从开始到现在的偏差采集次数
-	//int m_mostNearlyErr;
-	//int m_preNearlyErr;
-	//int m_mostNearlyErr;
-	//-------------------//
-	void setRegulate(float currentRate, float targetRate);
-	int degreeGet(float currentRate, float targetRate);
-	void stopSetRegularTimer();
-	void savePidParams();
-	void installPidParams();
-	/******************电动调节阀end***************************/
+	
 private slots:
 	/*******************标准流量计******************************/
 	void slotAskInstPulse();//请求瞬时流量
@@ -277,7 +227,6 @@ private slots:
 	/******************标准流量计end***************************/
 
 	/*******************电动调节阀******************************/
-	void slotSetRegulate();
 	void openPump();
 	void closePump();
 
