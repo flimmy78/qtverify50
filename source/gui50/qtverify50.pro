@@ -15,7 +15,7 @@ QMAKE_LIBDIR = 	$(ADEHOME)/lib \
                 $(ADEHOME)/bin \
 
 								
-LIBS += -lalgorithm -lsystemsetdlg -ldatatestdlg50 -lqaxserver -lmasterslaveset -llogindialog \
+LIBS += -lalgorithm -lsystemsetdlg50 -ldatatestdlg50 -lqaxserver -lmasterslaveset -llogindialog \
 				-lqtexdb -lreport -lcalcverify -ltvercomp -ltverparam -lcmbverify -lresultquerydlg \
 				-lmd5encode -lscancodedlg -ladjustratedlg -lusermanagedlg	\
 				-lflowweight50 -lflowstandard50 -lwaterweight50 -ltotalweight50 #-ltotalstandard50 -lwaterweight -lwaterstandard

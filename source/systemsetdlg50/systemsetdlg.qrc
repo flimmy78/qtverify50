@@ -1,0 +1,11 @@
+<RCC>
+  <qresource prefix="systemsetdlg">
+    <file>images/comset.png</file>
+    <file>images/portset.png</file>
+    <file>images/stdmeterparaset.png</file>
+    <file>images/stdmetercoeset.png</file>
+    <file>images/stdptparaset.png</file>
+    <file>images/ptparaset.png</file>
+    <file>images/setting.png</file>
+  </qresource>
+</RCC>
