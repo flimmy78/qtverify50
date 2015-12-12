@@ -757,6 +757,10 @@ select
   rec.F_Result,
   rec.F_MeterPosNo,
   rec.F_Model,
+  rec.F_WaterPress,
+  rec.F_Q3,
+  rec.F_Q3BiQ1,
+  rec.F_Q2BiQ1,
   mo.F_Name F_Model_en,
   mo.F_Desc F_Model_zh,
   st.f_name F_Standard,
@@ -791,8 +795,6 @@ select
 	order by rec.F_MeterPosNo, rec.f_meterno, rec.f_timestamp
 ;'
 );
-
-
 -----------------------------------------------------------------
 --                    PID创建语句表                     ----
 -----------------------------------------------------------------
