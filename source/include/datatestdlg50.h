@@ -123,10 +123,10 @@ public slots:
 	void on_btnWaterPump_clicked(); //水泵
 
 	void on_btnSetFreq_clicked(); //设置频率
-	void on_btnRegulate1_clicked();
-	void on_btnRegulate2_clicked();
-	void on_btnRegulate3_clicked();
-	void on_btnRegulate4_clicked();
+	void on_btnRegulateSmall_clicked();
+	void on_btnRegulateMid1_clicked();
+	void on_btnRegulateMid2_clicked();
+	void on_btnRegulateBig_clicked();
 	void setRegulate(int retNO, int opening);
 
 	void on_btnParaSet_clicked();
@@ -230,10 +230,10 @@ private slots:
 	void openPump();
 	void closePump();
 
-	void on_lineEditDN3_textChanged(const QString & text);
-	void on_lineEditDN10_textChanged(const QString & text);
-	void on_lineEditDN25_textChanged(const QString & text);
-	void on_lineEditDN50_textChanged(const QString & text);
+	void on_lineEditOpeningSmall_textChanged(const QString & text);
+	void on_lineEditOpeningMid1_textChanged(const QString & text);
+	void on_lineEditOpeningMid2_textChanged(const QString & text);
+	void on_lineEditOpeningBig_textChanged(const QString & text);
 	/******************电动调节阀end***************************/
 };
 

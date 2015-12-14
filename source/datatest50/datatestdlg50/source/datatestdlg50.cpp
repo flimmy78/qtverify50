@@ -27,10 +27,10 @@ DataTestDlg50::DataTestDlg50(QWidget *parent, Qt::WFlags flags)
 {
 	ui.setupUi(this);
 	m_stdParam = new QSettings(getFullIniFileName("stdmtrparaset.ini"), QSettings::IniFormat);
-	ui.ThermoDN3->setValue(80);
-	ui.ThermoDN10->setValue(70);
-	ui.ThermoDN25->setValue(60);
-	ui.ThermoDN50->setValue(50);
+	ui.ThermoSmall->setValue(80);
+	ui.ThermoMid1->setValue(70);
+	ui.ThermoMid2->setValue(60);
+	ui.ThermoBig->setValue(50);
 }
 
 DataTestDlg50::~DataTestDlg50()
@@ -515,27 +515,27 @@ void DataTestDlg50::initRegulateStatus()
 	m_nowRegNo = 0;
 
 	//端口号-调节阀按钮 映射关系
-	m_regBtn[m_portsetinfo.regflow1No] = ui.btnRegulate1;
-	m_regBtn[m_portsetinfo.regflow2No] = ui.btnRegulate2;
-	m_regBtn[m_portsetinfo.regflow3No] = ui.btnRegulate3;
-	m_regBtn[m_portsetinfo.regflow4No] = ui.btnRegulate4;
+	m_regBtn[m_portsetinfo.regSmallNo] = ui.btnRegulateSmall;
+	m_regBtn[m_portsetinfo.regMid1No] = ui.btnRegulateMid1;
+	m_regBtn[m_portsetinfo.regMid2No] = ui.btnRegulateMid2;
+	m_regBtn[m_portsetinfo.regBigNo] = ui.btnRegulateBig;
 
 	//调节阀初始状态
-	m_regStatus[m_portsetinfo.regflow1No] = REG_SUCCESS;
-	m_regStatus[m_portsetinfo.regflow2No] = REG_SUCCESS;
-	m_regStatus[m_portsetinfo.regflow3No] = REG_SUCCESS;
-	m_regStatus[m_portsetinfo.regflow4No] = REG_SUCCESS;
+	m_regStatus[m_portsetinfo.regSmallNo] = REG_SUCCESS;
+	m_regStatus[m_portsetinfo.regMid1No] = REG_SUCCESS;
+	m_regStatus[m_portsetinfo.regMid2No] = REG_SUCCESS;
+	m_regStatus[m_portsetinfo.regBigNo] = REG_SUCCESS;
 
-	setRegBtnBackColor(m_regBtn[m_portsetinfo.regflow1No], m_regStatus[m_portsetinfo.regflow1No]);
-	setRegBtnBackColor(m_regBtn[m_portsetinfo.regflow2No], m_regStatus[m_portsetinfo.regflow2No]);
-	setRegBtnBackColor(m_regBtn[m_portsetinfo.regflow3No], m_regStatus[m_portsetinfo.regflow3No]);
-	setRegBtnBackColor(m_regBtn[m_portsetinfo.regflow4No], m_regStatus[m_portsetinfo.regflow4No]);
+	setRegBtnBackColor(m_regBtn[m_portsetinfo.regSmallNo], m_regStatus[m_portsetinfo.regSmallNo]);
+	setRegBtnBackColor(m_regBtn[m_portsetinfo.regMid1No], m_regStatus[m_portsetinfo.regMid1No]);
+	setRegBtnBackColor(m_regBtn[m_portsetinfo.regMid2No], m_regStatus[m_portsetinfo.regMid2No]);
+	setRegBtnBackColor(m_regBtn[m_portsetinfo.regBigNo], m_regStatus[m_portsetinfo.regBigNo]);
 
 	//端口号-调节阀开度显示行 映射关系
-	m_regLineEdit[m_portsetinfo.regflow1No] = ui.lineEditDN3;
-	m_regLineEdit[m_portsetinfo.regflow2No] = ui.lineEditDN10;
-	m_regLineEdit[m_portsetinfo.regflow3No] = ui.lineEditDN25;
-	m_regLineEdit[m_portsetinfo.regflow4No] = ui.lineEditDN50;
+	m_regLineEdit[m_portsetinfo.regSmallNo] = ui.lineEditOpeningSmall;
+	m_regLineEdit[m_portsetinfo.regMid1No] = ui.lineEditOpeningMid1;
+	m_regLineEdit[m_portsetinfo.regMid2No] = ui.lineEditOpeningMid2;
+	m_regLineEdit[m_portsetinfo.regBigNo] = ui.lineEditOpeningBig;
 }
 
 //打开热量表通讯串口
@@ -624,7 +624,7 @@ void DataTestDlg50::on_btnValveBig_clicked() //大流量阀
 	m_nowPortNo = m_portsetinfo.bigNo;
 	operateRelay();
 
-	m_nowRegNo = m_portsetinfo.regflow1No;
+	m_nowRegNo = m_portsetinfo.regSmallNo;
 }
 
 void DataTestDlg50::on_btnValveMiddle1_clicked() //中流一阀
@@ -632,7 +632,7 @@ void DataTestDlg50::on_btnValveMiddle1_clicked() //中流一阀
 	m_nowPortNo = m_portsetinfo.middle1No;
 	operateRelay();
 
-	m_nowRegNo = m_portsetinfo.regflow2No;
+	m_nowRegNo = m_portsetinfo.regMid1No;
 }
 
 void DataTestDlg50::on_btnValveMiddle2_clicked() //中流二阀
@@ -683,24 +683,24 @@ void DataTestDlg50::closePump()
 	}
 }
 
-void DataTestDlg50::on_lineEditDN3_textChanged(const QString & text)
+void DataTestDlg50::on_lineEditOpeningSmall_textChanged(const QString & text)
 {
-	ui.ThermoDN3->setValue(text.toFloat());
+	ui.ThermoSmall->setValue(text.toFloat());
 }
 
-void DataTestDlg50::on_lineEditDN10_textChanged(const QString & text)
+void DataTestDlg50::on_lineEditOpeningMid1_textChanged(const QString & text)
 {
-	ui.ThermoDN10->setValue(text.toFloat());
+	ui.ThermoMid1->setValue(text.toFloat());
 }
 
-void DataTestDlg50::on_lineEditDN25_textChanged(const QString & text)
+void DataTestDlg50::on_lineEditOpeningMid2_textChanged(const QString & text)
 {
-	ui.ThermoDN25->setValue(text.toFloat());
+	ui.ThermoMid2->setValue(text.toFloat());
 }
 
-void DataTestDlg50::on_lineEditDN50_textChanged(const QString & text)
+void DataTestDlg50::on_lineEditOpeningBig_textChanged(const QString & text)
 {
-	ui.ThermoDN50->setValue(text.toFloat());
+	ui.ThermoBig->setValue(text.toFloat());
 }
 
 //设置频率
@@ -721,7 +721,7 @@ void DataTestDlg50::setRegulate(int regNO, int opening)
 	{
 		m_controlObj2->askControlRegulate(regNO-3, opening);
 	}
-/*
+
 	int sec = REGULATE_OPEN_TIME*opening/100;
 	float interval = (float)100/REGULATE_OPEN_TIME;
 	float value = 0;
@@ -731,31 +731,31 @@ void DataTestDlg50::setRegulate(int regNO, int opening)
 		value += interval;
 		wait(1000);
 	} while (sec--);
-	*/
+	
 }
 
-void DataTestDlg50::on_btnRegulate1_clicked() //调节阀1-DN3
+void DataTestDlg50::on_btnRegulateSmall_clicked() //调节阀1-DN3
 {
-	m_nowRegNo = m_portsetinfo.regflow1No;
-	setRegulate(m_nowRegNo, ui.spinBoxValveOpening->value());
+	m_nowRegNo = m_portsetinfo.regSmallNo;
+	setRegulate(m_nowRegNo, ui.spinBoxOpeningSmall->value());
 }
 
-void DataTestDlg50::on_btnRegulate2_clicked() //调节阀2-DN10
+void DataTestDlg50::on_btnRegulateMid1_clicked() //调节阀2-DN10
 {
-	m_nowRegNo = m_portsetinfo.regflow2No;
-	setRegulate(m_nowRegNo, ui.spinBoxValveOpening->value());
+	m_nowRegNo = m_portsetinfo.regMid1No;
+	setRegulate(m_nowRegNo, ui.spinBoxOpeningMid1->value());
 }
 
-void DataTestDlg50::on_btnRegulate3_clicked() //调节阀3-DN25
+void DataTestDlg50::on_btnRegulateMid2_clicked() //调节阀3-DN25
 {
-	m_nowRegNo = m_portsetinfo.regflow3No;
-	setRegulate(m_nowRegNo, ui.spinBoxValveOpening->value());
+	m_nowRegNo = m_portsetinfo.regMid2No;
+	setRegulate(m_nowRegNo, ui.spinBoxOpeningMid2->value());
 }
 
-void DataTestDlg50::on_btnRegulate4_clicked() //调节阀4-DN50
+void DataTestDlg50::on_btnRegulateBig_clicked() //调节阀4-DN50
 {
-	m_nowRegNo = m_portsetinfo.regflow4No;
-	setRegulate(m_nowRegNo, ui.spinBoxValveOpening->value());
+	m_nowRegNo = m_portsetinfo.regBigNo;
+	setRegulate(m_nowRegNo, ui.spinBoxOpeningBig->value());
 }
 
 //参数设置
