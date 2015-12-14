@@ -793,7 +793,7 @@ void DataTestDlg50::setRegulate(int regNO, int opening)
 void DataTestDlg50::on_btnRegulateSmall_clicked() //调节阀1-DN3
 {
 	m_nowRegNo = m_portsetinfo.regSmallNo;
-	m_smallOpening = 0;
+	m_smallOpening = ui.ThermoSmall->value();
 	setRegulate(m_nowRegNo, ui.spinBoxOpeningSmall->value());
 	m_regSmallTimer->start(REGULATE_FRESH_TIME);
 }
@@ -801,7 +801,7 @@ void DataTestDlg50::on_btnRegulateSmall_clicked() //调节阀1-DN3
 void DataTestDlg50::on_btnRegulateMid1_clicked() //调节阀2-DN10
 {
 	m_nowRegNo = m_portsetinfo.regMid1No;
-	m_mid1Opening = 0;
+	m_mid1Opening = ui.ThermoMid1->value();
 	setRegulate(m_nowRegNo, ui.spinBoxOpeningMid1->value());
 	m_regMid1Timer->start(REGULATE_FRESH_TIME);
 }
@@ -809,7 +809,7 @@ void DataTestDlg50::on_btnRegulateMid1_clicked() //调节阀2-DN10
 void DataTestDlg50::on_btnRegulateMid2_clicked() //调节阀3-DN25
 {
 	m_nowRegNo = m_portsetinfo.regMid2No;
-	m_mid2Opening = 0;
+	m_mid2Opening = ui.ThermoMid2->value();
 	setRegulate(m_nowRegNo, ui.spinBoxOpeningMid2->value());
 	m_regMid2Timer->start(REGULATE_FRESH_TIME);
 }
@@ -817,14 +817,22 @@ void DataTestDlg50::on_btnRegulateMid2_clicked() //调节阀3-DN25
 void DataTestDlg50::on_btnRegulateBig_clicked() //调节阀4-DN50
 {
 	m_nowRegNo = m_portsetinfo.regBigNo;
-	m_bigOpening = 0;
+	m_bigOpening = ui.ThermoBig->value();
 	setRegulate(m_nowRegNo, ui.spinBoxOpeningBig->value());
 	m_regBigTimer->start(REGULATE_FRESH_TIME);
 }
 
 void DataTestDlg50::slotFreshSmallRegOpening()
 {
-	ui.lineEditOpeningSmall->setText(QString("%1").arg(m_smallOpening++));
+	if (ui.ThermoSmall->value() < ui.spinBoxOpeningSmall->value())
+	{
+		ui.lineEditOpeningSmall->setText(QString("%1").arg(m_smallOpening++));
+	}
+	else
+	{
+		ui.lineEditOpeningSmall->setText(QString("%1").arg(m_smallOpening--));
+	}
+
 	if (ui.lineEditOpeningSmall->text().toInt() == ui.spinBoxOpeningSmall->value())
 	{
 		m_regSmallTimer->stop();
@@ -833,7 +841,15 @@ void DataTestDlg50::slotFreshSmallRegOpening()
 
 void DataTestDlg50::slotFreshMid1RegOpening()
 {
-	ui.lineEditOpeningMid1->setText(QString("%1").arg(m_mid1Opening++));
+	if (ui.ThermoMid1->value() < ui.spinBoxOpeningMid1->value())
+	{
+		ui.lineEditOpeningMid1->setText(QString("%1").arg(m_mid1Opening++));
+	}
+	else
+	{
+		ui.lineEditOpeningMid1->setText(QString("%1").arg(m_mid1Opening--));
+	}
+
 	if (ui.lineEditOpeningMid1->text().toInt() == ui.spinBoxOpeningMid1->value())
 	{
 		m_regMid1Timer->stop();
@@ -842,7 +858,15 @@ void DataTestDlg50::slotFreshMid1RegOpening()
 
 void DataTestDlg50::slotFreshMid2RegOpening()
 {
-	ui.lineEditOpeningMid2->setText(QString("%1").arg(m_mid2Opening++));
+	if (ui.ThermoMid2->value() < ui.spinBoxOpeningMid2->value())
+	{
+		ui.lineEditOpeningMid2->setText(QString("%1").arg(m_mid2Opening++));
+	}
+	else
+	{
+		ui.lineEditOpeningMid2->setText(QString("%1").arg(m_mid2Opening--));
+	}
+
 	if (ui.lineEditOpeningMid2->text().toInt() == ui.spinBoxOpeningMid2->value())
 	{
 		m_regMid2Timer->stop();
@@ -851,7 +875,15 @@ void DataTestDlg50::slotFreshMid2RegOpening()
 
 void DataTestDlg50::slotFreshBigRegOpening()
 {
-	ui.lineEditOpeningBig->setText(QString("%1").arg(m_bigOpening++));
+	if (ui.ThermoBig->value() < ui.spinBoxOpeningBig->value())
+	{
+		ui.lineEditOpeningBig->setText(QString("%1").arg(m_bigOpening++));
+	}
+	else
+	{
+		ui.lineEditOpeningBig->setText(QString("%1").arg(m_bigOpening--));
+	}
+
 	if (ui.lineEditOpeningBig->text().toInt() == ui.spinBoxOpeningBig->value())
 	{
 		m_regBigTimer->stop();
