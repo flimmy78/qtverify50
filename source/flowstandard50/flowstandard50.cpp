@@ -2228,7 +2228,7 @@ void FlowStandardDlg50::slotGetInstStdMeterPulse(const QByteArray & valueArray)
 	//{
 	//	instValue += getFlowValueByValve(FLOW_RATE_SMALL, INST_FLOW_VALUE);
 	//}
-	instValue = ui.lcdInstStdMeter_3->value()+ui.lcdInstStdMeter_10->value()+ui.lcdInstStdMeter_25->value();
+	instValue = ui.lcdInstStdMeter_3->value()+ui.lcdInstStdMeter_10->value()+ui.lcdInstStdMeter_25->value()+ui.lcdInstStdMeter_50->value();
 	ui.lcdFlowRate->display(instValue);
 }
 
@@ -2342,20 +2342,22 @@ void FlowStandardDlg50::slotGetAccumStdMeterPulse(const QByteArray & valueArray)
 	//	accumValue += getFlowValueByValve(FLOW_RATE_SMALL, ACCUM_FLOW_VALUE);
 	//}
 
-	accumValue = ui.lcdAccumStdMeter_3->value()+ui.lcdAccumStdMeter_10->value()+ui.lcdAccumStdMeter_25->value();
+	accumValue = ui.lcdAccumStdMeter_3->value()+ui.lcdAccumStdMeter_10->value()+ui.lcdAccumStdMeter_25->value()+ui.lcdAccumStdMeter_50->value();
 	ui.lcdAccumStdMeter->display(accumValue);	
 }
 
 void FlowStandardDlg50::freshInstStdMeter()
 {
-	ui.lcdInstStdMeter_25->display(getInstFlowRate(FLOW_RATE_BIG));
+	ui.lcdInstStdMeter_50->display(getInstFlowRate(FLOW_RATE_BIG));
+	ui.lcdInstStdMeter_25->display(getInstFlowRate(FLOW_RATE_MID_2));
 	ui.lcdInstStdMeter_10->display(getInstFlowRate(FLOW_RATE_MID_1));
 	ui.lcdInstStdMeter_3->display(getInstFlowRate(FLOW_RATE_SMALL));
 }
 
 void FlowStandardDlg50::freshAccumStdMeter()
 {
-	ui.lcdAccumStdMeter_25->display(getAccumFLowVolume(FLOW_RATE_BIG));
+	ui.lcdAccumStdMeter_50->display(getAccumFLowVolume(FLOW_RATE_BIG));
+	ui.lcdAccumStdMeter_25->display(getAccumFLowVolume(FLOW_RATE_MID_2));
 	ui.lcdAccumStdMeter_10->display(getAccumFLowVolume(FLOW_RATE_MID_1));
 	ui.lcdAccumStdMeter_3->display(getAccumFLowVolume(FLOW_RATE_SMALL));
 }
