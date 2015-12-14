@@ -27,10 +27,6 @@ DataTestDlg50::DataTestDlg50(QWidget *parent, Qt::WFlags flags)
 {
 	ui.setupUi(this);
 	m_stdParam = new QSettings(getFullIniFileName("stdmtrparaset.ini"), QSettings::IniFormat);
-	ui.ThermoSmall->setValue(80);
-	ui.ThermoMid1->setValue(70);
-	ui.ThermoMid2->setValue(60);
-	ui.ThermoBig->setValue(50);
 }
 
 DataTestDlg50::~DataTestDlg50()
@@ -199,6 +195,48 @@ void DataTestDlg50::closeEvent( QCloseEvent * event)
 			m_accumulateFlowCom = NULL;
 		}
 	}
+
+	//计时器，用于动态显示调节阀开度
+	if (m_regSmallTimer)
+	{
+		if (m_regSmallTimer->isActive())
+		{
+			m_regSmallTimer->stop();
+		}
+		delete m_regSmallTimer;
+		m_regSmallTimer = NULL;
+	}
+
+	if (m_regMid1Timer)
+	{
+		if (m_regMid1Timer->isActive())
+		{
+			m_regMid1Timer->stop();
+		}
+		delete m_regMid1Timer;
+		m_regMid1Timer = NULL;
+	}
+
+	if (m_regMid2Timer)
+	{
+		if (m_regMid2Timer->isActive())
+		{
+			m_regMid2Timer->stop();
+		}
+		delete m_regMid2Timer;
+		m_regMid2Timer = NULL;
+	}
+
+	if (m_regBigTimer)
+	{
+		if (m_regBigTimer->isActive())
+		{
+			m_regBigTimer->stop();
+		}
+		delete m_regBigTimer;
+		m_regBigTimer = NULL;
+	}
+
 }
 
 void DataTestDlg50::showEvent(QShowEvent *event)
@@ -536,6 +574,24 @@ void DataTestDlg50::initRegulateStatus()
 	m_regLineEdit[m_portsetinfo.regMid1No] = ui.lineEditOpeningMid1;
 	m_regLineEdit[m_portsetinfo.regMid2No] = ui.lineEditOpeningMid2;
 	m_regLineEdit[m_portsetinfo.regBigNo] = ui.lineEditOpeningBig;
+
+	//计时器，动态显示调节阀开度
+	m_smallOpening = 0;
+	m_regSmallTimer = new QTimer();
+	connect(m_regSmallTimer, SIGNAL(timeout()), this, SLOT(slotFreshSmallRegOpening()));
+
+	m_mid1Opening = 0;
+	m_regMid1Timer = new QTimer();
+	connect(m_regMid1Timer, SIGNAL(timeout()), this, SLOT(slotFreshMid1RegOpening()));
+
+	m_mid2Opening = 0;
+	m_regMid2Timer = new QTimer();
+	connect(m_regMid2Timer, SIGNAL(timeout()), this, SLOT(slotFreshMid2RegOpening()));
+
+	m_bigOpening = 0;
+	m_regBigTimer = new QTimer();
+	connect(m_regBigTimer, SIGNAL(timeout()), this, SLOT(slotFreshBigRegOpening()));
+
 }
 
 //打开热量表通讯串口
@@ -721,7 +777,7 @@ void DataTestDlg50::setRegulate(int regNO, int opening)
 	{
 		m_controlObj2->askControlRegulate(regNO-3, opening);
 	}
-
+/*
 	int sec = REGULATE_OPEN_TIME*opening/100;
 	float interval = (float)100/REGULATE_OPEN_TIME;
 	float value = 0;
@@ -731,31 +787,75 @@ void DataTestDlg50::setRegulate(int regNO, int opening)
 		value += interval;
 		wait(1000);
 	} while (sec--);
-	
+*/	
 }
 
 void DataTestDlg50::on_btnRegulateSmall_clicked() //调节阀1-DN3
 {
 	m_nowRegNo = m_portsetinfo.regSmallNo;
+	m_smallOpening = 0;
 	setRegulate(m_nowRegNo, ui.spinBoxOpeningSmall->value());
+	m_regSmallTimer->start(REGULATE_FRESH_TIME);
 }
 
 void DataTestDlg50::on_btnRegulateMid1_clicked() //调节阀2-DN10
 {
 	m_nowRegNo = m_portsetinfo.regMid1No;
+	m_mid1Opening = 0;
 	setRegulate(m_nowRegNo, ui.spinBoxOpeningMid1->value());
+	m_regMid1Timer->start(REGULATE_FRESH_TIME);
 }
 
 void DataTestDlg50::on_btnRegulateMid2_clicked() //调节阀3-DN25
 {
 	m_nowRegNo = m_portsetinfo.regMid2No;
+	m_mid2Opening = 0;
 	setRegulate(m_nowRegNo, ui.spinBoxOpeningMid2->value());
+	m_regMid2Timer->start(REGULATE_FRESH_TIME);
 }
 
 void DataTestDlg50::on_btnRegulateBig_clicked() //调节阀4-DN50
 {
 	m_nowRegNo = m_portsetinfo.regBigNo;
+	m_bigOpening = 0;
 	setRegulate(m_nowRegNo, ui.spinBoxOpeningBig->value());
+	m_regBigTimer->start(REGULATE_FRESH_TIME);
+}
+
+void DataTestDlg50::slotFreshSmallRegOpening()
+{
+	ui.lineEditOpeningSmall->setText(QString("%1").arg(m_smallOpening++));
+	if (ui.lineEditOpeningSmall->text().toInt() == ui.spinBoxOpeningSmall->value())
+	{
+		m_regSmallTimer->stop();
+	}
+}
+
+void DataTestDlg50::slotFreshMid1RegOpening()
+{
+	ui.lineEditOpeningMid1->setText(QString("%1").arg(m_mid1Opening++));
+	if (ui.lineEditOpeningMid1->text().toInt() == ui.spinBoxOpeningMid1->value())
+	{
+		m_regMid1Timer->stop();
+	}
+}
+
+void DataTestDlg50::slotFreshMid2RegOpening()
+{
+	ui.lineEditOpeningMid2->setText(QString("%1").arg(m_mid2Opening++));
+	if (ui.lineEditOpeningMid2->text().toInt() == ui.spinBoxOpeningMid2->value())
+	{
+		m_regMid2Timer->stop();
+	}
+}
+
+void DataTestDlg50::slotFreshBigRegOpening()
+{
+	ui.lineEditOpeningBig->setText(QString("%1").arg(m_bigOpening++));
+	if (ui.lineEditOpeningBig->text().toInt() == ui.spinBoxOpeningBig->value())
+	{
+		m_regBigTimer->stop();
+	}
 }
 
 //参数设置

@@ -27,7 +27,7 @@ class ParaSetDlg;
 class ReadComConfig;
 
 /*
-** 类名：DataTestDlg
+** 类名：DataTestDlg50
 ** 功能：数据采集与测试
 */
 
@@ -95,6 +95,15 @@ public:
 	PortSet_Ini_STR m_portsetinfo; //50台子的端口配置
 
 	MeterCoe_PTR m_oldCoe; //热表当前流量点系数
+
+	QTimer *m_regSmallTimer; //计时器，用于动态显示小调节阀的开度
+	int m_smallOpening; 
+	QTimer *m_regMid1Timer; //计时器，用于动态显示中一调节阀的开度
+	int m_mid1Opening; 
+	QTimer *m_regMid2Timer; //计时器，用于动态显示中二调节阀的开度
+	int m_mid2Opening; 
+	QTimer *m_regBigTimer;  //计时器，用于动态显示大调节阀的开度
+	int m_bigOpening; 
 
 	void closeEvent(QCloseEvent * event);
 	void showEvent(QShowEvent *event);
@@ -221,19 +230,23 @@ private slots:
 	/*******************标准流量计******************************/
 	void slotAskInstPulse();//请求瞬时流量
 	void slotAskAccumPulse();//请求累积流量
-
 	void slotGetInstStdMeterPulse(const QByteArray &);//瞬时流量槽函数
 	void slotGetAccumStdMeterPulse(const QByteArray &);//累积流量槽函数
 	/******************标准流量计end***************************/
 
-	/*******************电动调节阀******************************/
 	void openPump();
 	void closePump();
 
+	/*******************电动调节阀******************************/
 	void on_lineEditOpeningSmall_textChanged(const QString & text);
 	void on_lineEditOpeningMid1_textChanged(const QString & text);
 	void on_lineEditOpeningMid2_textChanged(const QString & text);
 	void on_lineEditOpeningBig_textChanged(const QString & text);
+
+	void slotFreshSmallRegOpening();
+	void slotFreshMid1RegOpening();
+	void slotFreshMid2RegOpening();
+	void slotFreshBigRegOpening();
 	/******************电动调节阀end***************************/
 };
 
