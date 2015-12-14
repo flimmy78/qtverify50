@@ -2208,26 +2208,10 @@ void FlowStandardDlg50::saveStartMeterNO()
 
 void FlowStandardDlg50::slotGetInstStdMeterPulse(const QByteArray & valueArray)
 {
-	m_instStdPulse = valueArray;
+	m_instStdCurrent = valueArray;
 	freshInstStdMeter();
 	float instValue = 0.0;//瞬时流量
-	//m_instRouteIsRead.clear();//每次采集前, 清空通道队列
-	//if (m_valveStatus[m_portsetinfo.bigNo])
-	//{
-	//	instValue += getFlowValueByValve(FLOW_RATE_BIG, INST_FLOW_VALUE);
-	//}
-	//if (m_valveStatus[m_portsetinfo.middle2No])
-	//{
-	//	instValue += getFlowValueByValve(FLOW_RATE_MID_2, INST_FLOW_VALUE);
-	//}
-	//if (m_valveStatus[m_portsetinfo.middle1No])
-	//{
-	//	instValue += getFlowValueByValve(FLOW_RATE_MID_1, INST_FLOW_VALUE);
-	//}
-	//if (m_valveStatus[m_portsetinfo.smallNo])
-	//{
-	//	instValue += getFlowValueByValve(FLOW_RATE_SMALL, INST_FLOW_VALUE);
-	//}
+
 	instValue = ui.lcdInstStdMeter_3->value()+ui.lcdInstStdMeter_10->value()+ui.lcdInstStdMeter_25->value()+ui.lcdInstStdMeter_50->value();
 	ui.lcdFlowRate->display(instValue);
 }
@@ -2292,13 +2276,8 @@ float FlowStandardDlg50::getStdUpperFlow(flow_rate_wdg wdgIdx)
 {
 	float upperFlow = 0.0f;
 
-	m_stdParam->beginReadArray("Route");
-	m_stdParam->setArrayIndex(wdgIdx);
-	int diamWdg = m_stdParam->value("Diameter").toInt();//读取管径的部件号
-	m_stdParam->endArray();
-	
 	m_stdParam->beginReadArray("FlowRate");
-	m_stdParam->setArrayIndex(diamWdg);
+	m_stdParam->setArrayIndex(wdgIdx);
 	upperFlow = m_stdParam->value("UpperFlow").toFloat();
 	m_stdParam->endArray();
 	return upperFlow;
@@ -2307,13 +2286,9 @@ float FlowStandardDlg50::getStdUpperFlow(flow_rate_wdg wdgIdx)
 float FlowStandardDlg50::getStdPulse(flow_rate_wdg wdgIdx)
 {
 	float pulse = 0.0f;
-	m_stdParam->beginReadArray("Route");
-	m_stdParam->setArrayIndex(wdgIdx);
-	int diamWdg = m_stdParam->value("Diameter").toInt();//读取管径的部件号
-	m_stdParam->endArray();
 
 	m_stdParam->beginReadArray("Pulse");
-	m_stdParam->setArrayIndex(diamWdg);
+	m_stdParam->setArrayIndex(wdgIdx);
 	pulse = m_stdParam->value("Pulse").toFloat();
 	m_stdParam->endArray();
 	return pulse;
@@ -2324,23 +2299,6 @@ void FlowStandardDlg50::slotGetAccumStdMeterPulse(const QByteArray & valueArray)
 	m_accumStdPulse = valueArray;
 	freshAccumStdMeter();
 	float accumValue = 0.0;//累积流量
-	//m_accumRouteIsRead.clear();//每次采集前, 清空通道队列
-	//if (m_valveStatus[m_portsetinfo.bigNo])
-	//{
-	//	accumValue += getFlowValueByValve(FLOW_RATE_BIG, ACCUM_FLOW_VALUE);
-	//}
-	//if (m_valveStatus[m_portsetinfo.middle2No])
-	//{
-	//	accumValue += getFlowValueByValve(FLOW_RATE_MID_2, ACCUM_FLOW_VALUE);
-	//}
-	//if (m_valveStatus[m_portsetinfo.middle1No])
-	//{
-	//	accumValue += getFlowValueByValve(FLOW_RATE_MID_1, ACCUM_FLOW_VALUE);
-	//}
-	//if (m_valveStatus[m_portsetinfo.smallNo])
-	//{
-	//	accumValue += getFlowValueByValve(FLOW_RATE_SMALL, ACCUM_FLOW_VALUE);
-	//}
 
 	accumValue = ui.lcdAccumStdMeter_3->value()+ui.lcdAccumStdMeter_10->value()+ui.lcdAccumStdMeter_25->value()+ui.lcdAccumStdMeter_50->value();
 	ui.lcdAccumStdMeter->display(accumValue);	
@@ -2369,7 +2327,7 @@ float FlowStandardDlg50::getInstFlowRate(flow_rate_wdg idx)
 	{
 		return 0.0;
 	}
-	int count = get9017RouteI(route, m_instStdPulse);
+	int count = get9017RouteI(route, m_instStdCurrent);
 	float upperFlow = getStdUpperFlow(idx);
 	return getInstStdValue(count, upperFlow);
 }

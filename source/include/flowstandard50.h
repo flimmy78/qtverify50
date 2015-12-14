@@ -238,7 +238,7 @@ private:
 	lcModRtuComObject *m_instantFlowCom;//瞬时流量串口对象
 	ComThread m_instantFlowThread;//瞬时流量采集线程
 	QTimer* m_instSTDMeterTimer;//瞬时流量计时器
-	QByteArray m_instStdPulse;//瞬时流量脉冲值, 需二次加工
+	QByteArray m_instStdCurrent;//瞬时流量脉冲值, 需二次加工
 
 	lcModRtuComObject *m_accumulateFlowCom;//累积流量串口对象
 	ComThread m_accumFlowThread;//累积流量采集线程
