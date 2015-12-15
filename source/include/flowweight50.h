@@ -258,10 +258,11 @@ public slots:
 
 	void saveStartMeterNO(); //保存起始表号
 
-	void openAllRegulator(); //打开所有调节阀至设定的开度
-	void setRegulatorOpening(int regNO, int opening);
 
 	/*******************电动调节阀******************************/
+	void openAllRegulator();  //打开所有调节阀至设定的开度
+	void closeAllRegulator(); //关闭所有调节阀
+
 	void on_btnRegulateSmall_clicked();
 	void on_btnRegulateMid1_clicked();
 	void on_btnRegulateMid2_clicked();
