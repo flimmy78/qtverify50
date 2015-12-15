@@ -739,57 +739,13 @@ void DataTestDlg50::closePump()
 	}
 }
 
-void DataTestDlg50::on_lineEditOpeningSmall_textChanged(const QString & text)
-{
-	ui.ThermoSmall->setValue(text.toFloat());
-}
-
-void DataTestDlg50::on_lineEditOpeningMid1_textChanged(const QString & text)
-{
-	ui.ThermoMid1->setValue(text.toFloat());
-}
-
-void DataTestDlg50::on_lineEditOpeningMid2_textChanged(const QString & text)
-{
-	ui.ThermoMid2->setValue(text.toFloat());
-}
-
-void DataTestDlg50::on_lineEditOpeningBig_textChanged(const QString & text)
-{
-	ui.ThermoBig->setValue(text.toFloat());
-}
-
 //设置频率
 void DataTestDlg50::on_btnSetFreq_clicked()
 {
 	m_controlObj->askSetDriverFreq(ui.spinBoxFreq->value());
 }
 
-//调节阀
-void DataTestDlg50::setRegulate(int regNO, int opening)
-{
-	setRegBtnBackColor(m_regBtn[regNO], false); //初始化调节阀背景色
-	if (regNO>=1 && regNO<=3)
-	{
-		m_controlObj->askControlRegulate(regNO, opening);
-	}
-	else
-	{
-		m_controlObj2->askControlRegulate(regNO-3, opening);
-	}
-/*
-	int sec = REGULATE_OPEN_TIME*opening/100;
-	float interval = (float)100/REGULATE_OPEN_TIME;
-	float value = 0;
-	do 
-	{
-		m_regLineEdit[regNO]->setText(QString("%1").arg(value));
-		value += interval;
-		wait(1000);
-	} while (sec--);
-*/	
-}
-
+//电动调节阀
 void DataTestDlg50::on_btnRegulateSmall_clicked() //调节阀1-DN3
 {
 	m_nowRegNo = m_portsetinfo.regSmallNo;
@@ -820,6 +776,39 @@ void DataTestDlg50::on_btnRegulateBig_clicked() //调节阀4-DN50
 	m_bigOpening = ui.ThermoBig->value();
 	setRegulate(m_nowRegNo, ui.spinBoxOpeningBig->value());
 	m_regBigTimer->start(REGULATE_FRESH_TIME);
+}
+
+void DataTestDlg50::setRegulate(int regNO, int opening)
+{
+	setRegBtnBackColor(m_regBtn[regNO], false); //初始化调节阀背景色
+	if (regNO>=1 && regNO<=3)
+	{
+		m_controlObj->askControlRegulate(regNO, opening);
+	}
+	else
+	{
+		m_controlObj2->askControlRegulate(regNO-3, opening);
+	}
+}
+
+void DataTestDlg50::on_lineEditOpeningSmall_textChanged(const QString & text)
+{
+	ui.ThermoSmall->setValue(text.toFloat());
+}
+
+void DataTestDlg50::on_lineEditOpeningMid1_textChanged(const QString & text)
+{
+	ui.ThermoMid1->setValue(text.toFloat());
+}
+
+void DataTestDlg50::on_lineEditOpeningMid2_textChanged(const QString & text)
+{
+	ui.ThermoMid2->setValue(text.toFloat());
+}
+
+void DataTestDlg50::on_lineEditOpeningBig_textChanged(const QString & text)
+{
+	ui.ThermoBig->setValue(text.toFloat());
 }
 
 void DataTestDlg50::slotFreshSmallRegOpening()

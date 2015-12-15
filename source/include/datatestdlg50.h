@@ -130,13 +130,7 @@ public slots:
 	void on_btnValveMiddle2_clicked(); //中流二
 	void on_btnValveSmall_clicked(); //小流量阀
 	void on_btnWaterPump_clicked(); //水泵
-
-	void on_btnSetFreq_clicked(); //设置频率
-	void on_btnRegulateSmall_clicked();
-	void on_btnRegulateMid1_clicked();
-	void on_btnRegulateMid2_clicked();
-	void on_btnRegulateBig_clicked();
-	void setRegulate(int retNO, int opening);
+	void on_btnSetFreq_clicked();   //设置频率
 
 	void on_btnParaSet_clicked();
 	void on_btnExit_clicked();
@@ -238,6 +232,12 @@ private slots:
 	void closePump();
 
 	/*******************电动调节阀******************************/
+	void on_btnRegulateSmall_clicked();
+	void on_btnRegulateMid1_clicked();
+	void on_btnRegulateMid2_clicked();
+	void on_btnRegulateBig_clicked();
+	void setRegulate(int retNO, int opening);
+
 	void on_lineEditOpeningSmall_textChanged(const QString & text);
 	void on_lineEditOpeningMid1_textChanged(const QString & text);
 	void on_lineEditOpeningMid2_textChanged(const QString & text);

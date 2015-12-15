@@ -138,6 +138,15 @@ public:
 	float m_balMaxWht2;
 	float m_balBottomWht2;
 
+	QTimer *m_regSmallTimer; //计时器，用于动态显示小调节阀的开度
+	int m_smallOpening; 
+	QTimer *m_regMid1Timer; //计时器，用于动态显示中一调节阀的开度
+	int m_mid1Opening; 
+	QTimer *m_regMid2Timer; //计时器，用于动态显示中二调节阀的开度
+	int m_mid2Opening; 
+	QTimer *m_regBigTimer;  //计时器，用于动态显示大调节阀的开度
+	int m_bigOpening; 
+
 	void initBalanceCom();     //天平串口
 	void initBalanceCom2();    //天平串口2
 	void initTemperatureCom(); //温度采集串口
@@ -145,6 +154,7 @@ public:
 	void initControlCom2();    //阀门控制串口2
 	void initMeterCom();       //热量表串口
 	void initValveStatus();	   //初始化阀门状态
+	void initRegulateStatus(); //初始化电动调节阀状态
 
 	int isComAndPortNormal();   //串口、端口设置是否正常
 	int isDataCollectNormal();	//检查数据采集是否正常（天平、温度、电磁流量计等）
@@ -247,6 +257,27 @@ public slots:
 	void slotReadNO(const int &row);        //读表号
 
 	void saveStartMeterNO(); //保存起始表号
+
+	void openAllRegulator(); //打开所有调节阀至设定的开度
+	void setRegulatorOpening(int regNO, int opening);
+
+	/*******************电动调节阀******************************/
+	void on_btnRegulateSmall_clicked();
+	void on_btnRegulateMid1_clicked();
+	void on_btnRegulateMid2_clicked();
+	void on_btnRegulateBig_clicked();
+	void setRegulate(int retNO, int opening);
+
+	void on_lineEditOpeningSmall_textChanged(const QString & text);
+	void on_lineEditOpeningMid1_textChanged(const QString & text);
+	void on_lineEditOpeningMid2_textChanged(const QString & text);
+	void on_lineEditOpeningBig_textChanged(const QString & text);
+
+	void slotFreshSmallRegOpening();
+	void slotFreshMid1RegOpening();
+	void slotFreshMid2RegOpening();
+	void slotFreshBigRegOpening();
+	/******************电动调节阀end***************************/
 
 private slots:
 
