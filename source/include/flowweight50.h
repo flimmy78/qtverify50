@@ -147,6 +147,9 @@ public:
 	QTimer *m_regBigTimer;  //计时器，用于动态显示大调节阀的开度
 	int m_bigOpening; 
 
+	QMap<int, QLineEdit*> m_RegLineEdit; //调节阀端口号与调节阀开度显示控制的映射关系
+	int m_lastPortNO; //记录上一个流量点的阀门端口号（一条管路跑多个流量点时使用）
+
 	void initBalanceCom();     //天平串口
 	void initBalanceCom2();    //天平串口2
 	void initTemperatureCom(); //温度采集串口
@@ -262,12 +265,13 @@ public slots:
 	/*******************电动调节阀******************************/
 	void openAllRegulator();  //打开所有调节阀至设定的开度
 	void closeAllRegulator(); //关闭所有调节阀
+	void setRegulatorOpening(int regNO, int opening); //设置单个调节阀开度，并在界面显示
 
 	void on_btnRegulateSmall_clicked();
 	void on_btnRegulateMid1_clicked();
 	void on_btnRegulateMid2_clicked();
 	void on_btnRegulateBig_clicked();
-	void setRegulate(int retNO, int opening);
+	void askControlRegulate(int retNO, int opening); //发送控制调节阀开度命令
 
 	void on_lineEditOpeningSmall_textChanged(const QString & text);
 	void on_lineEditOpeningMid1_textChanged(const QString & text);
