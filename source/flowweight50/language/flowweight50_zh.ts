@@ -73,7 +73,7 @@
         <location filename="../flowweight50.ui" line="104"/>
         <location filename="../flowweight50.ui" line="550"/>
         <source>ReadData</source>
-        <translation type="unfinished">读数据</translation>
+        <translation>读数据</translation>
     </message>
     <message>
         <location filename="../flowweight50.ui" line="109"/>
@@ -420,7 +420,7 @@ t</source>
     <message>
         <location filename="../flowweight50.cpp" line="750"/>
         <source>ReadData</source>
-        <translation type="unfinished">读数据</translation>
+        <translation>读数据</translation>
     </message>
     <message>
         <location filename="../flowweight50.cpp" line="755"/>
@@ -480,7 +480,7 @@ t</source>
         <location filename="../flowweight50.cpp" line="1198"/>
         <location filename="../flowweight50.cpp" line="2398"/>
         <source>NO. &lt;font color=DarkGreen size=6&gt;&lt;b&gt;%1&lt;/b&gt;&lt;/font&gt; flow point: &lt;font color=DarkGreen size=6&gt;&lt;b&gt;%2&lt;/b&gt;&lt;/font&gt; m3/h</source>
-        <translation type="unfinished">第 &lt;font color=DarkGreen size=6&gt;&lt;b&gt;%1&lt;/b&gt;&lt;/font&gt; 流量点: &lt;font color=DarkGreen size=6&gt;&lt;b&gt;%2&lt;/b&gt;&lt;/font&gt; m3/h</translation>
+        <translation>第 &lt;font color=DarkGreen size=6&gt;&lt;b&gt;%1&lt;/b&gt;&lt;/font&gt; 流量点: &lt;font color=DarkGreen size=6&gt;&lt;b&gt;%2&lt;/b&gt;&lt;/font&gt; m3/h</translation>
     </message>
     <message>
         <location filename="../flowweight50.cpp" line="1162"/>
