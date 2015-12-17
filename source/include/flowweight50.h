@@ -147,7 +147,8 @@ public:
 	QTimer *m_regBigTimer;  //计时器，用于动态显示大调节阀的开度
 	int m_bigOpening; 
 
-	QMap<int, QLineEdit*> m_RegLineEdit; //调节阀端口号与调节阀开度显示控制的映射关系
+	QMap<int, QLineEdit*> m_RegLineEdit; //调节阀端口号与调节阀开度显示控件的映射关系
+	QMap<int, QSpinBox*> m_RegSpinBox; //调节阀端口号与调节阀目标开度控件的映射关系
 	int m_lastPortNO; //记录上一个流量点的阀门端口号（一条管路跑多个流量点时使用）
 
 	void initBalanceCom();     //天平串口
