@@ -113,6 +113,8 @@ MainForm50::MainForm50(bool licenseOK, int validDays, QWidget *parent, Qt::WFlag
 	m_probationinfo->setOpenExternalLinks(true);
 	ui.statusBar->addPermanentWidget(m_probationinfo);
 
+	ui.actionScanCode->setVisible(false);
+	ui.actionAdjustFlowRate->setVisible(false);
 }
 
 MainForm50::~MainForm50()
