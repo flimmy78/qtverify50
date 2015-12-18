@@ -395,7 +395,7 @@ t</source>
         <location filename="../flowweight50.cpp" line="1309"/>
         <location filename="../flowweight50.cpp" line="1382"/>
         <source>Question</source>
-        <translation>提问</translation>
+        <translation>询问</translation>
     </message>
     <message>
         <location filename="../flowweight50.cpp" line="180"/>
@@ -441,7 +441,7 @@ t</source>
         <location filename="../flowweight50.cpp" line="812"/>
         <location filename="../flowweight50.cpp" line="1774"/>
         <source>regulator is opening, please wait...</source>
-        <translation>电动调节阀正在打开，请等待...</translation>
+        <translation>电动调节阀正在打开，请稍候...</translation>
     </message>
     <message>
         <location filename="../flowweight50.cpp" line="820"/>
@@ -506,7 +506,7 @@ t</source>
     <message>
         <location filename="../flowweight50.cpp" line="1330"/>
         <source>stopping verify...please wait a minute</source>
-        <translation>正在停止检定,请稍候...</translation>
+        <translation>正在停止检定...请稍候...</translation>
     </message>
     <message>
         <location filename="../flowweight50.cpp" line="1337"/>
