@@ -363,7 +363,7 @@ void MainForm50::on_actionDataTest_triggered()
 		m_datatestdlg = NULL;
 		m_datatestdlg = new DataTestDlg50();
 	}
-	int ah = QApplication::desktop()->availableGeometry().height();
+/*	int ah = QApplication::desktop()->availableGeometry().height();
 	int aw = QApplication::desktop()->availableGeometry().width();
 // 	int sh = QApplication::desktop()->screenGeometry().height();
 // 	int sw = QApplication::desktop()->screenGeometry().width();
@@ -374,7 +374,7 @@ void MainForm50::on_actionDataTest_triggered()
 	int y = (ah - wh - 100)/2;
 	m_datatestdlg->move(x, y);  
 //	m_datatestdlg->move((QApplication::desktop()->width()-m_datatestdlg->width())/2, (QApplication::desktop()->height()-m_datatestdlg->height())/2);  
-	m_datatestdlg->show();
+*/	m_datatestdlg->show();
 }
 
 void MainForm50::on_actionAdjustFlowRate_triggered()

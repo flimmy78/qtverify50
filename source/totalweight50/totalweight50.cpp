@@ -9,9 +9,8 @@
 **  版本历史:   2015/12 第一版
 **  内容包含:
 **  说明:		
-**  更新记录:   2015-7-13 初值不回零：需要读表初值，并判断初值是否全部读取成功;
-                          在表格响应：每输入一个初值，都调用startVerifyFlowPoint，在此函数中判断初值是否全部读取成功；
-						  在表格响应：每输入一个终值，都调用calcVerifyResult，在此函数中判断终值是否全部读取成功。
+**  更新记录:   
+
 ***********************************************/
 
 #include <QtGui/QMessageBox>
@@ -53,7 +52,6 @@ TotalWeightDlg50::TotalWeightDlg50(QWidget *parent, Qt::WFlags flags)
 
 	///////////////////////////////// 原showEvent()函数的内容 begin 
 	//否则每次最小化再显示时，会调用showEvent函数，导致内容清空等现象
-	ui.btnReCalc->hide();
 	ui.btnExhaust->hide();
 	ui.btnGoOn->hide();
 
@@ -120,6 +118,7 @@ TotalWeightDlg50::TotalWeightDlg50(QWidget *parent, Qt::WFlags flags)
 
 	//映射关系；初始化阀门状态	
 	initValveStatus();      
+	initRegulateStatus();
 
 	m_exaustTimer = new QTimer(this); //排气定时器
 	connect(m_exaustTimer, SIGNAL(timeout()), this, SLOT(slotExaustFinished()));
@@ -127,7 +126,8 @@ TotalWeightDlg50::TotalWeightDlg50(QWidget *parent, Qt::WFlags flags)
 	m_stopFlag = true; //停止检测标志（退出界面后，不再检查天平容量）
 
 	m_avgTFCount = 1; //计算平均温度用的累加计数器
-	m_nowOrder = 0;  //当前进行的检定序号
+	m_nowOrder = 0;   //当前进行的检定序号
+	m_lastPortNO = 0; 
 
 	m_nowParams = NULL;
 	m_continueVerify = true; //连续检定
@@ -174,6 +174,8 @@ TotalWeightDlg50::TotalWeightDlg50(QWidget *parent, Qt::WFlags flags)
 		qWarning()<<"串口、端口设置错误!";
 	}
 
+// 	QTimer::singleShot(3000, this, SLOT(close()));
+
 	///////////////////////////////// 原showEvent()函数的内容 end
 
 	ui.lcdInTemper->display(50);
@@ -205,9 +207,7 @@ void TotalWeightDlg50::closeEvent(QCloseEvent * event)
 
 	if (!m_stopFlag)
 	{
-		m_stopFlag = true;
-		closeAllValveAndPumpOpenOutValve();
-	 	wait(CYCLE_TIME);
+		stopVerify();
 	}
 	openValve(m_portsetinfo.bigWaterOutNo);
 	ui.labelHintPoint->clear();
@@ -342,6 +342,47 @@ void TotalWeightDlg50::closeEvent(QCloseEvent * event)
 		m_flowRateTimer = NULL;
 	}
 
+	//计时器，用于动态显示调节阀开度
+	if (m_regSmallTimer)
+	{
+		if (m_regSmallTimer->isActive())
+		{
+			m_regSmallTimer->stop();
+		}
+		delete m_regSmallTimer;
+		m_regSmallTimer = NULL;
+	}
+
+	if (m_regMid1Timer)
+	{
+		if (m_regMid1Timer->isActive())
+		{
+			m_regMid1Timer->stop();
+		}
+		delete m_regMid1Timer;
+		m_regMid1Timer = NULL;
+	}
+
+	if (m_regMid2Timer)
+	{
+		if (m_regMid2Timer->isActive())
+		{
+			m_regMid2Timer->stop();
+		}
+		delete m_regMid2Timer;
+		m_regMid2Timer = NULL;
+	}
+
+	if (m_regBigTimer)
+	{
+		if (m_regBigTimer->isActive())
+		{
+			m_regBigTimer->stop();
+		}
+		delete m_regBigTimer;
+		m_regBigTimer = NULL;
+	}
+
 	emit signalClosed();
 }
 
@@ -354,7 +395,7 @@ void TotalWeightDlg50::resizeEvent(QResizeEvent * event)
 	int hh = ui.tableWidget->horizontalHeader()->size().height();
 	int vw = ui.tableWidget->verticalHeader()->size().width();
 	int vSize = (int)((th-hh-10)/(m_maxMeterNum<=0 ? 12 : m_maxMeterNum));
-	int hSize = (int)((tw-vw-10)/COLUMN_TOTAL_COUNT);
+	int hSize = (int)((tw-vw-10)/(COLUMN_TOTAL_COUNT-1)); //隐藏了"密度"列
 	ui.tableWidget->verticalHeader()->setDefaultSectionSize(vSize);
 	ui.tableWidget->horizontalHeader()->setDefaultSectionSize(hSize);
 }
@@ -404,7 +445,7 @@ void TotalWeightDlg50::initTemperatureCom()
 
 	m_tempTimer = new QTimer();
 	connect(m_tempTimer, SIGNAL(timeout()), this, SLOT(slotAskPipeTemperature()));
-	
+
 	m_tempTimer->start(TIMEOUT_PIPE_TEMPER); //周期请求温度
 }
 
@@ -546,6 +587,37 @@ void TotalWeightDlg50::initValveStatus()
 	setValveBtnBackColor(m_valveBtn[m_portsetinfo.pumpNo], m_valveStatus[m_portsetinfo.pumpNo]);
 }
 
+void TotalWeightDlg50::initRegulateStatus()
+{
+	//端口号-阀门按钮 映射关系
+	m_RegLineEdit[m_portsetinfo.regSmallNo] = ui.lineEditOpeningSmall;
+	m_RegLineEdit[m_portsetinfo.regMid1No] = ui.lineEditOpeningMid1;
+	m_RegLineEdit[m_portsetinfo.regMid2No] = ui.lineEditOpeningMid2;
+	m_RegLineEdit[m_portsetinfo.regBigNo] = ui.lineEditOpeningBig;
+
+	m_RegSpinBox[m_portsetinfo.regSmallNo] = ui.spinBoxOpeningSmall;
+	m_RegSpinBox[m_portsetinfo.regMid1No] = ui.spinBoxOpeningMid1;
+	m_RegSpinBox[m_portsetinfo.regMid2No] = ui.spinBoxOpeningMid2;
+	m_RegSpinBox[m_portsetinfo.regBigNo] = ui.spinBoxOpeningBig;
+
+	//计时器，动态显示调节阀开度
+	m_smallOpening = 0;
+	m_regSmallTimer = new QTimer();
+	connect(m_regSmallTimer, SIGNAL(timeout()), this, SLOT(slotFreshSmallRegOpening()));
+
+	m_mid1Opening = 0;
+	m_regMid1Timer = new QTimer();
+	connect(m_regMid1Timer, SIGNAL(timeout()), this, SLOT(slotFreshMid1RegOpening()));
+
+	m_mid2Opening = 0;
+	m_regMid2Timer = new QTimer();
+	connect(m_regMid2Timer, SIGNAL(timeout()), this, SLOT(slotFreshMid2RegOpening()));
+
+	m_bigOpening = 0;
+	m_regBigTimer = new QTimer();
+	connect(m_regBigTimer, SIGNAL(timeout()), this, SLOT(slotFreshBigRegOpening()));
+}
+
 /*
 ** 函数功能：
 	在界面刷新大天平数值
@@ -581,6 +653,7 @@ void TotalWeightDlg50::slotFreshSmallBalanceValue(const float& balValue)
 		openValve(m_portsetinfo.smallWaterInNo);  //打开小天平进水阀
 	}
 }
+
 //在界面刷新入口温度和出口温度值
 void TotalWeightDlg50::slotFreshComTempValue(const QString& tempStr)
 {
@@ -804,7 +877,8 @@ void TotalWeightDlg50::initTableWidget()
 	connect(signalMapper5, SIGNAL(mapped(const int &)),this, SLOT(slotReadNO(const int &)));
 
 	ui.tableWidget->setVerticalHeaderLabels(vLabels);
-	ui.tableWidget->setFont(QFont("Times", 15, QFont::DemiBold, true));
+	ui.tableWidget->setFont(QFont("Times", 13, QFont::DemiBold, true));
+	ui.tableWidget->hideColumn(COLUMN_DENSITY); //隐藏"密度"列
 // 	ui.tableWidget->resizeColumnsToContents();
 // 	ui.tableWidget->setColumnWidth(COLUMN_METER_NUMBER, 125);
 }
@@ -840,6 +914,13 @@ int TotalWeightDlg50::startExhaustCountDown()
 		QMessageBox::warning(this, tr("Warning"), tr("data acquisition error, please check!"));
 		return false;
 	}
+
+	//打开4路电动调节阀
+	openAllRegulator();
+	ui.labelHintProcess->setText(tr("regulator is opening, please wait..."));
+	ui.labelHintPoint->clear();
+ 	wait(5000); //等待电动调节阀调整到一定开度，用于排气
+
 	m_controlObj->askSetDriverFreq(m_nowParams->fp_info[0].fp_freq);
 	if (!openAllValveAndPump())
 	{
@@ -878,7 +959,7 @@ void TotalWeightDlg50::slotExaustFinished()
 	m_exaustTimer->stop(); //停止排气计时
 	ui.labelHintProcess->setText(tr("Exhaust countdown finished!"));
 	ui.labelHintProcess->clear();
-	if (!closeAllFlowPointValves()) //关闭所有流量点阀门 失败
+	if (!closeAllFlowPointValves()) //关闭所有流量点阀门 失败 
 	{
 		if (!closeAllFlowPointValves()) //再尝试关闭一次
 		{
@@ -887,16 +968,35 @@ void TotalWeightDlg50::slotExaustFinished()
 		}
 	}
 
-	if (!prepareBigBalanceInitWeight())//准备大天平初始重量
+	//准备天平初始重量 begin
+	bool hasBigBalance = false; //是否需要准备大天平
+	bool hasSmallBalance = false; //是否需要准备小天平
+	for (int i=1; i<=m_flowPointNum; i++)
 	{
-		return;
+		if (m_paraSetReader->getFpBySeq(i).fp_valve_idx == 0)
+		{
+			hasBigBalance = true;
+		}
+		if (m_paraSetReader->getFpBySeq(i).fp_valve_idx >= 1)
+		{
+			hasSmallBalance = true;
+		}
 	}
-
-	if (!prepareSmallBalanceInitWeight())//准备小天平初始重量
+	if (hasBigBalance) //需要准备大天平
 	{
-		return;
+		if (!prepareBigBalanceInitWeight())//准备大天平初始重量
+		{
+			return;
+		}
 	}
-
+	if (hasSmallBalance) //需要准备小天平
+	{
+		if (!prepareSmallBalanceInitWeight())//准备小天平初始重量
+		{
+			return;
+		}
+	}
+	//准备天平初始重量 end
 	wait(BALANCE_STABLE_TIME); //等待天平数值稳定
 
 	if (setAllMeterVerifyStatus()) //设置检定状态成功
@@ -906,7 +1006,8 @@ void TotalWeightDlg50::slotExaustFinished()
 }
 
 /*
-** 排气结束后、开始检定前，准备天平,达到要求的初始重量
+** 排气结束后、开始检定前，准备大天平,达到要求的初始重量
+** 此时状态：水泵开启、进水阀开启、四个流量点阀门关闭、大小天平的进水和放水阀打开
 */
 int TotalWeightDlg50::prepareBigBalanceInitWeight()
 {
@@ -1161,11 +1262,6 @@ int TotalWeightDlg50::judgeBalanceAndCalcAvgTemperAndFlow(float targetV, bool bi
 	m_pipeOutTemper = m_pipeOutTemper/m_avgTFCount; //出口平均温度
 	m_stdInTemper = m_stdInTemper/m_avgTFCount;     //入口标准温度平均值
 	m_stdOutTemper = m_stdOutTemper/m_avgTFCount;   //出口标准温度平均值
-
-// 	if (m_avgTFCount > FLOW_SAMPLE_NUM*2)
-// 	{
-// 		m_realFlow = m_realFlow/(m_avgTFCount-FLOW_SAMPLE_NUM*2+1); //平均流速
-// 	}
 	QDateTime endTime = QDateTime::currentDateTime();
 	int tt = startTime.secsTo(endTime);
 	if (NULL==m_paraSetReader || m_stopFlag)
@@ -1267,6 +1363,8 @@ void TotalWeightDlg50::on_btnStart_clicked()
 	if (m_autopick) //自动读表
 	{
 		on_btnAllReadNO_clicked();
+// 		sleep(m_exaustSecond*1000/2);
+// 		setAllMeterVerifyStatus();
 	}
 	else //手动读表
 	{
@@ -1325,6 +1423,8 @@ void TotalWeightDlg50::stopVerify()
 		m_exaustTimer->stop();//停止排气定时器
 		closeAllValveAndPumpOpenOutValve();
 	}
+	closeAllRegulator();
+
 	ui.labelHintProcess->setText(tr("Verify has Stoped!"));
 	m_state = STATE_INIT; //重置初始状态
 
@@ -1653,13 +1753,13 @@ int TotalWeightDlg50::prepareVerifyFlowPoint(int order)
 			}
 // 		}
 	}
-/*	else //初值不回零
-	{
-// 		if (order >= 2)
+// 	else //初值不回零
+// 	{
+// 		if (order == 1) //第一次检定
 // 		{
-			sleep(WATCH_DATA_TIME); //等3秒，供操作人员看上一次的检定结果
+// 			setAllMeterVerifyStatus();
 // 		}
-	}*/
+// 	}
 
 // 	clearTableContents();
 	getMeterStartValue(); //获取表初值
@@ -1667,7 +1767,10 @@ int TotalWeightDlg50::prepareVerifyFlowPoint(int order)
 	return true;
 }
 
-//进行单个流量点的检定
+/*
+** 进行单个流量点的检定
+** order:检定次序，从1开始
+*/
 int TotalWeightDlg50::startVerifyFlowPoint(int order)
 {
 	if (m_stopFlag)
@@ -1684,7 +1787,6 @@ int TotalWeightDlg50::startVerifyFlowPoint(int order)
 		ui.tableWidget->item(row, COLUMN_METER_START)->text().toFloat(&ok);
 		if (!ok || ui.tableWidget->item(row, COLUMN_METER_START)->text().isEmpty())
 		{
-// 			QMessageBox::information(this, tr("Hint"), tr("please input init value of heat meter"));//请输入热量表初值！
 			ui.labelHintProcess->setText(tr("please input start value of heat meter"));
 			ui.tableWidget->setCurrentCell(row, COLUMN_METER_START); //定位到需要输入初值的地方
 			return false;
@@ -1712,18 +1814,42 @@ int TotalWeightDlg50::startVerifyFlowPoint(int order)
 	m_stdInTemper = ui.lnEditInStdTemp->text().toFloat();
 	m_stdOutTemper = ui.lnEditOutStdTemp->text().toFloat();
 
+	int regNO = m_paraSetReader->getFpBySeq(order).fp_regno; //order对应的调节阀端口号
+	int opening = m_paraSetReader->getFpBySeq(order).fp_opening; //order对应的调节阀开度
 	int portNo = m_paraSetReader->getFpBySeq(order).fp_valve;  //order对应的阀门端口号
 	float verifyQuantity = m_paraSetReader->getFpBySeq(order).fp_quantity; //第order次检定对应的检定量
 	float frequence = m_paraSetReader->getFpBySeq(order).fp_freq; //order对应的频率
 	m_controlObj->askSetDriverFreq(frequence);
+	while (m_RegSpinBox[regNO]->value() != m_RegLineEdit[regNO]->text().toInt()) //调节阀未到位
+	{
+		ui.labelHintProcess->setText(tr("please wait for regulator..."));
+		ui.labelHintPoint->clear();
+		wait(1000);
+	}
+	if (portNo == m_lastPortNO) //同一条管路连续跑
+	{
+		while (m_RegLineEdit[regNO]->text().toInt() > 0)
+		{
+			ui.labelHintProcess->setText(tr("regulator is closing, please wait..."));
+			wait(1000);
+		}
+		setRegulatorOpening(regNO, opening);
+		ui.labelHintProcess->setText(tr("regulator is opening, please wait..."));
+		while (m_RegLineEdit[regNO]->text().toInt() < opening)
+		{
+			wait(1000);
+		}
+	}
 	if (openValve(portNo)) //打开阀门，开始跑流量
 	{
+		m_lastPortNO = portNo;
 		if (judgeBalanceAndCalcAvgTemperAndFlow(m_balStartV + verifyQuantity, bigFlag)) //跑完检定量并计算此过程的平均温度和平均流量
 		{
 			ui.tableWidget->setEnabled(true);
 			ui.btnAllReadNO->setEnabled(true);
 			ui.btnAllReadData->setEnabled(true);
 			ui.btnAllVerifyStatus->setEnabled(true);
+			setRegulatorOpening(regNO, 0); //关闭调节阀
 			closeValve(portNo); //关闭order对应的阀门
 			wait(BALANCE_STABLE_TIME); //等待3秒钟，让天平数值稳定
 			if (bigFlag)
@@ -1842,7 +1968,11 @@ int TotalWeightDlg50::calcMeterError(int idx)
 	return 1; 
 }
 
-//输完热量表终值后，计算检定结果
+/*
+** 输完热量表终值后，计算检定结果
+** 返回值：1-计算成功、读表数据全部成功
+		   0-计算失败、读表数据有失败的
+*/
 int TotalWeightDlg50::calcVerifyResult()
 {
 	int ret = 0;
@@ -1892,7 +2022,18 @@ void TotalWeightDlg50::exportReport()
 //打开阀门
 int TotalWeightDlg50::openValve(UINT8 portno)
 {
-	m_controlObj->askControlRelay(portno, VALVE_OPEN);
+	if (NULL == m_controlObj)
+	{
+		return false;
+	}
+	if (portno <= 8)
+	{
+		m_controlObj->askControlRelay(portno, VALVE_OPEN);
+	}
+	else
+	{
+		m_controlObj2->askControlRelay(portno-8, VALVE_OPEN);
+	}
 	if (m_portsetinfo.version==OLD_CTRL_VERSION) //老控制板 无反馈
 	{
 		slotSetValveBtnStatus(portno, VALVE_OPEN);
@@ -1903,7 +2044,18 @@ int TotalWeightDlg50::openValve(UINT8 portno)
 //关闭阀门
 int TotalWeightDlg50::closeValve(UINT8 portno)
 {
-	m_controlObj->askControlRelay(portno, VALVE_CLOSE);
+	if (NULL == m_controlObj)
+	{
+		return false;
+	}
+	if (portno <= 8)
+	{
+		m_controlObj->askControlRelay(portno, VALVE_CLOSE);
+	}
+	else
+	{
+		m_controlObj2->askControlRelay(portno-8, VALVE_CLOSE);
+	}
 	if (m_portsetinfo.version==OLD_CTRL_VERSION) //老控制板 无反馈
 	{
 		slotSetValveBtnStatus(portno, VALVE_CLOSE);
@@ -1928,6 +2080,10 @@ int TotalWeightDlg50::operateValve(UINT8 portno)
 //打开水泵
 int TotalWeightDlg50::openWaterPump()
 {
+	if (NULL == m_controlObj)
+	{
+		return false;
+	}
 	m_nowPortNo = m_portsetinfo.pumpNo;
 	m_controlObj->askControlWaterPump(m_nowPortNo, VALVE_OPEN);
 	if (m_portsetinfo.version == OLD_CTRL_VERSION) //老控制板 无反馈
@@ -1940,6 +2096,10 @@ int TotalWeightDlg50::openWaterPump()
 //关闭水泵
 int TotalWeightDlg50::closeWaterPump()
 {
+	if (NULL == m_controlObj)
+	{
+		return false;
+	}
 	m_nowPortNo = m_portsetinfo.pumpNo;
 	m_controlObj->askControlWaterPump(m_nowPortNo, VALVE_CLOSE);
 	if (m_portsetinfo.version == OLD_CTRL_VERSION) //老控制板 无反馈
@@ -2003,7 +2163,7 @@ void TotalWeightDlg50::slotSetMeterEnergy(const QString& comName, const QString&
 	}
 
 	int idx = isMeterPosValid(meterPos);
-  if (idx < 0) //该表位不检表，当然也不需要读表数据
+	if (idx < 0) //该表位不检表，当然也不需要读表数据
 	{
 		return;
 	}
@@ -2150,6 +2310,10 @@ void TotalWeightDlg50::on_btnWaterPump_clicked()
 */
 void TotalWeightDlg50::on_btnSetFreq_clicked()
 {
+	if (NULL == m_controlObj)
+	{
+		return;
+	}
 	m_controlObj->askSetDriverFreq(ui.spinBoxFreq->value());
 }
 
@@ -2183,7 +2347,7 @@ int TotalWeightDlg50::getMeterStartValue()
 				wait(WAIT_COM_TIME); //需要等待，否则热表来不及响应通讯
 				ui.labelHintProcess->setText(tr("please input start value of heat meter"));
 				on_btnAllReadData_clicked();
-//	 			sleep(WAIT_COM_TIME); //等待串口返回数据
+//	 			wait(WAIT_COM_TIME); //等待串口返回数据
 			}
 			else //手动输入
 			{
@@ -2209,7 +2373,7 @@ int TotalWeightDlg50::getMeterEndValue()
 		return false;
 	}
 
-	ui.labelHintProcess->setText(tr("please input end value of heat meter"));	
+	ui.labelHintProcess->setText(tr("please input end value of heat meter"));
 	m_state = STATE_END_VALUE;
 
 	if (m_autopick) //自动采集
@@ -2225,6 +2389,7 @@ int TotalWeightDlg50::getMeterEndValue()
 	}
 	else //手动输入
 	{
+// 		QMessageBox::information(this, tr("Hint"), tr("please input end value of heat meter"));//请输入热量表终值！
 		ui.tableWidget->setCurrentCell(m_meterPosMap[0]-1, COLUMN_METER_END); //定位到第一个需要输入终值的地方
 		return false;
 	}
@@ -2406,4 +2571,251 @@ void TotalWeightDlg50::slotVerifyStatus(const int &row)
 {
 	qDebug()<<"slotVerifyStatus row ="<<row;
 	m_meterObj[row].askSetVerifyStatus(VTYPE_HEAT);
+}
+
+/*
+** 打开4路电动调节阀至设定的开度
+** 注意：选中的管路，将调节阀开度调整到设定开度；
+         未选中的管路，将将调节阀开度调整到50%，用于排气
+*/
+void TotalWeightDlg50::openAllRegulator()
+{
+	int regNO = 0;
+	float opening = 0;
+	int valve_idx = 0;
+	QString last_valve_idx;
+	for (int i=1; i<=m_flowPointNum; i++) //选中的管路，将调节阀开度调整到设定开度
+	{
+		regNO = m_paraSetReader->getFpBySeq(i).fp_regno;
+		opening = m_paraSetReader->getFpBySeq(i).fp_opening;
+		valve_idx = m_paraSetReader->getFpBySeq(i).fp_valve_idx;
+		if (last_valve_idx.contains(QString("%1").arg(valve_idx))) //同一管路跑多个流量点
+		{
+			continue;
+		}
+		switch (valve_idx)
+		{
+		case 0: //大流量点
+			ui.spinBoxOpeningBig->setValue(opening);
+			on_btnRegulateBig_clicked();
+			break;
+		case 1: //中二流量点
+			ui.spinBoxOpeningMid2->setValue(opening);
+			on_btnRegulateMid2_clicked();
+			break;
+		case 2: //中一流量点
+			ui.spinBoxOpeningMid1->setValue(opening);
+			on_btnRegulateMid1_clicked();
+			break;
+		case 3: //小流量点
+			ui.spinBoxOpeningSmall->setValue(opening);
+			on_btnRegulateSmall_clicked();
+			break;
+		default:
+			break;
+		}
+		last_valve_idx += QString("%1").arg(valve_idx);
+	}
+
+	//未选中的管路，将调节阀开度调整到50%，用于排气
+	if (ui.spinBoxOpeningSmall->value()==0)
+	{
+		ui.spinBoxOpeningSmall->setValue(50);
+		on_btnRegulateSmall_clicked();
+	}
+	if (ui.spinBoxOpeningMid1->value()==0)
+	{
+		ui.spinBoxOpeningMid1->setValue(50);
+		on_btnRegulateMid1_clicked();
+	}
+	if (ui.spinBoxOpeningMid2->value()==0)
+	{
+		ui.spinBoxOpeningMid2->setValue(50);
+		on_btnRegulateMid2_clicked();
+	}
+	if (ui.spinBoxOpeningBig->value()==0)
+	{
+		ui.spinBoxOpeningBig->setValue(50);
+		on_btnRegulateBig_clicked();
+	}
+}
+
+/*
+** 关闭4路电动调节阀
+*/
+void TotalWeightDlg50::closeAllRegulator()
+{
+	if (ui.spinBoxOpeningSmall->value()!=0)
+	{
+		ui.spinBoxOpeningSmall->setValue(0);
+		on_btnRegulateSmall_clicked();
+	}
+	if (ui.spinBoxOpeningMid1->value()!=0)
+	{
+		ui.spinBoxOpeningMid1->setValue(0);
+		on_btnRegulateMid1_clicked();
+	}
+	if (ui.spinBoxOpeningMid2->value()!=0)
+	{
+		ui.spinBoxOpeningMid2->setValue(0);
+		on_btnRegulateMid2_clicked();
+	}
+	if (ui.spinBoxOpeningBig->value()!=0)
+	{
+		ui.spinBoxOpeningBig->setValue(0);
+		on_btnRegulateBig_clicked();
+	}
+}
+
+void TotalWeightDlg50::setRegulatorOpening(int regNO, int opening)
+{
+	if (regNO == m_portsetinfo.regSmallNo) //小调节阀
+	{
+		ui.spinBoxOpeningSmall->setValue(opening);
+		on_btnRegulateSmall_clicked();
+	}
+	else if (regNO == m_portsetinfo.regMid1No) //中一调节阀
+	{
+		ui.spinBoxOpeningMid1->setValue(opening);
+		on_btnRegulateMid1_clicked();
+	}
+	else if (regNO == m_portsetinfo.regMid2No) //中二调节阀
+	{
+		ui.spinBoxOpeningMid2->setValue(opening);
+		on_btnRegulateMid2_clicked();
+	}
+	else if (regNO == m_portsetinfo.regBigNo) //大调节阀
+	{
+		ui.spinBoxOpeningBig->setValue(opening);
+		on_btnRegulateBig_clicked();
+	}
+}
+
+//电动调节阀
+void TotalWeightDlg50::on_btnRegulateSmall_clicked() //调节阀1-DN3
+{
+	m_smallOpening = ui.ThermoSmall->value();
+	askControlRegulate(m_portsetinfo.regSmallNo, ui.spinBoxOpeningSmall->value());
+	m_regSmallTimer->start(REGULATE_FRESH_TIME);
+}
+
+void TotalWeightDlg50::on_btnRegulateMid1_clicked() //调节阀2-DN10
+{
+	m_mid1Opening = ui.ThermoMid1->value();
+	askControlRegulate(m_portsetinfo.regMid1No, ui.spinBoxOpeningMid1->value());
+	m_regMid1Timer->start(REGULATE_FRESH_TIME);
+}
+
+void TotalWeightDlg50::on_btnRegulateMid2_clicked() //调节阀3-DN25
+{
+	m_mid2Opening = ui.ThermoMid2->value();
+	askControlRegulate(m_portsetinfo.regMid2No, ui.spinBoxOpeningMid2->value());
+	m_regMid2Timer->start(REGULATE_FRESH_TIME);
+}
+
+void TotalWeightDlg50::on_btnRegulateBig_clicked() //调节阀4-DN50
+{
+	m_bigOpening = ui.ThermoBig->value();
+	askControlRegulate(m_portsetinfo.regBigNo, ui.spinBoxOpeningBig->value());
+	m_regBigTimer->start(REGULATE_FRESH_TIME);
+}
+
+void TotalWeightDlg50::askControlRegulate(int regNO, int opening)
+{
+	if (regNO>=1 && regNO<=3)
+	{
+		m_controlObj->askControlRegulate(regNO, opening);
+	}
+	else
+	{
+		m_controlObj2->askControlRegulate(regNO-3, opening);
+	}
+}
+
+void TotalWeightDlg50::on_lineEditOpeningSmall_textChanged(const QString & text)
+{
+	ui.ThermoSmall->setValue(text.toFloat());
+}
+
+void TotalWeightDlg50::on_lineEditOpeningMid1_textChanged(const QString & text)
+{
+	ui.ThermoMid1->setValue(text.toFloat());
+}
+
+void TotalWeightDlg50::on_lineEditOpeningMid2_textChanged(const QString & text)
+{
+	ui.ThermoMid2->setValue(text.toFloat());
+}
+
+void TotalWeightDlg50::on_lineEditOpeningBig_textChanged(const QString & text)
+{
+	ui.ThermoBig->setValue(text.toFloat());
+}
+
+void TotalWeightDlg50::slotFreshSmallRegOpening()
+{
+	if (ui.ThermoSmall->value() < ui.spinBoxOpeningSmall->value())
+	{
+		ui.lineEditOpeningSmall->setText(QString("%1").arg(m_smallOpening++));
+	}
+	else
+	{
+		ui.lineEditOpeningSmall->setText(QString("%1").arg(m_smallOpening--));
+	}
+
+	if (ui.lineEditOpeningSmall->text().toInt() == ui.spinBoxOpeningSmall->value())
+	{
+		m_regSmallTimer->stop();
+	}
+}
+
+void TotalWeightDlg50::slotFreshMid1RegOpening()
+{
+	if (ui.ThermoMid1->value() < ui.spinBoxOpeningMid1->value())
+	{
+		ui.lineEditOpeningMid1->setText(QString("%1").arg(m_mid1Opening++));
+	}
+	else
+	{
+		ui.lineEditOpeningMid1->setText(QString("%1").arg(m_mid1Opening--));
+	}
+
+	if (ui.lineEditOpeningMid1->text().toInt() == ui.spinBoxOpeningMid1->value())
+	{
+		m_regMid1Timer->stop();
+	}
+}
+
+void TotalWeightDlg50::slotFreshMid2RegOpening()
+{
+	if (ui.ThermoMid2->value() < ui.spinBoxOpeningMid2->value())
+	{
+		ui.lineEditOpeningMid2->setText(QString("%1").arg(m_mid2Opening++));
+	}
+	else
+	{
+		ui.lineEditOpeningMid2->setText(QString("%1").arg(m_mid2Opening--));
+	}
+
+	if (ui.lineEditOpeningMid2->text().toInt() == ui.spinBoxOpeningMid2->value())
+	{
+		m_regMid2Timer->stop();
+	}
+}
+
+void TotalWeightDlg50::slotFreshBigRegOpening()
+{
+	if (ui.ThermoBig->value() < ui.spinBoxOpeningBig->value())
+	{
+		ui.lineEditOpeningBig->setText(QString("%1").arg(m_bigOpening++));
+	}
+	else
+	{
+		ui.lineEditOpeningBig->setText(QString("%1").arg(m_bigOpening--));
+	}
+
+	if (ui.lineEditOpeningBig->text().toInt() == ui.spinBoxOpeningBig->value())
+	{
+		m_regBigTimer->stop();
+	}
 }
