@@ -47,6 +47,10 @@ public:
 
 	ComThread m_valveThread;   //阀门控制线程
 	ControlComObject *m_controlObj;
+
+	ComThread m_valveThread2;   //阀门控制线程
+	ControlComObject *m_controlObj2;
+
 	QMap<int, bool> m_valveStatus; //阀门号与阀门状态的映射关系
 	QMap<int, QToolButton*> m_valveBtn;	//阀门号与阀门按钮的映射关系
 	int m_nowPortNo;	//当前控制阀门端口号
@@ -73,7 +77,8 @@ public:
 	QString m_numPrefix;      //表号前缀(14位表号的前6位）
 	float m_flowSC;           //流量检定安全系数
 	bool m_adjErr;            //是否调整误差
-	bool m_writeNO;          //是否修改表号
+	bool m_writeNO;           //是否修改表号
+	bool m_repeatverify;      //是否重复检测
 	//检定过程相关的控制参数 end
 
 	int m_avgTFCount;		  //计算平均温度和平均流量用的累加计数器
@@ -116,43 +121,54 @@ public:
 	ReadComConfig *m_readComConfig; //读串口设置
 	PortSet_Ini_STR m_portsetinfo;  //端口配置
 
+	QTimer *m_regSmallTimer; //计时器，用于动态显示小调节阀的开度
+	int m_smallOpening; 
+	QTimer *m_regMid1Timer; //计时器，用于动态显示中一调节阀的开度
+	int m_mid1Opening; 
+	QTimer *m_regMid2Timer; //计时器，用于动态显示中二调节阀的开度
+	int m_mid2Opening; 
+	QTimer *m_regBigTimer;  //计时器，用于动态显示大调节阀的开度
+	int m_bigOpening; 
+
+	QMap<int, QLineEdit*> m_RegLineEdit; //调节阀端口号与调节阀开度显示控件的映射关系
+	QMap<int, QSpinBox*> m_RegSpinBox; //调节阀端口号与调节阀目标开度控件的映射关系
+	int m_lastPortNO; //记录上一个流量点的阀门端口号（一条管路跑多个流量点时使用）
+
 	void initTemperatureCom(); //温度采集串口
 	void initControlCom();     //阀门控制串口
+	void initControlCom2();    //阀门控制串口2
 	void initMeterCom();       //热量表串口
 	void initValveStatus();	   //初始化阀门状态
+	void initRegulateStatus(); //初始化电动调节阀状态
 
 	int isComAndPortNormal();   //串口、端口设置是否正常
 	int isDataCollectNormal();	//检查数据采集是否正常（天平、温度、电磁流量计等）
 	int isMeterPosValid(int meterPos); //判断表位号是否有效(该表位是否需要检表)
-	int getValidMeterNum();//获取有效的检表个数()
+	int getValidMeterNum();       //获取有效的检表个数()
 
-
-public slots:
 	void showEvent(QShowEvent * event);
 	void closeEvent(QCloseEvent * event);
 	void resizeEvent(QResizeEvent * event);
+
+public slots:
 
 	int readNowParaConfig();	 //获取当前检定参数
 	void showNowKeyParaConfig(); //显示当前关键参数设置信息
 	void initTableWidget();     //设置表格行数
 
-
 	void on_btnStart_clicked();   //点击"开始"按钮
-	void on_btnExhaust_clicked();  //点击"排气"按钮
+	void on_btnExhaust_clicked(); //点击"排气"按钮
 	void on_btnGoOn_clicked();    //点击"继续"按钮
-		
 	void on_btnStop_clicked();    //点击"终止检测"按钮
-	void on_btnExit_clicked();    //退出按钮
+	void on_btnExit_clicked();    //点击"退出"按钮
 	void on_btnReCalc_clicked();  //点击"重新计算"按钮
 	int startExhaustCountDown();  //开始排气倒计时
 	void slotExaustFinished();    //排气时间结束
 	int readAllMeterFlowCoe();    //读取所有被检表的流量系数
-	int setAllMeterVerifyStatus();   //设置热量表进入检定状态
+	int setAllMeterVerifyStatus();//设置热量表进入检定状态
 	int openAllValveAndPump();    //打开所有阀门和水泵
 	int closeAllValveAndPumpOpenOutValve(); //关闭所有阀门和水泵、打开防水阀
 	int closeAllFlowPointValves();//关闭所有流量点阀门
-	int closeWaterOutValve();     //关闭放水阀
-	int openWaterOutValve();      //打开放水阀
 	int judgeTartgetVolAndCalcAvgTemperAndFlow(double initV, double verifyV); //判断是否完成检定量检定量，并累加进出口温度，每秒累加一次，用于计算进出口平均温度
 	void stopVerify();            //停止检定
 	void startVerify();           //开始检定
@@ -164,11 +180,11 @@ public slots:
 	int openWaterPump();			//打开水泵
 	int closeWaterPump();			//关闭水泵
 	int operateWaterPump();			//操作水泵：打开或者关闭
-	int getMeterStartValue();     //获取表初值
-	int getMeterEndValue();       //获取表终值
-	void makeStartValueByLastEndValue(); //上一次的终值作为本次的初值
-	int calcAllMeterError();//计算所有被检表的误差
-	int calcMeterError(int idx); //计算某个表的误差
+	int getMeterStartValue();       //获取表初值
+	int getMeterEndValue();         //获取表终值
+	void makeStartValueByLastEndValue(); //将上一次检定后的终值作为本次的初值
+	int calcAllMeterError();      //计算所有被检表的误差
+	int calcMeterError(int idx);  //计算某个表的误差
 	int calcVerifyResult();       //计算检定结果
 
 	void slotAskPipeTemperature();//请求管路温度
@@ -188,10 +204,10 @@ public slots:
 
 	void on_btnParaSet_clicked();	   //参数设置
 	void on_btnWaterIn_clicked();      //进水阀
-	void on_btnBigWaterIn_clicked();     //大天平进水阀
-	void on_btnBigWaterOut_clicked();    //大天平放水阀
-	void on_btnSmallWaterIn_clicked();   //小天平进水阀
-	void on_btnSmallWaterOut_clicked();  //小天平放水阀
+	void on_btnBigWaterIn_clicked();   //大天平进水阀
+	void on_btnBigWaterOut_clicked();  //大天平放水阀
+	void on_btnSmallWaterIn_clicked(); //小天平进水阀
+	void on_btnSmallWaterOut_clicked();//小天平放水阀
 	void on_btnValveBig_clicked();     //大流量阀
 	void on_btnValveMiddle1_clicked(); //中流一
 	void on_btnValveMiddle2_clicked(); //中流二
@@ -214,9 +230,34 @@ public slots:
 	void slotAdjustError(const int &row);   //调整误差
 	void slotReadData(const int &row);      //读表数据(单个表)
 	void slotVerifyStatus(const int &row);  //检定状态
-	void slotReadNO(const int &row);        //读表号(单个表)
+	void slotReadNO(const int &row);        //读表号
 
 	void saveStartMeterNO(); //保存起始表号
+
+
+	/*******************电动调节阀******************************/
+	void openAllRegulator();  //打开所有调节阀至设定的开度
+	void closeAllRegulator(); //关闭所有调节阀
+	void setRegulatorOpening(int regNO, int opening); //设置单个调节阀开度，并在界面显示
+
+	void on_btnRegulateSmall_clicked();
+	void on_btnRegulateMid1_clicked();
+	void on_btnRegulateMid2_clicked();
+	void on_btnRegulateBig_clicked();
+	void askControlRegulate(int retNO, int opening); //发送控制调节阀开度命令
+
+	void on_lineEditOpeningSmall_textChanged(const QString & text);
+	void on_lineEditOpeningMid1_textChanged(const QString & text);
+	void on_lineEditOpeningMid2_textChanged(const QString & text);
+	void on_lineEditOpeningBig_textChanged(const QString & text);
+
+	void slotFreshSmallRegOpening();
+	void slotFreshMid1RegOpening();
+	void slotFreshMid2RegOpening();
+	void slotFreshBigRegOpening();
+	/******************电动调节阀end***************************/
+
+private slots:
 
 signals:
 	void signalClosed();
