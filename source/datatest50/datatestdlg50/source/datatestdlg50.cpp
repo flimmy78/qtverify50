@@ -258,7 +258,7 @@ void DataTestDlg50::showEvent(QShowEvent *event)
 	m_oldCoe = new MeterCoe_STR;
 	memset(m_oldCoe, 0, sizeof(MeterCoe_STR));
 
-	/********************************************/
+	/***************标准流量计***********************/
 	m_mapInstWdg[FLOW_RATE_BIG]   = ui.lcdInstStdMeter_50;
 	m_mapInstWdg[FLOW_RATE_MID_2] = ui.lcdInstStdMeter_25;
 	m_mapInstWdg[FLOW_RATE_MID_1] = ui.lcdInstStdMeter_10;
@@ -273,7 +273,7 @@ void DataTestDlg50::showEvent(QShowEvent *event)
 	m_stdMeterReader->mapInstWdg(&m_mapInstWdg, ui.lcdStdMeterFlowRate);
 	m_stdMeterReader->mapAccumWdg(&m_mapAccumWdg, ui.lcdAccumStdMeter);
 	m_stdMeterReader->startReadMeter();
-	/*********************************************/
+	/***************标准流量计end********************/
 }
 
 /*

@@ -30,6 +30,7 @@
 #include "parasetdlg.h"
 #include "readcomconfig.h"
 #include "report.h"
+#include "readstdmeter.h"
 
 TotalWeightDlg50::TotalWeightDlg50(QWidget *parent, Qt::WFlags flags)
 	: QWidget(parent, flags)
@@ -180,6 +181,11 @@ TotalWeightDlg50::TotalWeightDlg50(QWidget *parent, Qt::WFlags flags)
 
 	ui.lcdInTemper->display(50);
 	ui.lcdOutTemper->display(40);
+
+	m_stdMeterReader = NULL;
+	m_stdMeterReader = new CStdMeterReader;
+	m_stdMeterReader->mapInstWdg(NULL, ui.lcdFlowRateStd, true);
+	m_stdMeterReader->startReadInstMeter();
 }
 
 TotalWeightDlg50::~TotalWeightDlg50()
@@ -381,6 +387,12 @@ void TotalWeightDlg50::closeEvent(QCloseEvent * event)
 		}
 		delete m_regBigTimer;
 		m_regBigTimer = NULL;
+	}
+
+	if (m_stdMeterReader)
+	{
+		delete m_stdMeterReader;
+		m_stdMeterReader = NULL;
 	}
 
 	emit signalClosed();

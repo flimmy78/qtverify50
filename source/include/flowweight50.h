@@ -25,6 +25,7 @@ class CAlgorithm;
 class ParaSetDlg;
 class ParaSetReader;
 class ReadComConfig;
+class CStdMeterReader;
 
 
 class FLOWWEIGHT50_EXPORT FlowWeightDlg50 : public QWidget
@@ -292,6 +293,8 @@ signals:
 
 private:
 	Ui::FlowWeightClass50 ui;
+	CStdMeterReader* m_stdMeterReader;//标准流量计
+
 	void exportReport();//导出报告
 };
 

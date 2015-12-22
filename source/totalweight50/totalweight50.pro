@@ -10,7 +10,7 @@ QMAKE_LIBDIR +=  ./           \
         	     $(ADEHOME)/lib \
 	             $(ADEHOME)/bin 
 	            
-LIBS +=	-lprotocol -lsystemsetdlg -lcomobject -lqtexdb -lalgorithm -lreport -lqwtd
+LIBS +=	-lprotocol -lsystemsetdlg -lcomobject -lqtexdb -lalgorithm -lreport -lqwtd -lreadstdmeter
 
 DESTDIR = $(ADEHOME)\tmp\totalweight50
 #MOC_DIR = $(ADEHOME)/tmp/totalweight50/moc

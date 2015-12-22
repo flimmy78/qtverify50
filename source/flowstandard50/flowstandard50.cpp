@@ -29,13 +29,13 @@
 #include "parasetdlg.h"
 #include "readcomconfig.h"
 #include "report.h"
+#include "readstdmeter.h"
 
 FlowStandardDlg50::FlowStandardDlg50(QWidget *parent, Qt::WFlags flags)
 	: QWidget(parent, flags)
 {
 	qDebug()<<"FlowStandardDlg50 thread:"<<QThread::currentThreadId();
 	ui.setupUi(this);
-	m_stdParam = new QSettings(getFullIniFileName("stdmtrparaset.ini"), QSettings::IniFormat);
 
 	//不同等级的热量表对应的标准误差,单位%
 	m_gradeErrA[1] = 1.00f;
@@ -63,14 +63,6 @@ FlowStandardDlg50::FlowStandardDlg50(QWidget *parent, Qt::WFlags flags)
 	}
 
 	m_readComConfig = new ReadComConfig(); //读串口设置接口（必须在initBalanceCom前调用）
-
-	m_instantFlowCom = NULL;
-	m_instSTDMeterTimer = NULL;
-	initInstStdCom();//初始化瞬时流量串口
-
-	m_accumulateFlowCom = NULL;
-	m_accumSTDMeterTimer = NULL;
-	initAccumStdCom();//初始化累积流量串口
 
 	m_tempObj = NULL;
 	m_tempTimer = NULL;
@@ -147,6 +139,23 @@ FlowStandardDlg50::FlowStandardDlg50(QWidget *parent, Qt::WFlags flags)
 	}
 
 	///////////////////////////////// 原showEvent()函数的内容 end
+
+	/***************标准流量计***********************/
+	m_mapInstWdg[FLOW_RATE_BIG]   = ui.lcdInstStdMeter_50;
+	m_mapInstWdg[FLOW_RATE_MID_2] = ui.lcdInstStdMeter_25;
+	m_mapInstWdg[FLOW_RATE_MID_1] = ui.lcdInstStdMeter_10;
+	m_mapInstWdg[FLOW_RATE_SMALL] = ui.lcdInstStdMeter_3;
+
+	m_mapAccumWdg[FLOW_RATE_BIG]   = ui.lcdAccumStdMeter_50;
+	m_mapAccumWdg[FLOW_RATE_MID_2] = ui.lcdAccumStdMeter_25;
+	m_mapAccumWdg[FLOW_RATE_MID_1] = ui.lcdAccumStdMeter_10;
+	m_mapAccumWdg[FLOW_RATE_SMALL] = ui.lcdAccumStdMeter_3;
+	m_stdMeterReader = NULL;
+	m_stdMeterReader = new CStdMeterReader;
+	m_stdMeterReader->mapInstWdg(&m_mapInstWdg, ui.lcdFlowRate);
+	m_stdMeterReader->mapAccumWdg(&m_mapAccumWdg, ui.lcdAccumStdMeter);
+	m_stdMeterReader->startReadMeter();
+	/***************标准流量计end********************/
 }
 
 FlowStandardDlg50::~FlowStandardDlg50()
@@ -259,47 +268,11 @@ void FlowStandardDlg50::closeEvent( QCloseEvent * event)
 		m_exaustTimer = NULL;
 	}
 
-	if (m_instSTDMeterTimer)
+	if (m_stdMeterReader)
 	{
-		if (m_instSTDMeterTimer->isActive())
-		{
-			m_instSTDMeterTimer->stop();
-		}
-
-		delete m_instSTDMeterTimer;
-		m_instSTDMeterTimer = NULL;
+		delete m_stdMeterReader;
+		m_stdMeterReader = NULL;
 	}
-
-	if (m_instantFlowCom)
-	{
-		m_instantFlowThread.exit();
-		delete m_instantFlowCom;
-		m_instantFlowCom = NULL;
-	}
-
-	if (m_accumSTDMeterTimer)
-	{
-		if (m_accumSTDMeterTimer->isActive())
-		{
-			m_accumSTDMeterTimer->stop();
-		}
-		delete m_accumSTDMeterTimer;
-		m_accumSTDMeterTimer = NULL;
-	}
-
-	if (m_accumulateFlowCom)
-	{
-		m_accumFlowThread.exit();
-		delete m_accumulateFlowCom;
-		m_accumulateFlowCom = NULL;
-	}
-	
-	if (m_stdParam)//停掉瞬时和累积流量的timer后才能销毁配置文件对象
-	{
-		delete m_stdParam;
-		m_stdParam = NULL;
-	}
-
 	emit signalClosed();
 }
 
@@ -315,55 +288,6 @@ void FlowStandardDlg50::resizeEvent(QResizeEvent * event)
 	int hSize = (int)((tw-vw-10)/COLUMN__FLOW_COUNT);
 	ui.tableWidget->verticalHeader()->setDefaultSectionSize(vSize);
 	ui.tableWidget->horizontalHeader()->setDefaultSectionSize(hSize);
-}
-
-//瞬时流量采集串口, 上位机直接采集
-void FlowStandardDlg50::initInstStdCom()
-{
-	ComInfoStruct InstStdCom = m_readComConfig->ReadInstStdConfig();
-	m_instantFlowCom = new lcModRtuComObject();
-	m_instantFlowCom->moveToThread(&m_instantFlowThread);
-	m_instantFlowThread.start();
-	m_instantFlowCom->openLcModCom(&InstStdCom);
-
-	connect(m_instantFlowCom, SIGNAL(lcModValueIsReady(const QByteArray &)), this, SLOT(slotGetInstStdMeterPulse(const QByteArray &)));
-
-	if (m_instSTDMeterTimer == NULL)
-		m_instSTDMeterTimer = new QTimer();
-
-	connect(m_instSTDMeterTimer, SIGNAL(timeout()), this, SLOT(slotAskInstPulse()));
-	m_instSTDMeterTimer->start(TIMEOUT_STD_INST);
-}
-//累计流量采集串口, 上位机直接采集
-void FlowStandardDlg50::initAccumStdCom()
-{
-	ComInfoStruct AccumStdCom = m_readComConfig->ReadAccumStdConfig();
-	m_accumulateFlowCom = new lcModRtuComObject();
-	m_accumulateFlowCom->moveToThread(&m_accumFlowThread);
-	m_accumFlowThread.start();
-	m_accumulateFlowCom->openLcModCom(&AccumStdCom);
-
-	connect(m_accumulateFlowCom, SIGNAL(lcModValueIsReady(const QByteArray &)), this, SLOT(slotGetAccumStdMeterPulse(const QByteArray &)));
-
-	if (m_accumSTDMeterTimer == NULL)
-		m_accumSTDMeterTimer = new QTimer();
-
-	connect(m_accumSTDMeterTimer, SIGNAL(timeout()), this, SLOT(slotAskAccumPulse()));
-	m_accumSTDMeterTimer->start(TIMEOUT_STD_ACCUM);
-}
-
-void FlowStandardDlg50::slotAskInstPulse()
-{
-	bool ok;
-	uchar address = (uchar)m_stdParam->value("DevNo./InstDevNo").toString().toInt(&ok, 16);
-	m_instantFlowCom->ask901712RoutesCmd(address);
-}
-
-void FlowStandardDlg50::slotAskAccumPulse()
-{
-	bool ok;
-	uchar address = (uchar)m_stdParam->value("DevNo./AccumDevNo").toString().toInt(&ok, 16);
-	m_accumulateFlowCom->ask9150A16RoutesCmd(address);
 }
 
 /*
@@ -821,7 +745,6 @@ int FlowStandardDlg50::judgeTartgetVolAndCalcAvgTemperAndFlow(double initV, doub
 	int second          = 0;
 	double nowFlow       = m_paraSetReader->getFpBySeq(m_nowOrder).fp_verify;
 	double nowVol        = initV;
-	flow_rate_wdg wdgIdx = (flow_rate_wdg)m_paraSetReader->getBigSmallBySeq(m_nowOrder);//获取大流量还是小流量点 
 	while (!m_stopFlag && (nowVol < targetV))
 	{
 		qDebug()<<"当前流水量 ="<<nowVol<<", 小于目标体积 "<<targetV;
@@ -834,7 +757,7 @@ int FlowStandardDlg50::judgeTartgetVolAndCalcAvgTemperAndFlow(double initV, doub
 			.arg(m_nowOrder).arg(nowFlow));
 		ui.labelHintProcess->setText(tr("Verifying...Please wait for about <font color=DarkGreen size=6><b>%1</b></font> second").arg(second));
 		wait(CYCLE_TIME);		
-		nowVol = getAccumFLowVolume(wdgIdx);//记录标准表体积(L)
+		nowVol = ui.lcdAccumStdMeter->value();//记录标准表体积(L)
 	}
 
 	m_pipeInTemper = m_pipeInTemper/m_avgTFCount;   //入口平均温度
@@ -1271,8 +1194,7 @@ int FlowStandardDlg50::startVerifyFlowPoint(int order)
 	float frequence = m_paraSetReader->getFpBySeq(order).fp_freq; //order对应的频率
 	m_controlObj->askSetDriverFreq(frequence);
 
-	flow_rate_wdg wdgIdx = (flow_rate_wdg)m_paraSetReader->getBigSmallBySeq(order);//获取大流量还是小流量点 
-	m_stdStartVol = getAccumFLowVolume(wdgIdx);//记录标准表初始体积(L)
+	m_stdStartVol = ui.lcdAccumStdMeter->value();//记录标准表初始体积(L)
 	//m_stdStartVol = ui.lcdAccumStdMeter->value();
 	qDebug() << "start volumn: " << m_stdStartVol;
 	float stdStartT = m_pipeOutTemper;//标准表初始温度, 现采集管路出口的平均温度.(不准确需要更精确的修正)
@@ -1294,7 +1216,7 @@ int FlowStandardDlg50::startVerifyFlowPoint(int order)
 			closeValve(portNo); //关闭order对应的阀门
 			wait(BALANCE_STABLE_TIME); //等待3秒钟，让天平数值稳定
 
-			m_stdEndVol = getAccumFLowVolume(wdgIdx);//记录标准表最终体积(L)
+			m_stdEndVol = ui.lcdAccumStdMeter->value();//记录标准表最终体积(L)
 			//m_stdEndVol = ui.lcdAccumStdMeter->value();
 			float stdEndT = m_pipeOutTemper;//标准表最终温度, 现采集管路出口的平均温度.(不准确需要更精确的修正)
 			float stdEndDen = m_chkAlg->getDensityByQuery(stdEndT);//标准表最终平均密度(kg/L)
@@ -2204,142 +2126,4 @@ void FlowStandardDlg50::saveStartMeterNO()
 	QSettings settings(filename, QSettings::IniFormat);
 	settings.setIniCodec("GB2312");//解决向ini文件中写汉字乱码
 	settings.setValue("Other/meternumber", m_newMeterNO);
-}
-
-void FlowStandardDlg50::slotGetInstStdMeterPulse(const QByteArray & valueArray)
-{
-	m_instStdCurrent = valueArray;
-	freshInstStdMeter();
-	float instValue = 0.0;//瞬时流量
-
-	instValue = ui.lcdInstStdMeter_3->value()+ui.lcdInstStdMeter_10->value()+ui.lcdInstStdMeter_25->value()+ui.lcdInstStdMeter_50->value();
-	ui.lcdFlowRate->display(instValue);
-}
-
-float FlowStandardDlg50::getFlowValueByValve(flow_rate_wdg wdgIdx, flow_type fType)
-{
-	int route		= getRouteByWdg(wdgIdx, fType);//标准表接到力创模块的通道号
-	int count		= 0;//电流/脉冲信号	
-	float pulse		= 0.0f;//脉冲当量
-	float upperFlow = 0.0f;//上限流量
-	float retValue  = 0.0f;//瞬时流量
-
-	switch (fType)
-	{
-	case INST_FLOW_VALUE:		
-		if (m_instRouteIsRead.contains(route))//如果前面已经读取过此通道, 则直接返回0	
-			return 0.0f;
-		else
-			m_instRouteIsRead.append(route);//如果前面没有读取过此通道, 则加入队列
-
-		retValue = getInstFlowRate(wdgIdx);
-		break;
-	case ACCUM_FLOW_VALUE:
-		if (m_accumRouteIsRead.contains(route))//如果前面已经读取过此通道, 则直接返回0	
-			return 0.0f;
-		else
-			m_accumRouteIsRead.append(route);//如果前面没有读取过此通道, 则加入队列
-
-		retValue = getAccumFLowVolume(wdgIdx);
-		break;
-	default:
-		break;
-	}	
-	return retValue;
-}
-
-int FlowStandardDlg50::getRouteByWdg(flow_rate_wdg wdgIdx, flow_type fType)
-{
-	int route = -1;
-	if (m_stdParam == NULL)
-	{
-		return route;
-	}
-	m_stdParam->beginReadArray("Route");
-	m_stdParam->setArrayIndex(wdgIdx);
-	switch(fType)
-	{
-	case INST_FLOW_VALUE:
-		route = m_stdParam->value("InstRoute").toInt();
-		break;
-	case ACCUM_FLOW_VALUE:
-		route = m_stdParam->value("AccumRoute").toInt();
-		break;
-	default:
-		break;
-	}	
-	m_stdParam->endArray();
-	return route;
-}
-
-float FlowStandardDlg50::getStdUpperFlow(flow_rate_wdg wdgIdx)
-{
-	float upperFlow = 0.0f;
-
-	m_stdParam->beginReadArray("FlowRate");
-	m_stdParam->setArrayIndex(wdgIdx);
-	upperFlow = m_stdParam->value("UpperFlow").toFloat();
-	m_stdParam->endArray();
-	return upperFlow;
-}
-
-float FlowStandardDlg50::getStdPulse(flow_rate_wdg wdgIdx)
-{
-	float pulse = 0.0f;
-
-	m_stdParam->beginReadArray("Pulse");
-	m_stdParam->setArrayIndex(wdgIdx);
-	pulse = m_stdParam->value("Pulse").toFloat();
-	m_stdParam->endArray();
-	return pulse;
-}
-
-void FlowStandardDlg50::slotGetAccumStdMeterPulse(const QByteArray & valueArray)
-{
-	m_accumStdPulse = valueArray;
-	freshAccumStdMeter();
-	float accumValue = 0.0;//累积流量
-
-	accumValue = ui.lcdAccumStdMeter_3->value()+ui.lcdAccumStdMeter_10->value()+ui.lcdAccumStdMeter_25->value()+ui.lcdAccumStdMeter_50->value();
-	ui.lcdAccumStdMeter->display(accumValue);	
-}
-
-void FlowStandardDlg50::freshInstStdMeter()
-{
-	ui.lcdInstStdMeter_50->display(getInstFlowRate(FLOW_RATE_BIG));
-	ui.lcdInstStdMeter_25->display(getInstFlowRate(FLOW_RATE_MID_2));
-	ui.lcdInstStdMeter_10->display(getInstFlowRate(FLOW_RATE_MID_1));
-	ui.lcdInstStdMeter_3->display(getInstFlowRate(FLOW_RATE_SMALL));
-}
-
-void FlowStandardDlg50::freshAccumStdMeter()
-{
-	ui.lcdAccumStdMeter_50->display(getAccumFLowVolume(FLOW_RATE_BIG));
-	ui.lcdAccumStdMeter_25->display(getAccumFLowVolume(FLOW_RATE_MID_2));
-	ui.lcdAccumStdMeter_10->display(getAccumFLowVolume(FLOW_RATE_MID_1));
-	ui.lcdAccumStdMeter_3->display(getAccumFLowVolume(FLOW_RATE_SMALL));
-}
-
-float FlowStandardDlg50::getInstFlowRate(flow_rate_wdg idx)
-{
-	int route = getRouteByWdg(idx, INST_FLOW_VALUE);
-	if (route < 0)
-	{
-		return 0.0;
-	}
-	int count = get9017RouteI(route, m_instStdCurrent);
-	float upperFlow = getStdUpperFlow(idx);
-	return getInstStdValue(count, upperFlow);
-}
-
-float FlowStandardDlg50::getAccumFLowVolume(flow_rate_wdg idx)
-{
-	int route = getRouteByWdg(idx, ACCUM_FLOW_VALUE);
-	if (route < 0)
-	{
-		return 0.0;
-	}
-	int count = get9150ARouteI(route, m_accumStdPulse);
-	float pulse = getStdPulse(idx);
-	return count*pulse;
 }

@@ -25,7 +25,7 @@ class CAlgorithm;
 class ParaSetDlg;
 class ParaSetReader;
 class ReadComConfig;
-
+class CStdMeterReader;
 
 class TOTALWEIGHT50_EXPORT TotalWeightDlg50 : public QWidget
 {
@@ -300,6 +300,8 @@ signals:
 
 private:
 	Ui::TotalWeightClass50 ui;
+	CStdMeterReader* m_stdMeterReader;
+
 	void exportReport();
 };
 
