@@ -160,7 +160,7 @@
     <message>
         <location filename="../flowstandard50.ui" line="966"/>
         <source>DN50</source>
-        <translation type="unfinished">DN50</translation>
+        <translation>DN50</translation>
     </message>
     <message>
         <location filename="../flowstandard50.ui" line="2071"/>
@@ -169,7 +169,11 @@ i
 g
 i
 n</source>
-        <translation type="unfinished"></translation>
+        <translation>b
+i
+g
+i
+n</translation>
     </message>
     <message>
         <location filename="../flowstandard50.ui" line="2100"/>
@@ -179,14 +183,21 @@ g
 o
 u
 t</source>
-        <translation type="unfinished"></translation>
+        <translation>b
+i
+g
+o
+u
+t</translation>
     </message>
     <message>
         <location filename="../flowstandard50.ui" line="2130"/>
         <source>s
 i
 n</source>
-        <translation type="unfinished"></translation>
+        <translation>s
+i
+n</translation>
     </message>
     <message>
         <location filename="../flowstandard50.ui" line="2157"/>
@@ -194,7 +205,10 @@ n</source>
 o
 u
 t</source>
-        <translation type="unfinished"></translation>
+        <translation>s
+o
+u
+t</translation>
     </message>
     <message>
         <location filename="../flowstandard50.ui" line="2210"/>
@@ -238,27 +252,27 @@ t</source>
     <message>
         <location filename="../flowstandard50.ui" line="130"/>
         <source>Regulator</source>
-        <translation type="unfinished"></translation>
+        <translation>Regulator</translation>
     </message>
     <message>
         <location filename="../flowstandard50.ui" line="195"/>
         <source>Small</source>
-        <translation type="unfinished"></translation>
+        <translation>Small</translation>
     </message>
     <message>
         <location filename="../flowstandard50.ui" line="279"/>
         <source>Mid1</source>
-        <translation type="unfinished"></translation>
+        <translation>Mid1</translation>
     </message>
     <message>
         <location filename="../flowstandard50.ui" line="379"/>
         <source>Mid2</source>
-        <translation type="unfinished"></translation>
+        <translation>Mid2</translation>
     </message>
     <message>
         <location filename="../flowstandard50.ui" line="463"/>
         <source>Big</source>
-        <translation type="unfinished"></translation>
+        <translation>Big</translation>
     </message>
     <message>
         <location filename="../flowstandard50.ui" line="587"/>
@@ -606,7 +620,7 @@ Please wait for about %1 second</source>
         <location filename="../flowstandard50.cpp" line="690"/>
         <location filename="../flowstandard50.cpp" line="1351"/>
         <source>regulator is opening, please wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>regulator is opening, please wait...</translation>
     </message>
     <message>
         <location filename="../flowstandard50.cpp" line="704"/>
@@ -652,12 +666,12 @@ Please wait for about %1 second</source>
     <message>
         <location filename="../flowstandard50.cpp" line="1327"/>
         <source>please wait for regulator...</source>
-        <translation type="unfinished"></translation>
+        <translation>please wait for regulator...</translation>
     </message>
     <message>
         <location filename="../flowstandard50.cpp" line="1347"/>
         <source>regulator is closing, please wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>regulator is closing, please wait...</translation>
     </message>
     <message>
         <location filename="../flowstandard50.cpp" line="1571"/>

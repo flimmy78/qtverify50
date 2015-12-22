@@ -1978,7 +1978,7 @@ t</string>
          <string notr="true">font: 75 12pt &quot;Aharoni&quot;;</string>
         </property>
         <property name="text">
-         <string>HintPoint:</string>
+         <string/>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -2016,7 +2016,7 @@ t</string>
          <string notr="true">font: 75 12pt &quot;Aharoni&quot;;</string>
         </property>
         <property name="text">
-         <string>HintProcess:</string>
+         <string/>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>

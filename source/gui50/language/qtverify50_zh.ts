@@ -10,7 +10,7 @@
     </message>
     <message>
         <location filename="../source/mainform50.cpp" line="106"/>
-        <location filename="../source/mainform50.cpp" line="866"/>
+        <location filename="../source/mainform50.cpp" line="868"/>
         <source>Official Version</source>
         <translation>正式版</translation>
     </message>
@@ -20,62 +20,62 @@
         <translation>试用版！试用期剩余 %1 天</translation>
     </message>
     <message>
-        <location filename="../source/mainform50.cpp" line="124"/>
+        <location filename="../source/mainform50.cpp" line="126"/>
         <source>Question</source>
         <translation>询问</translation>
     </message>
     <message>
-        <location filename="../source/mainform50.cpp" line="124"/>
+        <location filename="../source/mainform50.cpp" line="126"/>
         <source>Quit Really ?</source>
         <translation>确认退出吗?</translation>
     </message>
     <message>
-        <location filename="../source/mainform50.cpp" line="681"/>
-        <location filename="../source/mainform50.cpp" line="728"/>
+        <location filename="../source/mainform50.cpp" line="683"/>
+        <location filename="../source/mainform50.cpp" line="730"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="../source/mainform50.cpp" line="681"/>
+        <location filename="../source/mainform50.cpp" line="683"/>
         <source>Excel object lose!</source>
         <translation>找不到Excel组件!</translation>
     </message>
     <message>
-        <location filename="../source/mainform50.cpp" line="728"/>
+        <location filename="../source/mainform50.cpp" line="730"/>
         <source>No right for user manage!</source>
         <translation>没有用户管理权限！</translation>
     </message>
     <message>
-        <location filename="../source/mainform50.cpp" line="840"/>
-        <location filename="../source/mainform50.cpp" line="846"/>
-        <location filename="../source/mainform50.cpp" line="849"/>
-        <location filename="../source/mainform50.cpp" line="852"/>
-        <location filename="../source/mainform50.cpp" line="855"/>
+        <location filename="../source/mainform50.cpp" line="842"/>
+        <location filename="../source/mainform50.cpp" line="848"/>
+        <location filename="../source/mainform50.cpp" line="851"/>
+        <location filename="../source/mainform50.cpp" line="854"/>
+        <location filename="../source/mainform50.cpp" line="857"/>
         <source>Hint</source>
         <translation>提示</translation>
     </message>
     <message>
-        <location filename="../source/mainform50.cpp" line="840"/>
+        <location filename="../source/mainform50.cpp" line="842"/>
         <source>Failed To Start</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../source/mainform50.cpp" line="846"/>
+        <location filename="../source/mainform50.cpp" line="848"/>
         <source>Timed Out</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../source/mainform50.cpp" line="849"/>
+        <location filename="../source/mainform50.cpp" line="851"/>
         <source>Write Error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../source/mainform50.cpp" line="852"/>
+        <location filename="../source/mainform50.cpp" line="854"/>
         <source>Read Error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../source/mainform50.cpp" line="855"/>
+        <location filename="../source/mainform50.cpp" line="857"/>
         <source>Unknown Error</source>
         <translation></translation>
     </message>
