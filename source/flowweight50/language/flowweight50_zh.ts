@@ -185,8 +185,7 @@
         <source>i
 n
 </source>
-        <translation>总
-进
+        <translation>进
 水
 阀</translation>
     </message>
@@ -198,8 +197,9 @@ a
 l
 l</source>
         <translation>小
-管
-路</translation>
+流
+量
+阀</translation>
     </message>
     <message>
         <location filename="../flowweight50.ui" line="935"/>
@@ -208,9 +208,9 @@ i
 d
 1</source>
         <translation>中
+流
 一
-管
-路</translation>
+阀</translation>
     </message>
     <message>
         <location filename="../flowweight50.ui" line="963"/>
@@ -219,9 +219,9 @@ i
 d
 2</source>
         <translation>中
+流
 二
-管
-路</translation>
+阀</translation>
     </message>
     <message>
         <location filename="../flowweight50.ui" line="991"/>
@@ -229,8 +229,9 @@ d
 i
 g</source>
         <translation>大
-管
-路</translation>
+流
+量
+阀</translation>
     </message>
     <message>
         <location filename="../flowweight50.ui" line="1018"/>

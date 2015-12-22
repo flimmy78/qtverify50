@@ -786,16 +786,18 @@ int FlowStandardDlg50::setAllMeterVerifyStatus()
 	return true;
 }
 
-//打开所有阀门和水泵
+/*
+** 打开所有阀门和水泵（关闭大、小天平进水阀，因为标准表法不需要使用天平）
+*/
 int FlowStandardDlg50::openAllValveAndPump()
 {
 	openValve(m_portsetinfo.bigWaterOutNo); //大天平放水阀
 	wait(CYCLE_TIME);
 	openValve(m_portsetinfo.smallWaterOutNo);
 	wait(CYCLE_TIME);
-	openValve(m_portsetinfo.bigWaterInNo);
+	closeValve(m_portsetinfo.bigWaterInNo);
 	wait(CYCLE_TIME);
-	openValve(m_portsetinfo.smallWaterInNo);
+	closeValve(m_portsetinfo.smallWaterInNo);
 	wait(CYCLE_TIME);
 	openValve(m_portsetinfo.waterInNo);
 	openWaterPump();//打开水泵
@@ -816,11 +818,11 @@ int FlowStandardDlg50::closeAllValveAndPumpOpenOutValve()
 {
 	openValve(m_portsetinfo.bigWaterOutNo); //打开大天平放水阀
 	wait(CYCLE_TIME);
-	openValve(m_portsetinfo.bigWaterInNo);  //打开大天平进水阀
+	closeValve(m_portsetinfo.bigWaterInNo);  //关闭大天平进水阀
 	wait(CYCLE_TIME);
 	openValve(m_portsetinfo.smallWaterOutNo);//打开小天平放水阀
 	wait(CYCLE_TIME);
-	openValve(m_portsetinfo.smallWaterInNo);//打开小天平进水阀
+	closeValve(m_portsetinfo.smallWaterInNo);//关闭小天平进水阀
 	wait(CYCLE_TIME);
 	closeWaterPump();    //退出时关闭水泵
 	closeAllFlowPointValves();//关闭所有流量点阀门
