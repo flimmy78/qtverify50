@@ -133,7 +133,7 @@
       <item row="0" column="0">
        <layout class="QGridLayout" name="gridLayout_16">
         <item row="0" column="0" colspan="2">
-         <widget class="QwtThermo" name="ThermoSmall">
+         <widget class="QwtThermo" name="ThermoSmall" native="true">
           <property name="maximumSize">
            <size>
             <width>60</width>
@@ -217,7 +217,7 @@
       <item row="0" column="2">
        <layout class="QGridLayout" name="gridLayout_17">
         <item row="0" column="0" colspan="2">
-         <widget class="QwtThermo" name="ThermoMid1">
+         <widget class="QwtThermo" name="ThermoMid1" native="true">
           <property name="maximumSize">
            <size>
             <width>60</width>
@@ -317,7 +317,7 @@
       <item row="2" column="0">
        <layout class="QGridLayout" name="gridLayout_18">
         <item row="0" column="0" colspan="2">
-         <widget class="QwtThermo" name="ThermoMid2">
+         <widget class="QwtThermo" name="ThermoMid2" native="true">
           <property name="maximumSize">
            <size>
             <width>60</width>
@@ -401,7 +401,7 @@
       <item row="2" column="2">
        <layout class="QGridLayout" name="gridLayout_19">
         <item row="0" column="0" colspan="2">
-         <widget class="QwtThermo" name="ThermoBig">
+         <widget class="QwtThermo" name="ThermoBig" native="true">
           <property name="maximumSize">
            <size>
             <width>60</width>
@@ -723,7 +723,7 @@
              </size>
             </property>
             <property name="numDigits">
-             <number>10</number>
+             <number>4</number>
             </property>
             <property name="segmentStyle">
              <enum>QLCDNumber::Flat</enum>
@@ -764,7 +764,7 @@
              </size>
             </property>
             <property name="numDigits">
-             <number>10</number>
+             <number>5</number>
             </property>
             <property name="segmentStyle">
              <enum>QLCDNumber::Flat</enum>
@@ -833,7 +833,7 @@
              </size>
             </property>
             <property name="numDigits">
-             <number>10</number>
+             <number>5</number>
             </property>
             <property name="segmentStyle">
              <enum>QLCDNumber::Flat</enum>
@@ -855,7 +855,7 @@
              </size>
             </property>
             <property name="numDigits">
-             <number>10</number>
+             <number>4</number>
             </property>
             <property name="segmentStyle">
              <enum>QLCDNumber::Flat</enum>
@@ -905,7 +905,7 @@
              </size>
             </property>
             <property name="numDigits">
-             <number>10</number>
+             <number>4</number>
             </property>
             <property name="segmentStyle">
              <enum>QLCDNumber::Flat</enum>
@@ -946,7 +946,7 @@
              </size>
             </property>
             <property name="numDigits">
-             <number>10</number>
+             <number>5</number>
             </property>
             <property name="segmentStyle">
              <enum>QLCDNumber::Flat</enum>
@@ -1000,7 +1000,7 @@
              </size>
             </property>
             <property name="numDigits">
-             <number>10</number>
+             <number>4</number>
             </property>
             <property name="segmentStyle">
              <enum>QLCDNumber::Flat</enum>
@@ -1041,7 +1041,7 @@
              </size>
             </property>
             <property name="numDigits">
-             <number>10</number>
+             <number>5</number>
             </property>
             <property name="segmentStyle">
              <enum>QLCDNumber::Flat</enum>

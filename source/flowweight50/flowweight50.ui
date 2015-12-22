@@ -136,7 +136,7 @@
       <item row="0" column="0">
        <layout class="QGridLayout" name="gridLayout_8">
         <item row="0" column="0" colspan="2">
-         <widget class="QwtThermo" name="ThermoSmall">
+         <widget class="QwtThermo" name="ThermoSmall" native="true">
           <property name="maximumSize">
            <size>
             <width>60</width>
@@ -220,7 +220,7 @@
       <item row="0" column="2">
        <layout class="QGridLayout" name="gridLayout_10">
         <item row="0" column="0" colspan="2">
-         <widget class="QwtThermo" name="ThermoMid1">
+         <widget class="QwtThermo" name="ThermoMid1" native="true">
           <property name="maximumSize">
            <size>
             <width>60</width>
@@ -320,7 +320,7 @@
       <item row="2" column="0">
        <layout class="QGridLayout" name="gridLayout_11">
         <item row="0" column="0" colspan="2">
-         <widget class="QwtThermo" name="ThermoMid2">
+         <widget class="QwtThermo" name="ThermoMid2" native="true">
           <property name="maximumSize">
            <size>
             <width>60</width>
@@ -404,7 +404,7 @@
       <item row="2" column="2">
        <layout class="QGridLayout" name="gridLayout_12">
         <item row="0" column="0" colspan="2">
-         <widget class="QwtThermo" name="ThermoBig">
+         <widget class="QwtThermo" name="ThermoBig" native="true">
           <property name="maximumSize">
            <size>
             <width>60</width>
