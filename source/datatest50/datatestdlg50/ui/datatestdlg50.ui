@@ -814,14 +814,14 @@ p</string>
    <item row="1" column="2" rowspan="2">
     <layout class="QGridLayout" name="gridLayout_24">
      <item row="0" column="0" colspan="2">
-      <widget class="QwtThermo" name="ThermoSmall" native="true">
+      <widget class="QwtThermo" name="ThermoSmall">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="value" stdset="0">
+       <property name="value">
         <double>0.000000000000000</double>
        </property>
       </widget>
@@ -927,14 +927,14 @@ p</string>
    <item row="1" column="4" rowspan="2">
     <layout class="QGridLayout" name="gridLayout_12">
      <item row="0" column="0" colspan="2">
-      <widget class="QwtThermo" name="ThermoMid1" native="true">
+      <widget class="QwtThermo" name="ThermoMid1">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="value" stdset="0">
+       <property name="value">
         <double>0.000000000000000</double>
        </property>
       </widget>
@@ -1035,14 +1035,14 @@ p</string>
    <item row="1" column="6" rowspan="2">
     <layout class="QGridLayout" name="gridLayout_11">
      <item row="0" column="0" colspan="2">
-      <widget class="QwtThermo" name="ThermoMid2" native="true">
+      <widget class="QwtThermo" name="ThermoMid2">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="value" stdset="0">
+       <property name="value">
         <double>0.000000000000000</double>
        </property>
       </widget>
@@ -1143,14 +1143,14 @@ p</string>
    <item row="1" column="8" rowspan="2">
     <layout class="QGridLayout" name="gridLayout_5">
      <item row="0" column="0" colspan="2">
-      <widget class="QwtThermo" name="ThermoBig" native="true">
+      <widget class="QwtThermo" name="ThermoBig">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="value" stdset="0">
+       <property name="value">
         <double>0.000000000000000</double>
        </property>
       </widget>
@@ -1326,11 +1326,17 @@ p</string>
             <height>0</height>
            </size>
           </property>
+          <property name="smallDecimalPoint">
+           <bool>false</bool>
+          </property>
           <property name="numDigits">
-           <number>4</number>
+           <number>5</number>
           </property>
           <property name="segmentStyle">
            <enum>QLCDNumber::Flat</enum>
+          </property>
+          <property name="value" stdset="0">
+           <double>0.000000000000000</double>
           </property>
          </widget>
         </item>
@@ -1368,10 +1374,13 @@ p</string>
            </size>
           </property>
           <property name="numDigits">
-           <number>5</number>
+           <number>6</number>
           </property>
           <property name="segmentStyle">
            <enum>QLCDNumber::Flat</enum>
+          </property>
+          <property name="value" stdset="0">
+           <double>0.000000000000000</double>
           </property>
          </widget>
         </item>
@@ -1437,7 +1446,7 @@ p</string>
            </size>
           </property>
           <property name="numDigits">
-           <number>5</number>
+           <number>6</number>
           </property>
           <property name="segmentStyle">
            <enum>QLCDNumber::Flat</enum>
@@ -1459,7 +1468,7 @@ p</string>
            </size>
           </property>
           <property name="numDigits">
-           <number>4</number>
+           <number>5</number>
           </property>
           <property name="segmentStyle">
            <enum>QLCDNumber::Flat</enum>
@@ -1509,7 +1518,7 @@ p</string>
            </size>
           </property>
           <property name="numDigits">
-           <number>4</number>
+           <number>5</number>
           </property>
           <property name="segmentStyle">
            <enum>QLCDNumber::Flat</enum>
@@ -1550,7 +1559,7 @@ p</string>
            </size>
           </property>
           <property name="numDigits">
-           <number>5</number>
+           <number>6</number>
           </property>
           <property name="segmentStyle">
            <enum>QLCDNumber::Flat</enum>
@@ -1604,10 +1613,10 @@ p</string>
            </size>
           </property>
           <property name="numDigits">
-           <number>3</number>
+           <number>5</number>
           </property>
           <property name="digitCount">
-           <number>3</number>
+           <number>5</number>
           </property>
           <property name="segmentStyle">
            <enum>QLCDNumber::Flat</enum>
@@ -1648,7 +1657,10 @@ p</string>
            </size>
           </property>
           <property name="numDigits">
-           <number>5</number>
+           <number>6</number>
+          </property>
+          <property name="digitCount">
+           <number>6</number>
           </property>
           <property name="segmentStyle">
            <enum>QLCDNumber::Flat</enum>
@@ -1714,7 +1726,7 @@ p</string>
            </size>
           </property>
           <property name="numDigits">
-           <number>5</number>
+           <number>6</number>
           </property>
           <property name="segmentStyle">
            <enum>QLCDNumber::Flat</enum>
@@ -1730,7 +1742,7 @@ p</string>
            </sizepolicy>
           </property>
           <property name="numDigits">
-           <number>4</number>
+           <number>5</number>
           </property>
           <property name="segmentStyle">
            <enum>QLCDNumber::Flat</enum>
