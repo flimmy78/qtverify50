@@ -41,6 +41,7 @@
 #include "calculator_result.h"
 #include "cmb_result.h"
 #include "total_result.h"
+#include "water_result.h"
 #include "scancodedlg.h"
 #include "register.h"
 #include "md5encode.h"
@@ -88,6 +89,7 @@ MainForm50::MainForm50(bool licenseOK, int validDays, QWidget *parent, Qt::WFlag
 	m_CalcResultDlg = NULL;
 	m_CmbResultDlg = NULL;
 	m_TotalResultDlg = NULL;
+	m_WaterResultDlg = NULL;
 
 	m_comProcess = new QProcess(this);
 	QObject::connect(m_comProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
@@ -308,6 +310,12 @@ void MainForm50::closeEvent( QCloseEvent * event)
 		{
 			delete m_TotalResultDlg;
 			m_TotalResultDlg = NULL;
+		}
+
+		if (m_WaterResultDlg)
+		{
+			delete m_WaterResultDlg;
+			m_WaterResultDlg = NULL;
 		}
 	}
 }
@@ -659,6 +667,18 @@ void MainForm50::on_actionTotalResult_triggered()
 	}
 	m_TotalResultDlg = new TotalResultDlg();
 	m_TotalResultDlg->show();
+}
+
+//查询水表检定结果（包括质量法和标准表法）
+void MainForm50::on_actionWaterResult_triggered()
+{
+	if (NULL != m_WaterResultDlg)
+	{	
+		delete m_WaterResultDlg;
+		m_WaterResultDlg = NULL;
+	}
+	m_WaterResultDlg = new WaterResultDlg();
+	m_WaterResultDlg->show();
 }
 
 //查询温度传感器检定结果

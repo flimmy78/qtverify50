@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1243</width>
-    <height>592</height>
+    <height>814</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -172,6 +172,7 @@
    <addaction name="separator"/>
    <addaction name="actionFlowResult"/>
    <addaction name="actionTotalResult"/>
+   <addaction name="actionWaterResult"/>
    <addaction name="actionPtResult"/>
    <addaction name="actionCalculatorResult"/>
    <addaction name="actionCombineResult"/>
@@ -596,6 +597,15 @@
    </property>
    <property name="text">
     <string>WaterStandard</string>
+   </property>
+  </action>
+  <action name="actionWaterResult">
+   <property name="icon">
+    <iconset resource="../qtverify50.qrc">
+     <normaloff>:/qtverify/images/waterresult.png</normaloff>:/qtverify/images/waterresult.png</iconset>
+   </property>
+   <property name="text">
+    <string>WaterResult</string>
    </property>
   </action>
  </widget>

@@ -29,6 +29,7 @@ class PlaResultDlg;
 class CalcResultDlg;
 class CmbResultDlg;
 class TotalResultDlg;
+class WaterResultDlg;
 class ScanCodeDlg;
 class RegisterDlg;
 class AdjustRateDlg;
@@ -81,6 +82,7 @@ public:
 	CalcResultDlg* m_CalcResultDlg;
 	CmbResultDlg* m_CmbResultDlg;
 	TotalResultDlg* m_TotalResultDlg;
+	WaterResultDlg* m_WaterResultDlg;
 
 	void closeEvent(QCloseEvent * event);
 
@@ -118,6 +120,7 @@ public slots:
 	//Data Query
 	void on_actionFlowResult_triggered();
 	void on_actionTotalResult_triggered();
+	void on_actionWaterResult_triggered();
 	void on_actionPtResult_triggered();
 	void on_actionCalculatorResult_triggered();
 	void on_actionCombineResult_triggered();
