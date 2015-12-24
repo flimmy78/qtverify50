@@ -27,7 +27,7 @@
 #include "flowweight50.h"
 #include "flowstandard50.h"
 #include "totalweight50.h"
-// #include "totalstandard.h"
+#include "totalstandard50.h"
 #include "calcverify.h"
 #include "cmbverify.h"
 #include "stdmtrparaset.h"
@@ -73,8 +73,9 @@ MainForm50::MainForm50(bool licenseOK, int validDays, QWidget *parent, Qt::WFlag
  	m_flowWeightDlg = NULL;
  	m_flowStandardDlg = NULL;
 	m_totalWeightDlg = NULL;
-// 	m_totalStandardDlg = NULL;
+ 	m_totalStandardDlg = NULL;
 	m_waterWeight50 = NULL; //水表检定（质量法）
+	m_waterStandard50 = NULL; //水表检定（质量法）
 	m_calcDlg = NULL;  
 	m_cmbVerifyDlg = NULL;
 	m_tvercompDlg = NULL;
@@ -219,16 +220,22 @@ void MainForm50::closeEvent( QCloseEvent * event)
 			m_totalWeightDlg = NULL;
 		}
 
-// 		if (m_totalStandardDlg)
-// 		{
-// 			delete m_totalStandardDlg;
-// 			m_totalStandardDlg = NULL;
-// 		}
+		if (m_totalStandardDlg)
+		{
+			delete m_totalStandardDlg;
+			m_totalStandardDlg = NULL;
+		}
 
 		if (m_waterWeight50)
 		{
 			delete m_waterWeight50;
 			m_waterWeight50 = NULL;
+		}
+
+		if (m_waterStandard50)
+		{
+			delete m_waterStandard50;
+			m_waterStandard50 = NULL;
 		}
 
 		if (m_calcDlg)
@@ -582,6 +589,22 @@ void MainForm50::on_actionWaterWeight_triggered()
 	m_waterWeight50->showMaximized();
 }
 
+//水表检定（质量法）
+void MainForm50::on_actionWaterStandard_triggered()
+{
+// 	if (NULL == m_waterStandard50)
+// 	{
+// 		m_waterStandard50 = new WaterStandardDlg50();
+// 	}
+// 	else //目的是执行WaterStandardDlg50的构造函数
+// 	{
+// 		delete m_waterStandard50;
+// 		m_waterStandard50 = NULL;
+// 		m_waterStandard50 = new WaterStandardDlg50();
+// 	}
+// 	m_waterStandard50->showMaximized();
+}
+
 //总量检定（质量法）
 void MainForm50::on_actionTotalWeight_triggered()
 {
@@ -597,22 +620,22 @@ void MainForm50::on_actionTotalWeight_triggered()
 	}
 	m_totalWeightDlg->showMaximized();
 }
-/*
+
 //总量检定（标准表法）
-void MainForm::on_actionTotalStandard_triggered()
+void MainForm50::on_actionTotalStandard_triggered()
 {
 	if (NULL == m_totalStandardDlg)
 	{
-		m_totalStandardDlg = new TotalStandardDlg();
+		m_totalStandardDlg = new TotalStandardDlg50();
 	}
 	else //目的是执行TotalStandardDlg的构造函数
 	{
 		delete m_totalStandardDlg;
 		m_totalStandardDlg = NULL;
-		m_totalStandardDlg = new TotalStandardDlg();
+		m_totalStandardDlg = new TotalStandardDlg50();
 	}
 	m_totalStandardDlg->showMaximized();
-}*/
+}
 
 //查询流量检定结果（包括质量法和标准表法）
 void MainForm50::on_actionFlowResult_triggered()

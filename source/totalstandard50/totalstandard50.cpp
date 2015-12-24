@@ -1,16 +1,15 @@
 /***********************************************
-**  文件名:     flowstandard50.cpp
-**  功能:       流量检定(标准表法）主界面-DN50，双天平、双控制板
+**  文件名:     totalstandard50.cpp
+**  功能:       总量检定(标准表法)主界面，DN50
 **  操作系统:   基于Trolltech Qt4.8.5的跨平台系统
-**  生成时间:   2015/11/27
+**  生成时间:   2015/12/23
 **  专业组:     德鲁计量软件组
 **  程序设计者: YS
 **  程序员:     YS
-**  版本历史:   2015/11 第一版
+**  版本历史:   2015/12 第一版
 **  内容包含:
 **  说明:		
 **  更新记录:   
-
 ***********************************************/
 
 #include <QtGui/QMessageBox>
@@ -23,7 +22,7 @@
 #include <QCloseEvent>
 #include <math.h>
 
-#include "flowstandard50.h"
+#include "totalstandard50.h"
 #include "commondefine.h"
 #include "algorithm.h"
 #include "qtexdb.h"
@@ -32,16 +31,16 @@
 #include "report.h"
 #include "readstdmeter.h"
 
-FlowStandardDlg50::FlowStandardDlg50(QWidget *parent, Qt::WFlags flags)
+TotalStandardDlg50::TotalStandardDlg50(QWidget *parent, Qt::WFlags flags)
 	: QWidget(parent, flags)
 {
-	qDebug()<<"FlowStandardDlg50 thread:"<<QThread::currentThreadId();
+	qDebug()<<"TotalStandardDlg50 thread:"<<QThread::currentThreadId();
 	ui.setupUi(this);
 
 	//不同等级的热量表对应的标准误差,单位%
-	m_gradeErrA[1] = 1.00f;
-	m_gradeErrA[2] = 2.00f;
-	m_gradeErrA[3] = 3.00f;
+	m_gradeErrA[1] = 2.00f;
+	m_gradeErrA[2] = 3.00f;
+	m_gradeErrA[3] = 4.00f;
 
 	m_gradeErrB[1] = 0.01f;
 	m_gradeErrB[2] = 0.02f;
@@ -67,6 +66,10 @@ FlowStandardDlg50::FlowStandardDlg50(QWidget *parent, Qt::WFlags flags)
 	m_tempTimer = NULL;
 	initTemperatureCom();	//初始化温度采集串口
 
+	m_stdTempObj = NULL;
+	m_stdTempTimer = NULL;
+	initStdTemperatureCom(); //初始化标准温度采集串口
+
 	m_controlObj = NULL;
 	initControlCom();		//初始化控制串口
 
@@ -75,6 +78,23 @@ FlowStandardDlg50::FlowStandardDlg50(QWidget *parent, Qt::WFlags flags)
 
 	m_meterObj = NULL;      //热量表通讯
 	m_recPtr = NULL;        //流量检测结果
+
+	btnGroupEnergyUnit = new QButtonGroup(ui.groupBoxEnergyUnit); //能量单位
+	btnGroupEnergyUnit->addButton(ui.radioButtonMJ, UNIT_MJ);
+	btnGroupEnergyUnit->addButton(ui.radioButtonKwh, UNIT_KWH);
+	connect(btnGroupEnergyUnit, SIGNAL(buttonClicked(int)), this, SLOT(slot_btnGroupEnergyUnit_clicked(int)));
+	ui.radioButtonKwh->setChecked(true); //默认单位:kWh
+	m_unit = UNIT_KWH;
+
+	btnGroupInstallPos = new QButtonGroup(ui.groupBoxInstallPos); //安装位置
+	btnGroupInstallPos->addButton(ui.radioButtonPosIn, INSTALLPOS_IN);
+	btnGroupInstallPos->addButton(ui.radioButtonPosOut, INSTALLPOS_OUT);
+	connect(btnGroupInstallPos, SIGNAL(buttonClicked(int)), this, SLOT(slot_btnGroupInstallPos_clicked(int)));
+	ui.radioButtonPosIn->setChecked(true); //默认入口安装
+	m_installPos = INSTALLPOS_IN;
+
+	m_minDeltaT = 3.0; //最小温差
+	ui.lnEditMinDeltaT->setText(QString::number(m_minDeltaT));
 
 	//计算类接口
 	m_chkAlg = new CAlgorithm();
@@ -102,10 +122,7 @@ FlowStandardDlg50::FlowStandardDlg50(QWidget *parent, Qt::WFlags flags)
 	m_validMeterNum = 0;     //实际检表个数
 	m_exaustSecond = 45;     //默认排气时间45秒
 	m_pickcode = PROTOCOL_VER_DELU; //采集代码 默认德鲁
-	m_flowSC = 1.0;			 //流量安全系数，默认1.0
-	m_adjErr = false;        //默认不调整误差
-	m_writeNO = false;       //默认不写表号
-	m_repeatverify = false;  //默认不重复检测
+	m_totalSC = 1.0;			 //总量安全系数，默认1.0
 	m_meterStartValue = NULL;
 	m_meterEndValue = NULL;
 	m_meterTemper = NULL;
@@ -113,7 +130,6 @@ FlowStandardDlg50::FlowStandardDlg50(QWidget *parent, Qt::WFlags flags)
 	m_meterStdValue = NULL;
 	m_meterError = NULL;
 	m_meterErr = NULL;
-	m_oldMeterCoe = NULL;
 	m_meterResult = NULL;
 	m_stdStartVol = 0;
 	m_stdEndVol = 0;
@@ -168,18 +184,19 @@ FlowStandardDlg50::FlowStandardDlg50(QWidget *parent, Qt::WFlags flags)
 	/***************标准流量计end********************/
 }
 
-FlowStandardDlg50::~FlowStandardDlg50()
+TotalStandardDlg50::~TotalStandardDlg50()
 {
+	qDebug()<<"TotalStandardDlg50::showEvent";
 }
 
-void FlowStandardDlg50::showEvent(QShowEvent * event)
+void TotalStandardDlg50::showEvent(QShowEvent * event)
 {
-	qDebug()<<"FlowStandardDlg50::showEvent";
+	qDebug()<<"TotalStandardDlg50::showEvent";
 }
 
-void FlowStandardDlg50::closeEvent( QCloseEvent * event)
+void TotalStandardDlg50::closeEvent(QCloseEvent * event)
 {
-	qDebug()<<"^^^^^FlowStandardDlg50::closeEvent";
+	qDebug()<<"^^^^^TotalStandardDlg50::closeEvent";
 	int button = QMessageBox::question(this, tr("Question"), tr("Exit Really ?"), \
 		QMessageBox::Yes|QMessageBox::Default, QMessageBox::No|QMessageBox::Escape);
 	if (button == QMessageBox::No)
@@ -222,15 +239,13 @@ void FlowStandardDlg50::closeEvent( QCloseEvent * event)
 		m_readComConfig = NULL;
 	}
 
-	if (m_tempThread.isRunning())  // 温度采集
+	if (m_tempObj)  // 温度采集
 	{
+		delete m_tempObj;
+		m_tempObj = NULL;
+
 		m_tempThread.exit(); //否则日志中会有警告"QThread: Destroyed while thread is still running"
-		if (m_tempObj)
-		{
-			delete m_tempObj;
-			m_tempObj = NULL; 
-		}	 		 		
-	}	   
+	}
 
 	if (m_tempTimer) //采集温度计时器
 	{
@@ -242,6 +257,23 @@ void FlowStandardDlg50::closeEvent( QCloseEvent * event)
 		m_tempTimer = NULL;
 	}
 
+	if (m_stdTempTimer) //标准温度采集计时器, 必须先于串口对象停掉
+	{
+		if (m_stdTempTimer->isActive())
+		{
+			m_stdTempTimer->stop();
+		}
+		delete m_stdTempTimer;
+		m_stdTempTimer = NULL;
+	}
+
+	if (m_stdTempObj)  // 标准温度采集
+	{
+		delete m_stdTempObj;
+		m_stdTempObj = NULL;
+
+		m_stdTempThread.exit();
+	}	
 
 	if (m_controlObj)  //阀门控制
 	{
@@ -337,7 +369,7 @@ void FlowStandardDlg50::closeEvent( QCloseEvent * event)
 	emit signalClosed();
 }
 
-void FlowStandardDlg50::resizeEvent(QResizeEvent * event)
+void TotalStandardDlg50::resizeEvent(QResizeEvent * event)
 {
 	qDebug()<<"resizeEvent...";
 
@@ -346,7 +378,7 @@ void FlowStandardDlg50::resizeEvent(QResizeEvent * event)
 	int hh = ui.tableWidget->horizontalHeader()->size().height();
 	int vw = ui.tableWidget->verticalHeader()->size().width();
 	int vSize = (int)((th-hh-10)/(m_maxMeterNum<=0 ? 12 : m_maxMeterNum));
-	int hSize = (int)((tw-vw-10)/(COLUMN__FLOW_COUNT-1)); //隐藏了"密度"列
+	int hSize = (int)((tw-vw-10)/(COLUMN_TOTAL_COUNT-1)); //隐藏了"密度"列
 	ui.tableWidget->verticalHeader()->setDefaultSectionSize(vSize);
 	ui.tableWidget->horizontalHeader()->setDefaultSectionSize(hSize);
 }
@@ -355,7 +387,7 @@ void FlowStandardDlg50::resizeEvent(QResizeEvent * event)
 ** 温度采集串口 上位机直接采集
 ** 周期请求
 */
-void FlowStandardDlg50::initTemperatureCom()
+void TotalStandardDlg50::initTemperatureCom()
 {
 	ComInfoStruct tempStruct = m_readComConfig->ReadTempConfig();
 	m_tempObj = new TempComObject();
@@ -370,13 +402,39 @@ void FlowStandardDlg50::initTemperatureCom()
 	m_tempTimer->start(TIMEOUT_PIPE_TEMPER); //周期请求温度
 }
 
-void FlowStandardDlg50::slotAskPipeTemperature()
+void TotalStandardDlg50::slotAskPipeTemperature()
 {
 	m_tempObj->writeTemperatureComBuffer();
 }
 
+/*
+** 开辟一个新线程，打开标准温度采集串口
+*/
+void TotalStandardDlg50::initStdTemperatureCom()
+{
+	ComInfoStruct tempStruct = m_readComConfig->ReadStdTempConfig();
+	m_stdTempObj = new StdTempComObject();
+	QSettings stdconfig(getFullIniFileName("stdplasensor.ini"), QSettings::IniFormat);
+	m_stdTempObj->moveToThread(&m_stdTempThread);
+	m_stdTempThread.start();
+	m_stdTempObj->openTemperatureCom(&tempStruct);
+	m_stdTempObj->setStdTempVersion(stdconfig.value("in_use/model").toInt());
+	connect(m_stdTempObj, SIGNAL(temperatureIsReady(const QString &)), this, SLOT(slotFreshStdTempValue(const QString &)));
+
+	m_stdTempCommand = stdTempR1;
+	m_stdTempTimer = new QTimer();
+	connect(m_stdTempTimer, SIGNAL(timeout()), this, SLOT(slotAskStdTemperature()));
+	
+ 	m_stdTempTimer->start(TIMEOUT_STD_TEMPER);
+}
+
+void TotalStandardDlg50::slotAskStdTemperature()
+{
+	m_stdTempObj->writeStdTempComBuffer(m_stdTempCommand);
+}
+
 //控制板通讯串口
-void FlowStandardDlg50::initControlCom()
+void TotalStandardDlg50::initControlCom()
 {
 	ComInfoStruct valveStruct = m_readComConfig->ReadValveConfig();
 	m_controlObj = new ControlComObject();
@@ -390,7 +448,7 @@ void FlowStandardDlg50::initControlCom()
 }
 
 //控制板通讯串口2
-void FlowStandardDlg50::initControlCom2()
+void TotalStandardDlg50::initControlCom2()
 {
 	ComInfoStruct valveStruct2 = m_readComConfig->ReadValveConfig2();
 	m_controlObj2 = new ControlComObject();
@@ -404,7 +462,7 @@ void FlowStandardDlg50::initControlCom2()
 }
 
 //热量表通讯串口
-void FlowStandardDlg50::initMeterCom()
+void TotalStandardDlg50::initMeterCom()
 {
 	if (m_meterObj)
 	{
@@ -432,17 +490,9 @@ void FlowStandardDlg50::initMeterCom()
 		m_meterObj[i].setProtocolVersion(m_pickcode); //设置表协议类型
 		m_meterThread[i].start();
 		m_meterObj[i].openMeterCom(&m_readComConfig->ReadMeterConfigByNum(i+1));
-
+		
 		connect(&m_meterObj[i], SIGNAL(readMeterNoIsOK(const QString&, const QString&)), this, SLOT(slotSetMeterNumber(const QString&, const QString&)));
-		connect(&m_meterObj[i], SIGNAL(readMeterFlowIsOK(const QString&, const QString&)), this, SLOT(slotSetMeterFlow(const QString&, const QString&)));
-		connect(&m_meterObj[i], SIGNAL(readMeterBigCoeIsOK(const QString&, const QString&)), \
-			this, SLOT(slotFreshBigCoe(const QString&, const QString&)));
-		connect(&m_meterObj[i], SIGNAL(readMeterMid2CoeIsOK(const QString&, const QString&)), \
-			this, SLOT(slotFreshMid2Coe(const QString&, const QString&)));
-		connect(&m_meterObj[i], SIGNAL(readMeterMid1CoeIsOK(const QString&, const QString&)), \
-			this, SLOT(slotFreshMid1Coe(const QString&, const QString&)));
-		connect(&m_meterObj[i], SIGNAL(readMeterSmallCoeIsOK(const QString&, const QString&)), \
-			this, SLOT(slotFreshSmallCoe(const QString&, const QString&)));
+		connect(&m_meterObj[i], SIGNAL(readMeterHeatIsOK(const QString&, const QString&)), this, SLOT(slotSetMeterEnergy(const QString&, const QString&)));
 	}
 }
 
@@ -450,7 +500,7 @@ void FlowStandardDlg50::initMeterCom()
 ** 端口号-阀门映射关系；初始化阀门状态（默认阀门初始状态全部为关闭,水泵初始状态为关闭）
 ** 需要改进得更加灵活
 */
-void FlowStandardDlg50::initValveStatus()
+void TotalStandardDlg50::initValveStatus()
 {
 	m_nowPortNo = 0;
 
@@ -490,7 +540,7 @@ void FlowStandardDlg50::initValveStatus()
 	setValveBtnBackColor(m_valveBtn[m_portsetinfo.pumpNo], m_valveStatus[m_portsetinfo.pumpNo]);
 }
 
-void FlowStandardDlg50::initRegulateStatus()
+void TotalStandardDlg50::initRegulateStatus()
 {
 	//端口号-阀门按钮 映射关系
 	m_RegLineEdit[m_portsetinfo.regSmallNo] = ui.lineEditOpeningSmall;
@@ -522,20 +572,97 @@ void FlowStandardDlg50::initRegulateStatus()
 }
 
 //在界面刷新入口温度和出口温度值
-void FlowStandardDlg50::slotFreshComTempValue(const QString& tempStr)
+void TotalStandardDlg50::slotFreshComTempValue(const QString& tempStr)
 {
 	ui.lcdInTemper->display(tempStr.left(TEMPER_DATA_WIDTH));   //入口温度 PV
 	ui.lcdOutTemper->display(tempStr.right(TEMPER_DATA_WIDTH)); //出口温度 SV
 }
 
+//刷新标准温度
+void TotalStandardDlg50::slotFreshStdTempValue(const QString& stdTempStr)
+{
+// 	qDebug()<<"stdTempStr ="<<stdTempStr<<"; m_stdTempCommand ="<<m_stdTempCommand;
+	switch (m_stdTempCommand)
+	{
+// 	case stdTempT1: 
+// 		ui.lnEditOutStdResist->setText(stdTempStr);
+// 		break;
+// 	case stdTempT2: 
+// 		ui.lnEditInStdTemp->setText(stdTempStr);
+// 		break;
+	case stdTempR1: 
+		ui.lnEditInStdResist->setText(stdTempStr);
+		m_stdTempCommand = stdTempR2;
+		break;
+	case stdTempR2: 
+		ui.lnEditOutStdResist->setText(stdTempStr);
+		m_stdTempCommand = stdTempR1;
+		break;
+	default:
+		break;
+	}
+}
+
+//采集标准温度
+void TotalStandardDlg50::on_btnStdTempCollect_clicked()
+{
+	ui.lnEditInStdResist->clear();
+	ui.lnEditOutStdResist->clear();
+	ui.lnEditInStdTemp->clear();
+	ui.lnEditOutStdTemp->clear();
+	m_stdTempTimer->start(TIMEOUT_STD_TEMPER);
+}
+
+//停止采集标准温度
+void TotalStandardDlg50::on_btnStdTempStop_clicked()
+{
+	m_stdTempTimer->stop();
+}
+
+void TotalStandardDlg50::on_lnEditInStdResist_textChanged(const QString & text)
+{
+	float resis = text.toFloat();
+	float temp = calcTemperByResis(resis);
+	ui.lnEditInStdTemp->setText(QString::number(temp));
+}
+
+void TotalStandardDlg50::on_lnEditOutStdResist_textChanged(const QString & text)
+{
+	float resis = text.toFloat();
+	float temp = calcTemperByResis(resis);
+	ui.lnEditOutStdTemp->setText(QString::number(temp));
+}
+
+void TotalStandardDlg50::slot_btnGroupEnergyUnit_clicked(int id)
+{
+	m_unit = btnGroupEnergyUnit->checkedId();
+	if (m_unit==UNIT_KWH) 
+	{
+		ui.tableWidget->setHorizontalHeaderItem(COLUMN_METER_START, new QTableWidgetItem(QObject::tr("MeterValue0(kWh)")));
+		ui.tableWidget->setHorizontalHeaderItem(COLUMN_METER_END, new QTableWidgetItem(QObject::tr("MeterValue1(kWh)")));
+		ui.tableWidget->setHorizontalHeaderItem(COLUMN_STD_VALUE, new QTableWidgetItem(QObject::tr("StdValue(kWh)")));
+	}
+	else
+	{
+		ui.tableWidget->setHorizontalHeaderItem(COLUMN_METER_START, new QTableWidgetItem(QObject::tr("MeterValue0(MJ)")));
+		ui.tableWidget->setHorizontalHeaderItem(COLUMN_METER_END, new QTableWidgetItem(QObject::tr("MeterValue1(MJ)")));
+		ui.tableWidget->setHorizontalHeaderItem(COLUMN_STD_VALUE, new QTableWidgetItem(QObject::tr("StdValue(MJ)")));
+	}
+}
+
+void TotalStandardDlg50::slot_btnGroupInstallPos_clicked(int id)
+{
+	m_installPos = btnGroupInstallPos->checkedId();
+}
+
 //检测串口、端口设置是否正确
-int FlowStandardDlg50::isComAndPortNormal()
+int TotalStandardDlg50::isComAndPortNormal()
 {
 	return true;
 }
 
 //获取当前检定参数;初始化表格控件；显示关键参数；初始化热量表通讯串口
-int FlowStandardDlg50::readNowParaConfig()
+int TotalStandardDlg50::readNowParaConfig()
 {
 	if (NULL == m_paraSetReader)
 	{
@@ -561,23 +688,17 @@ int FlowStandardDlg50::readNowParaConfig()
 	m_maxMeterNum = m_nowParams->m_maxMeters;//不同表规格对应的最大检表数量
 	m_pickcode = m_nowParams->m_pickcode; //采集代码
 	m_numPrefix = getNumPrefixOfManufac(m_pickcode); //表号前缀
-	m_flowSC = m_nowParams->sc_flow; //流量安全系数
-	m_adjErr = m_nowParams->bo_adjerror; //是否调整误差
-	m_writeNO = m_nowParams->bo_writenum;//是否写表号
-	m_newMeterNO = m_nowParams->meterNo;
-	m_repeatverify = m_nowParams->bo_repeatverify; //是否重复检测
+	m_totalSC = m_nowParams->sc_thermal;  //总量安全系数
 
 	initTableWidget();
 	showNowKeyParaConfig();
 	initMeterCom();
 
-	ui.btnAllAdjError->setEnabled(false);
-	ui.btnAllModifyNO->setEnabled(false);
 	return true;
 }
 
 //初始化表格控件
-void FlowStandardDlg50::initTableWidget()
+void TotalStandardDlg50::initTableWidget()
 {
 	if (m_maxMeterNum <= 0)
 	{
@@ -585,8 +706,6 @@ void FlowStandardDlg50::initTableWidget()
 	}
 	ui.tableWidget->setRowCount(m_maxMeterNum); //设置表格行数
 
-	QSignalMapper *signalMapper1 = new QSignalMapper();
-	QSignalMapper *signalMapper2 = new QSignalMapper();
 	QSignalMapper *signalMapper3 = new QSignalMapper();
 	QSignalMapper *signalMapper4 = new QSignalMapper();
 	QSignalMapper *signalMapper5 = new QSignalMapper();
@@ -613,18 +732,6 @@ void FlowStandardDlg50::initTableWidget()
 		ui.tableWidget->item(i, COLUMN_STD_ERROR)->setFlags(Qt::NoItemFlags);
 
 		//设置按钮
-		QPushButton *btnModNo = new QPushButton(QObject::tr("\(%1\)").arg(i+1) + tr("ModifyNO"));
-		ui.tableWidget->setCellWidget(i, COLUMN_MODIFY_METERNO, btnModNo);
-		signalMapper1->setMapping(btnModNo, i);
-		connect(btnModNo, SIGNAL(clicked()), signalMapper1, SLOT(map()));
-		btnModNo->setEnabled(false);
-
-		QPushButton *btnAdjErr = new QPushButton(QObject::tr("\(%1\)").arg(i+1) + tr("AdjustErr"));
-		ui.tableWidget->setCellWidget(i, COLUMN_ADJUST_ERROR, btnAdjErr);
-		signalMapper2->setMapping(btnAdjErr, i);
-		connect(btnAdjErr, SIGNAL(clicked()), signalMapper2, SLOT(map()));
-		btnAdjErr->setEnabled(false);
-
 		QPushButton *btnReadData = new QPushButton(QObject::tr("\(%1\)").arg(i+1) + tr("ReadData"));
 		ui.tableWidget->setCellWidget(i, COLUMN_READ_DATA, btnReadData);
 		signalMapper3->setMapping(btnReadData, i);
@@ -640,8 +747,6 @@ void FlowStandardDlg50::initTableWidget()
 		signalMapper5->setMapping(btnReadNO, i);
 		connect(btnReadNO, SIGNAL(clicked()), signalMapper5, SLOT(map()));
 	}
-	connect(signalMapper1, SIGNAL(mapped(const int &)),this, SLOT(slotModifyMeterNO(const int &)));
-	connect(signalMapper2, SIGNAL(mapped(const int &)),this, SLOT(slotAdjustError(const int &)));
 	connect(signalMapper3, SIGNAL(mapped(const int &)),this, SLOT(slotReadData(const int &)));
 	connect(signalMapper4, SIGNAL(mapped(const int &)),this, SLOT(slotVerifyStatus(const int &)));
 	connect(signalMapper5, SIGNAL(mapped(const int &)),this, SLOT(slotReadNO(const int &)));
@@ -654,7 +759,7 @@ void FlowStandardDlg50::initTableWidget()
 }
 
 //显示当前关键参数设置信息
-void FlowStandardDlg50::showNowKeyParaConfig()
+void TotalStandardDlg50::showNowKeyParaConfig()
 {
 	if (NULL == m_nowParams)
 	{
@@ -668,7 +773,7 @@ void FlowStandardDlg50::showNowKeyParaConfig()
 }
 
 //检查数据采集是否正常，包括天平、温度、电磁流量计
-int FlowStandardDlg50::isDataCollectNormal()
+int TotalStandardDlg50::isDataCollectNormal()
 {
 	return true;
 }
@@ -676,7 +781,7 @@ int FlowStandardDlg50::isDataCollectNormal()
 /*
 ** 开始排气倒计时
 */
-int FlowStandardDlg50::startExhaustCountDown()
+int TotalStandardDlg50::startExhaustCountDown()
 {
 	if (!isDataCollectNormal())
 	{
@@ -711,7 +816,7 @@ int FlowStandardDlg50::startExhaustCountDown()
 /*
 ** 排气定时器响应函数
 */
-void FlowStandardDlg50::slotExaustFinished()
+void TotalStandardDlg50::slotExaustFinished()
 {
 	if (m_stopFlag)
 	{
@@ -744,40 +849,8 @@ void FlowStandardDlg50::slotExaustFinished()
 	}
 }
 
-/*
-** 读取所有热表流量系数
-*/
-int FlowStandardDlg50::readAllMeterFlowCoe()
-{
-	qDebug()<<"readAllMeterFlowCoe ...";
-	int idx = -1;
-	for (int j=0; j<m_maxMeterNum; j++)
-	{
-		idx = isMeterPosValid(j+1);
-		if (m_state == STATE_START_VALUE)
-		{
-			ui.tableWidget->item(j, COLUMN_METER_START)->setText("");
-			if (idx >= 0)
-			{
-				m_meterStartValue[idx] = 0;
-			}
-		}
-		else if (m_state == STATE_END_VALUE)
-		{
-			ui.tableWidget->item(j, COLUMN_METER_END)->setText("");
-			if (idx >= 0)
-			{
-				m_meterEndValue[idx] = 0;
-			}
-		}
-		m_meterObj[j].askReadMeterFlowCoe();
-	}
-
-	return true;
-}
-
 //设置所有热量表进入检定状态
-int FlowStandardDlg50::setAllMeterVerifyStatus()
+int TotalStandardDlg50::setAllMeterVerifyStatus()
 {
 	ui.labelHintPoint->setText(tr("setting verify status ..."));
 	on_btnAllVerifyStatus_clicked();
@@ -786,10 +859,8 @@ int FlowStandardDlg50::setAllMeterVerifyStatus()
 	return true;
 }
 
-/*
-** 打开所有阀门和水泵（关闭大、小天平进水阀，因为标准表法不需要使用天平）
-*/
-int FlowStandardDlg50::openAllValveAndPump()
+//打开所有阀门和水泵
+int TotalStandardDlg50::openAllValveAndPump()
 {
 	openValve(m_portsetinfo.bigWaterOutNo); //大天平放水阀
 	wait(CYCLE_TIME);
@@ -814,7 +885,7 @@ int FlowStandardDlg50::openAllValveAndPump()
 }
 
 //关闭所有阀门和水泵
-int FlowStandardDlg50::closeAllValveAndPumpOpenOutValve()
+int TotalStandardDlg50::closeAllValveAndPumpOpenOutValve()
 {
 	openValve(m_portsetinfo.bigWaterOutNo); //打开大天平放水阀
 	wait(CYCLE_TIME);
@@ -833,7 +904,7 @@ int FlowStandardDlg50::closeAllValveAndPumpOpenOutValve()
 }
 
 //关闭所有流量点阀门
-int FlowStandardDlg50::closeAllFlowPointValves()
+int TotalStandardDlg50::closeAllFlowPointValves()
 {
 	closeValve(m_portsetinfo.bigNo);
 	wait(CYCLE_TIME);
@@ -850,7 +921,7 @@ int FlowStandardDlg50::closeAllFlowPointValves()
 ** 功能：判断天平重量是否达到要求的检定量；计算检定过程的平均温度和平均流量(m3/h)
 ** 脉冲数会很大，超出float的范围，所以要用double
 */
-int FlowStandardDlg50::judgeTartgetVolAndCalcAvgTemperAndFlow(double initV, double verifyV)
+int TotalStandardDlg50::judgeTartgetVolAndCalcAvgTemperAndFlow(float initV, float verifyV)
 {
 	double targetV = initV + verifyV;
 	ui.tableWidget->setEnabled(false);
@@ -868,6 +939,8 @@ int FlowStandardDlg50::judgeTartgetVolAndCalcAvgTemperAndFlow(double initV, doub
 		m_avgTFCount++;
 		m_pipeInTemper += ui.lcdInTemper->value();
 		m_pipeOutTemper += ui.lcdOutTemper->value();
+		m_stdInTemper += ui.lnEditInStdTemp->text().toFloat();
+		m_stdOutTemper += ui.lnEditOutStdTemp->text().toFloat();
 		second = 3.6*(targetV - nowVol)/nowFlow;
 		ui.labelHintPoint->setText(tr("NO. <font color=DarkGreen size=6><b>%1</b></font> flow point: <font color=DarkGreen size=6><b>%2</b></font> m3/h")\
 			.arg(m_nowOrder).arg(nowFlow));
@@ -878,6 +951,8 @@ int FlowStandardDlg50::judgeTartgetVolAndCalcAvgTemperAndFlow(double initV, doub
 
 	m_pipeInTemper = m_pipeInTemper/m_avgTFCount;   //入口平均温度
 	m_pipeOutTemper = m_pipeOutTemper/m_avgTFCount; //出口平均温度
+	m_stdInTemper = m_stdInTemper/m_avgTFCount;     //入口标准温度平均值
+	m_stdOutTemper = m_stdOutTemper/m_avgTFCount;   //出口标准温度平均值
 
 	QDateTime endTime = QDateTime::currentDateTime();
 	int tt = startTime.secsTo(endTime);
@@ -899,7 +974,7 @@ int FlowStandardDlg50::judgeTartgetVolAndCalcAvgTemperAndFlow(double initV, doub
 }
 
 //清空表格，第一列除外("表号"列)
-void FlowStandardDlg50::clearTableContents()
+void TotalStandardDlg50::clearTableContents()
 {
 	for (int i=0; i<m_maxMeterNum; i++)
 	{
@@ -916,9 +991,25 @@ void FlowStandardDlg50::clearTableContents()
 }
 
 //点击"开始"按钮
-void FlowStandardDlg50::on_btnStart_clicked()
+void TotalStandardDlg50::on_btnStart_clicked()
 {
-	m_repeatverify = m_nowParams->bo_repeatverify; //重置重复检测选项
+	//判断是否输入了最小温差
+	bool ok;
+	m_minDeltaT = ui.lnEditMinDeltaT->text().toFloat(&ok);
+	if (!ok || ui.lnEditMinDeltaT->text().isEmpty())
+	{
+		QMessageBox::warning(this, tr("Warning"), tr("please input minimum delta temperature!"));
+		ui.lnEditMinDeltaT->setFocus();
+		return;
+	}
+	bool ok1, ok2;
+	float stdInTemp = ui.lnEditInStdTemp->text().toFloat(&ok1);
+	float stdOutTemp = ui.lnEditOutStdTemp->text().toFloat(&ok2);
+	if ( !ok1 || !ok2 || (stdInTemp-stdOutTemp)<=0 )
+	{
+		QMessageBox::warning(this, tr("Warning"), tr("std temperature is error, please check!"));
+		return;
+	}
 
 	m_timeStamp = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss.zzz"); //记录时间戳
 	m_nowDate = QDateTime::currentDateTime().toString("yyyy-MM-dd"); //当前日期'2014-08-07'
@@ -932,8 +1023,6 @@ void FlowStandardDlg50::on_btnStart_clicked()
 	ui.btnAllReadNO->setEnabled(true);
 	ui.btnAllReadData->setEnabled(true);
 	ui.btnAllVerifyStatus->setEnabled(true);
-	ui.btnAllAdjError->setEnabled(false);
-	ui.btnAllModifyNO->setEnabled(false);
 	
 	m_stopFlag = false;
 	m_state = STATE_INIT;
@@ -944,9 +1033,6 @@ void FlowStandardDlg50::on_btnStart_clicked()
 		ui.tableWidget->item(i,COLUMN_METER_NUMBER)->setText("");
 		ui.tableWidget->item(i, COLUMN_METER_NUMBER)->setForeground(QBrush());
 		ui.tableWidget->item(i, COLUMN_DISP_ERROR)->setForeground(QBrush());
-		ui.tableWidget->cellWidget(i, COLUMN_ADJUST_ERROR)->setEnabled(false);
-		ui.tableWidget->cellWidget(i, COLUMN_ADJUST_ERROR)->setStyleSheet(";");
-		ui.tableWidget->cellWidget(i, COLUMN_MODIFY_METERNO)->setEnabled(false);
 	}
 	clearTableContents();
 
@@ -973,25 +1059,25 @@ void FlowStandardDlg50::on_btnStart_clicked()
 /*
 ** 点击"排气"按钮
 */
-void FlowStandardDlg50::on_btnExhaust_clicked()
+void TotalStandardDlg50::on_btnExhaust_clicked()
 {
 
 }
 
 //点击"继续"按钮
-void FlowStandardDlg50::on_btnGoOn_clicked()
+void TotalStandardDlg50::on_btnGoOn_clicked()
 {
 	ui.btnGoOn->hide();
 	startVerify();
 }
 
 //点击"重新计算"按钮
-void FlowStandardDlg50::on_btnReCalc_clicked()
+void TotalStandardDlg50::on_btnReCalc_clicked()
 {
 }
 
 //点击"终止检测"按钮
-void FlowStandardDlg50::on_btnStop_clicked()
+void TotalStandardDlg50::on_btnStop_clicked()
 {
 	int button = QMessageBox::question(this, tr("Question"), tr("Stop Really ?"), \
 		QMessageBox::Yes|QMessageBox::Default, QMessageBox::No|QMessageBox::Escape);
@@ -1003,14 +1089,14 @@ void FlowStandardDlg50::on_btnStop_clicked()
 	stopVerify();
 }
 
-void FlowStandardDlg50::on_btnExit_clicked()
+void TotalStandardDlg50::on_btnExit_clicked()
 {
 	stopVerify();
 	this->close();
 }
 
 //停止检定
-void FlowStandardDlg50::stopVerify()
+void TotalStandardDlg50::stopVerify()
 {
 	ui.labelHintPoint->clear();
 	if (!m_stopFlag)
@@ -1033,7 +1119,7 @@ void FlowStandardDlg50::stopVerify()
 }
 
 //开始检定
-void FlowStandardDlg50::startVerify()
+void TotalStandardDlg50::startVerify()
 {
 	//释放内存
 	if (m_meterErr != NULL)
@@ -1044,15 +1130,6 @@ void FlowStandardDlg50::startVerify()
 		}
 		delete []m_meterErr;
 		m_meterErr = NULL;
-	}
-	if (m_oldMeterCoe != NULL)
-	{
-		for (int n=0; n<m_validMeterNum; n++)
-		{
-			delete []m_oldMeterCoe[n];
-		}
-		delete []m_oldMeterCoe;
-		m_oldMeterCoe = NULL;
 	}
 
 	getValidMeterNum(); //获取实际检表的个数(根据获取到的表号个数)
@@ -1087,8 +1164,8 @@ void FlowStandardDlg50::startVerify()
 		delete []m_recPtr;
 		m_recPtr = NULL;
 	}
-	m_recPtr = new Flow_Verify_Record_STR[m_validMeterNum];
-	memset(m_recPtr, 0, sizeof(Flow_Verify_Record_STR)*m_validMeterNum);
+	m_recPtr = new Total_Verify_Record_STR[m_validMeterNum];
+	memset(m_recPtr, 0, sizeof(Total_Verify_Record_STR)*m_validMeterNum);
 
 	m_state = STATE_INIT; //初始状态
 
@@ -1154,17 +1231,6 @@ void FlowStandardDlg50::startVerify()
 		memset(m_meterErr[i], 0, sizeof(float)*VERIFY_POINTS);
 	}
 
-	//各个有效表位的热量表的原来的各流量点系数
-	m_oldMeterCoe = new MeterCoe_PTR[m_validMeterNum];
-	for (int j=0; j<m_validMeterNum; j++)
-	{
-		m_oldMeterCoe[j] = new MeterCoe_STR;
-		m_oldMeterCoe[j]->bigCoe = 1.0;
-		m_oldMeterCoe[j]->mid2Coe = 1.0;
-		m_oldMeterCoe[j]->mid1Coe = 1.0;
-		m_oldMeterCoe[j]->smallCoe = 1.0;
-	}
-
 	//所有流量点是否都合格
 	if (m_meterResult != NULL)
 	{
@@ -1177,16 +1243,6 @@ void FlowStandardDlg50::startVerify()
 		m_meterResult[p] = 1;
 	}
 
-	 //读取原来的流量点系数
-	if (m_adjErr)
-	{
-		ui.labelHintPoint->setText(tr("read meter now coe ..."));
-		m_state = STATE_READ_COE;
-		readAllMeterFlowCoe();
-		wait(WAIT_COM_TIME); 
-		m_state = STATE_INIT;
-	}
-
 	if (m_continueVerify) //连续检定
 	{
 		wait(BALANCE_STABLE_TIME); //等待3秒钟(等待水流稳定)
@@ -1197,7 +1253,7 @@ void FlowStandardDlg50::startVerify()
 }
 
 //获取有效检表个数,并生成映射关系（被检表下标-表位号）
-int FlowStandardDlg50::getValidMeterNum()
+int TotalStandardDlg50::getValidMeterNum()
 {
 	//匹配表号是否为数字; 
 	//前一个'\'是转义字符, "\\"就相当于'\', "\\d"相当于'\d', 匹配一个数字, '+'是数字的正闭包;
@@ -1229,7 +1285,7 @@ int FlowStandardDlg50::getValidMeterNum()
 输入:meterPos(表位号)，从1开始
 返回:被检表下标，从0开始
 */
-int FlowStandardDlg50::isMeterPosValid(int meterPos)
+int TotalStandardDlg50::isMeterPosValid(int meterPos)
 {
 	for (int i=0; i<m_validMeterNum; i++)
 	{
@@ -1245,16 +1301,11 @@ int FlowStandardDlg50::isMeterPosValid(int meterPos)
 ** 准备单个流量点的检定，进行必要的检查
 ** 注意：order从1开始
 */
-int FlowStandardDlg50::prepareVerifyFlowPoint(int order)
+int TotalStandardDlg50::prepareVerifyFlowPoint(int order)
 {
 	if (order < 1 || order > m_flowPointNum || m_stopFlag)
 	{
 		return false;
-	}
-
-	if (!m_continueVerify) //非连续检定，每次检定开始之前都要判断天平容量
-	{
-		wait(BALANCE_STABLE_TIME);   //等待3秒钟，等待水流稳定
 	}
 
 	int i=0;
@@ -1289,7 +1340,7 @@ int FlowStandardDlg50::prepareVerifyFlowPoint(int order)
 /* 即处于管道中的定常流动状态的液体,在任意管道界面上, 它的流进和流出液体质量相等.
 /* 所以在进行标准表检定时, 必须将标准表的体积换算为对应温度下的质量.
 /************************************************************************/
-int FlowStandardDlg50::startVerifyFlowPoint(int order)
+int TotalStandardDlg50::startVerifyFlowPoint(int order)
 {
 	if (m_stopFlag)
 	{
@@ -1318,6 +1369,10 @@ int FlowStandardDlg50::startVerifyFlowPoint(int order)
 
 	int regNO = m_paraSetReader->getFpBySeq(order).fp_regno; //order对应的调节阀端口号
 	int opening = m_paraSetReader->getFpBySeq(order).fp_opening; //order对应的调节阀开度
+	//直接使用标准温度计的温度即可， 因为恒温槽的温度波动很小，不必要使用平均温度
+	m_stdInTemper = ui.lnEditInStdTemp->text().toFloat();
+	m_stdOutTemper = ui.lnEditOutStdTemp->text().toFloat();
+
 	int portNo = m_paraSetReader->getFpBySeq(order).fp_valve;  //order对应的阀门端口号
 	float verifyQuantity = m_paraSetReader->getFpBySeq(order).fp_quantity; //第order次检定对应的检定量
 	float frequence = m_paraSetReader->getFpBySeq(order).fp_freq; //order对应的频率
@@ -1388,7 +1443,9 @@ int FlowStandardDlg50::startVerifyFlowPoint(int order)
 			{
 				m_meterTemper[m] = m_chkAlg->getMeterTempByPos(m_pipeInTemper, m_pipeOutTemper, m_meterPosMap[m]);//计算每个被检表的温度
 				m_meterDensity[m] = m_chkAlg->getDensityByQuery(m_meterTemper[m]);//计算每个被检表的密度
-				m_meterStdValue[m] = m_chkAlg->getStdVolByPos((m_StdEndMass-m_StdStartMass), m_pipeInTemper, m_pipeOutTemper, m_meterPosMap[m]); //计算每个被检表的体积标准值
+
+				//计算每个被检表的热量标准值, 如果按照jjg-2010, 需要用质量守恒法将标准表的质量计算到表位上。如果按照jjg-2001则直接计算即可
+				m_meterStdValue[m] = m_chkAlg->calcStdEnergyByEnthalpy(m_stdInTemper, m_stdOutTemper, m_StdEndMass-m_StdStartMass, m_unit); 
 
 				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_FLOW_POINT)->setText(QString::number(m_realFlow, 'f', 3));//流量点
 				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_METER_END)->setText("");//表终值
@@ -1401,7 +1458,7 @@ int FlowStandardDlg50::startVerifyFlowPoint(int order)
 				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_DISP_ERROR)->setForeground(QBrush());//示值误差
 			}
 			getMeterEndValue();
-		} //跑完检定量
+		}//跑完检定量
 	}
 
 	return true;
@@ -1410,7 +1467,7 @@ int FlowStandardDlg50::startVerifyFlowPoint(int order)
 /*
 ** 计算所有被检表的误差
 */
-int FlowStandardDlg50::calcAllMeterError()
+int TotalStandardDlg50::calcAllMeterError()
 {
 	int ret = 1;
 	for (int i=0; i<m_validMeterNum; i++)
@@ -1425,7 +1482,7 @@ int FlowStandardDlg50::calcAllMeterError()
 ** 输入参数：
 **     idx:被检表数组的索引
 */
-int FlowStandardDlg50::calcMeterError(int idx)
+int TotalStandardDlg50::calcMeterError(int idx)
 {
 	bool ok;
 	int row = m_meterPosMap[idx] - 1;
@@ -1439,7 +1496,7 @@ int FlowStandardDlg50::calcMeterError(int idx)
 	int valveIdx = m_paraSetReader->getFpBySeq(m_nowOrder).fp_valve_idx; //0:大 1:中二 2:中一 3:小
 	m_meterErr[idx][valveIdx] = m_meterError[idx];
 	ui.tableWidget->item(row, COLUMN_DISP_ERROR)->setText(QString::number(m_meterError[idx], 'f', ERR_PRECISION)); //示值误差
-	float stdError = m_flowSC*(m_gradeErrA[m_nowParams->m_grade] + m_gradeErrB[m_nowParams->m_grade]*m_mapNormalFlow[m_standard]/m_realFlow); //标准误差=规程要求误差*流量安全系数
+	float stdError = m_totalSC*(m_gradeErrA[m_nowParams->m_grade] + 4*m_minDeltaT/(m_stdInTemper-m_stdOutTemper) + m_gradeErrB[m_nowParams->m_grade]*m_mapNormalFlow[m_standard]/m_realFlow); //标准误差=规程要求误差*总量安全系数
 	ui.tableWidget->item(row, COLUMN_STD_ERROR)->setText("±" + QString::number(stdError, 'f', ERR_PRECISION)); //标准误差
 	if (fabs(m_meterError[idx]) > stdError)
 	{
@@ -1481,7 +1538,9 @@ int FlowStandardDlg50::calcMeterError(int idx)
 	m_recPtr[idx].airPress = m_nowParams->m_airpress.toFloat();
 	m_recPtr[idx].envTemper = m_nowParams->m_temper.toFloat();
 	m_recPtr[idx].envHumidity = m_nowParams->m_humidity.toFloat();
-	m_recPtr[idx].flowcoe = m_nowParams->sc_flow;
+	m_recPtr[idx].totalcoe = m_nowParams->sc_thermal;
+	m_recPtr[idx].inSlotTemper = ui.lnEditInStdTemp->text().toFloat();
+	m_recPtr[idx].outSlotTemper = ui.lnEditOutStdTemp->text().toFloat();
 	m_recPtr[idx].deviceInfoId = m_readComConfig->getDeviceInfoID();
 
 	return 1; 
@@ -1492,7 +1551,7 @@ int FlowStandardDlg50::calcMeterError(int idx)
 ** 返回值：1-计算成功、读表数据全部成功
 		   0-计算失败、读表数据有失败的
 */
-int FlowStandardDlg50::calcVerifyResult()
+int TotalStandardDlg50::calcVerifyResult()
 {
 	int ret = 0;
 	ret = calcAllMeterError();
@@ -1504,46 +1563,7 @@ int FlowStandardDlg50::calcVerifyResult()
 		if (m_nowOrder>=m_flowPointNum) //最后一个流量点
 		{
 			stopVerify(); //停止检定
-			if (m_adjErr) //选择调整误差
-			{
-				ui.btnAllAdjError->setEnabled(true);
-				for (int i=0; i<m_validMeterNum; i++)
-				{
-					ui.tableWidget->cellWidget(m_meterPosMap[i]-1, COLUMN_ADJUST_ERROR)->setEnabled(true);
-				}
-			}
-			if (m_writeNO) //选择写表号
-			{
-				ui.btnAllModifyNO->setEnabled(true);
-				for (int n=0; n<m_validMeterNum; n++)
-				{
-					ui.tableWidget->cellWidget(m_meterPosMap[n]-1, COLUMN_MODIFY_METERNO)->setEnabled(true);
-				}
-				//如果不是新表，请将热量表调至"温差"状态！
-				QMessageBox::information(this, tr("Hint"), tr("if it isn't new meter , please change meter to \"deltaT\" status !"));
-				for (int j=0; j<m_validMeterNum; j++)
-				{
-					if (m_meterResult[j]) //所有流量点都合格才修改表号
-					{
-						m_mapMeterPosAndNewNO[m_meterPosMap[j]] = m_newMeterNO;
-						slotModifyMeterNO(m_meterPosMap[j]-1);
-						modifyFlowVerifyRec_MeterNO(m_numPrefix + QString::number(m_newMeterNO), m_timeStamp, m_meterPosMap[j]);
-						m_newMeterNO++;
-					}
-				}
-				saveStartMeterNO();
-			}
 			exportReport();
-			if (m_repeatverify) //重复检测
-			{
-				if (m_adjErr) //调整误差
-				{
-					on_btnAllAdjError_clicked();
-				}
-				wait(WAIT_COM_TIME);
-				on_btnStart_clicked();
-				m_repeatverify = false;
-			}
 		}
 		else //不是最后一个流量点
 		{
@@ -1558,15 +1578,16 @@ int FlowStandardDlg50::calcVerifyResult()
 	return ret;
 }
 
-void FlowStandardDlg50::exportReport()
+
+void TotalStandardDlg50::exportReport()
 {
 	QString sqlCondition = QString("F_TimeStamp=\'%1\' and F_MethodFlag = 1").arg(m_timeStamp);
 	QString xlsname = QDateTime::fromString(m_timeStamp, "yyyy-MM-dd HH:mm:ss.zzz").toString("yyyy-MM-dd_hh-mm-ss") + ".xls";
 	try
 	{
-		QString defaultPath = QProcessEnvironment::systemEnvironment().value("ADEHOME") + "\\report\\flow\\std\\";
+		QString defaultPath = QProcessEnvironment::systemEnvironment().value("ADEHOME") + "\\report\\total\\std\\";
 		CReport rpt(sqlCondition);
-		rpt.setIniName("rptconfig_flow_std.ini");
+		rpt.setIniName("rptconfig_total_std.ini");
 		rpt.writeRpt();
 		rpt.saveTo(defaultPath + xlsname);
 		ui.labelHintProcess->setText(tr("Verify has Stoped!") + "\n" + tr("export excel file successful!"));
@@ -1578,8 +1599,8 @@ void FlowStandardDlg50::exportReport()
 }
 
 //打开阀门
-int FlowStandardDlg50::openValve(UINT8 portno)
-{	
+int TotalStandardDlg50::openValve(UINT8 portno)
+{
 	if (NULL == m_controlObj)
 	{
 		return false;
@@ -1600,7 +1621,7 @@ int FlowStandardDlg50::openValve(UINT8 portno)
 }
 
 //关闭阀门
-int FlowStandardDlg50::closeValve(UINT8 portno)
+int TotalStandardDlg50::closeValve(UINT8 portno)
 {
 	if (NULL == m_controlObj)
 	{
@@ -1622,7 +1643,7 @@ int FlowStandardDlg50::closeValve(UINT8 portno)
 }
 
 //操作阀门：打开或者关闭
-int FlowStandardDlg50::operateValve(UINT8 portno)
+int TotalStandardDlg50::operateValve(UINT8 portno)
 {
 	if (m_valveStatus[portno]==VALVE_OPEN) //阀门原来是打开状态
 	{
@@ -1636,7 +1657,7 @@ int FlowStandardDlg50::operateValve(UINT8 portno)
 }
 
 //打开水泵
-int FlowStandardDlg50::openWaterPump()
+int TotalStandardDlg50::openWaterPump()
 {
 	if (NULL == m_controlObj)
 	{
@@ -1652,7 +1673,7 @@ int FlowStandardDlg50::openWaterPump()
 }
 
 //关闭水泵
-int FlowStandardDlg50::closeWaterPump()
+int TotalStandardDlg50::closeWaterPump()
 {
 	if (NULL == m_controlObj)
 	{
@@ -1668,7 +1689,7 @@ int FlowStandardDlg50::closeWaterPump()
 }
 
 //操作水泵 打开或者关闭
-int FlowStandardDlg50::operateWaterPump()
+int TotalStandardDlg50::operateWaterPump()
 {
 	if (m_valveStatus[m_portsetinfo.pumpNo]==VALVE_OPEN) //水泵原来是打开状态
 	{
@@ -1682,21 +1703,21 @@ int FlowStandardDlg50::operateWaterPump()
 }
 
 //响应阀门状态设置成功
-void FlowStandardDlg50::slotSetValveBtnStatus(const UINT8 &portno, const bool &status)
+void TotalStandardDlg50::slotSetValveBtnStatus(const UINT8 &portno, const bool &status)
 {
 	m_valveStatus[portno] = status;
 	setValveBtnBackColor(m_valveBtn[portno], m_valveStatus[portno]);
 }
 
 //响应调节阀调节成功
-void FlowStandardDlg50::slotSetRegulateOk()
+void TotalStandardDlg50::slotSetRegulateOk()
 {
 // 	setRegBtnBackColor(m_regBtn[m_nowRegIdx], true);
 }
 
 
 //自动读取表号成功 显示表号
-void FlowStandardDlg50::slotSetMeterNumber(const QString& comName, const QString& meterNo)
+void TotalStandardDlg50::slotSetMeterNumber(const QString& comName, const QString& meterNo)
 {
 	int meterPos = m_readComConfig->getMeterPosByComName(comName);
 	if (meterPos < 1)
@@ -1710,9 +1731,9 @@ void FlowStandardDlg50::slotSetMeterNumber(const QString& comName, const QString
 }
 
 /*
-** 自动读取表流量成功 显示表流量
+** 自动读取表热量成功 显示表热量
 */
-void FlowStandardDlg50::slotSetMeterFlow(const QString& comName, const QString& flow)
+void TotalStandardDlg50::slotSetMeterEnergy(const QString& comName, const QString& energy)
 {
 	int meterPos = m_readComConfig->getMeterPosByComName(comName);
 	if (meterPos < 1)
@@ -1725,114 +1746,21 @@ void FlowStandardDlg50::slotSetMeterFlow(const QString& comName, const QString& 
 	{
 		return;
 	}
-
+	bool ok;
+	energy.toFloat(&ok);
 	if (m_state == STATE_START_VALUE) //初值
 	{
-		ui.tableWidget->item(meterPos - 1, COLUMN_METER_START)->setText(flow);
+		ui.tableWidget->item(meterPos - 1, COLUMN_METER_START)->setText(energy);
 	}
 	else if (m_state == STATE_END_VALUE) //终值
 	{
-		ui.tableWidget->item(meterPos - 1, COLUMN_METER_END)->setText(flow);
-	}
-}
+  		ui.tableWidget->item(meterPos - 1, COLUMN_METER_END)->setText(energy);
 
-/*
-** 自动读取表流量成功 刷新大流量点系数
-*/
-void FlowStandardDlg50::slotFreshBigCoe(const QString& comName, const QString& bigCoe)
-{
-	int meterPos = m_readComConfig->getMeterPosByComName(comName);
-	if (meterPos < 1)
-	{
-		return;
-	}
-	int idx = isMeterPosValid(meterPos);
-	if (idx < 0)
-	{
-		return;
-	}
-	if (m_state == STATE_READ_COE)
-	{
-// 		m_meterErr[idx][0] = calcErrorValueOfCoe(bigCoe);
-		m_oldMeterCoe[idx]->bigCoe = calcFloatValueOfCoe(bigCoe) ;
-		qDebug()<<comName<<"表位 ="<<meterPos<<", 有效索引 ="<<idx<<", bigCoe ="<<m_oldMeterCoe[idx]->bigCoe;
-	}
-}
-
-/*
-** 自动读取表流量成功 刷新中二流量点系数
-*/
-void FlowStandardDlg50::slotFreshMid2Coe(const QString& comName, const QString& mid2Coe)
-{
-	int meterPos = m_readComConfig->getMeterPosByComName(comName);
-	if (meterPos < 1)
-	{
-		return;
-	}
-	int idx = isMeterPosValid(meterPos);
-	if (idx < 0)
-	{
-		return;
-	}
-
-	if (m_state == STATE_READ_COE)
-	{
-// 		m_meterErr[idx][1] = calcErrorValueOfCoe(mid2Coe);
-		m_oldMeterCoe[idx]->mid2Coe = calcFloatValueOfCoe(mid2Coe) ;
-		qDebug()<<comName<<"表位 ="<<meterPos<<", 有效索引 ="<<idx<<", mid2Coe ="<<m_oldMeterCoe[idx]->mid2Coe;
-	}
-}
-
-/*
-** 自动读取表流量成功 刷新中一流量点系数
-*/
-void FlowStandardDlg50::slotFreshMid1Coe(const QString& comName, const QString& mid1Coe)
-{
-	int meterPos = m_readComConfig->getMeterPosByComName(comName);
-	if (meterPos < 1)
-	{
-		return;
-	}
-	int idx = isMeterPosValid(meterPos);
-	if (idx < 0)
-	{
-		return;
-	}
-
-	if (m_state == STATE_READ_COE)
-	{
-// 		m_meterErr[idx][2] = calcErrorValueOfCoe(mid1Coe);
-		m_oldMeterCoe[idx]->mid1Coe = calcFloatValueOfCoe(mid1Coe) ;
-		qDebug()<<comName<<"表位 ="<<meterPos<<", 有效索引 ="<<idx<<", mid1Coe ="<<m_oldMeterCoe[idx]->mid1Coe;
-	}
-}
-
-/*
-** 自动读取表流量成功 刷新小流量点系数
-*/
-void FlowStandardDlg50::slotFreshSmallCoe(const QString& comName, const QString& smallCoe)
-{
-	int meterPos = m_readComConfig->getMeterPosByComName(comName);
-	if (meterPos < 1)
-	{
-		return;
-	}
-	int idx = isMeterPosValid(meterPos);
-	if (idx < 0)
-	{
-		return;
-	}
-
-	if (m_state == STATE_READ_COE)
-	{
-// 		m_meterErr[idx][3] = calcErrorValueOfCoe(smallCoe);
-		m_oldMeterCoe[idx]->smallCoe = calcFloatValueOfCoe(smallCoe) ;
-		qDebug()<<comName<<"表位 ="<<meterPos<<", 有效索引 ="<<idx<<", smallCoe ="<<m_oldMeterCoe[idx]->smallCoe;
 	}
 }
 
 //设置阀门按钮背景色
-void FlowStandardDlg50::setValveBtnBackColor(QToolButton *btn, bool status)
+void TotalStandardDlg50::setValveBtnBackColor(QToolButton *btn, bool status)
 {
 	if (NULL == btn)
 	{
@@ -1851,7 +1779,7 @@ void FlowStandardDlg50::setValveBtnBackColor(QToolButton *btn, bool status)
 }
 
 //设置调节阀按钮背景色
-void FlowStandardDlg50::setRegBtnBackColor(QPushButton *btn, bool status)
+void TotalStandardDlg50::setRegBtnBackColor(QPushButton *btn, bool status)
 {
 	if (NULL == btn)
 	{
@@ -1868,7 +1796,7 @@ void FlowStandardDlg50::setRegBtnBackColor(QPushButton *btn, bool status)
 }
 
 //参数设置
-void FlowStandardDlg50::on_btnParaSet_clicked()
+void TotalStandardDlg50::on_btnParaSet_clicked()
 {
 	if (NULL == m_paraSetDlg)
 	{
@@ -1886,55 +1814,55 @@ void FlowStandardDlg50::on_btnParaSet_clicked()
 /*
 ** 控制继电器开断
 */
-void FlowStandardDlg50::on_btnWaterIn_clicked() //进水阀
+void TotalStandardDlg50::on_btnWaterIn_clicked() //进水阀
 {
 	m_nowPortNo = m_portsetinfo.waterInNo;
 	operateValve(m_nowPortNo);
 }
 
-void FlowStandardDlg50::on_btnBigWaterIn_clicked() //大天平进水阀
+void TotalStandardDlg50::on_btnBigWaterIn_clicked() //大天平进水阀
 {
 	m_nowPortNo = m_portsetinfo.bigWaterInNo;
 	operateValve(m_nowPortNo);
 }
 
-void FlowStandardDlg50::on_btnBigWaterOut_clicked() //大天平放水阀
+void TotalStandardDlg50::on_btnBigWaterOut_clicked() //大天平放水阀
 {
 	m_nowPortNo = m_portsetinfo.bigWaterOutNo;
 	operateValve(m_nowPortNo);
 }
 
-void FlowStandardDlg50::on_btnSmallWaterIn_clicked() //小天平进水阀
+void TotalStandardDlg50::on_btnSmallWaterIn_clicked() //小天平进水阀
 {
 	m_nowPortNo = m_portsetinfo.smallWaterInNo;
 	operateValve(m_nowPortNo);
 }
 
-void FlowStandardDlg50::on_btnSmallWaterOut_clicked() //小天平放水阀
+void TotalStandardDlg50::on_btnSmallWaterOut_clicked() //小天平放水阀
 {
 	m_nowPortNo = m_portsetinfo.smallWaterOutNo;
 	operateValve(m_nowPortNo);
 }
 
-void FlowStandardDlg50::on_btnValveBig_clicked() //大流量阀
+void TotalStandardDlg50::on_btnValveBig_clicked() //大流量阀
 {
 	m_nowPortNo = m_portsetinfo.bigNo;
 	operateValve(m_nowPortNo);
 }
 
-void FlowStandardDlg50::on_btnValveMiddle1_clicked() //中流一阀
+void TotalStandardDlg50::on_btnValveMiddle1_clicked() //中流一阀
 {
 	m_nowPortNo = m_portsetinfo.middle1No;
 	operateValve(m_nowPortNo);
 }
 
-void FlowStandardDlg50::on_btnValveMiddle2_clicked() //中流二阀
+void TotalStandardDlg50::on_btnValveMiddle2_clicked() //中流二阀
 {
 	m_nowPortNo = m_portsetinfo.middle2No;
 	operateValve(m_nowPortNo);
 }
 
-void FlowStandardDlg50::on_btnValveSmall_clicked() //小流量阀
+void TotalStandardDlg50::on_btnValveSmall_clicked() //小流量阀
 {
 	m_nowPortNo = m_portsetinfo.smallNo;
 	operateValve(m_nowPortNo);
@@ -1943,7 +1871,7 @@ void FlowStandardDlg50::on_btnValveSmall_clicked() //小流量阀
 /*
 ** 控制水泵开关
 */
-void FlowStandardDlg50::on_btnWaterPump_clicked()
+void TotalStandardDlg50::on_btnWaterPump_clicked()
 {
 /*	if (ui.spinBoxFrequency->value() <= 0)
 	{
@@ -1959,7 +1887,7 @@ void FlowStandardDlg50::on_btnWaterPump_clicked()
 /*
 ** 设置变频器频率
 */
-void FlowStandardDlg50::on_btnSetFreq_clicked()
+void TotalStandardDlg50::on_btnSetFreq_clicked()
 {
 	if (NULL == m_controlObj)
 	{
@@ -1969,7 +1897,7 @@ void FlowStandardDlg50::on_btnSetFreq_clicked()
 }
 
 //获取表初值
-int FlowStandardDlg50::getMeterStartValue()
+int TotalStandardDlg50::getMeterStartValue()
 {
 	if (m_stopFlag)
 	{
@@ -2017,7 +1945,7 @@ int FlowStandardDlg50::getMeterStartValue()
 }
 
 //获取表终值
-int FlowStandardDlg50::getMeterEndValue()
+int TotalStandardDlg50::getMeterEndValue()
 {
 	if (m_stopFlag)
 	{
@@ -2048,7 +1976,7 @@ int FlowStandardDlg50::getMeterEndValue()
 }
 
 //上一次的终值作为本次的初值
-void FlowStandardDlg50::makeStartValueByLastEndValue()
+void TotalStandardDlg50::makeStartValueByLastEndValue()
 {
 // 	clearTableContents();
 	for (int i=0; i<m_validMeterNum; i++)
@@ -2064,7 +1992,7 @@ void FlowStandardDlg50::makeStartValueByLastEndValue()
       row：行数，从0开始
 	  column：列数，从0开始
 */
-void FlowStandardDlg50::on_tableWidget_cellChanged(int row, int column)
+void TotalStandardDlg50::on_tableWidget_cellChanged(int row, int column)
 {
 	if (!m_autopick && column==COLUMN_METER_NUMBER && m_state==STATE_INIT) //手动输入 表号列 初始状态
 	{
@@ -2116,9 +2044,9 @@ void FlowStandardDlg50::on_tableWidget_cellChanged(int row, int column)
 /*
 ** 保存所有被检表的检定记录
 */
-int FlowStandardDlg50::saveAllVerifyRecords()
+int TotalStandardDlg50::saveAllVerifyRecords()
 {
-	int ret = insertFlowVerifyRec(m_recPtr, m_validMeterNum);
+ 	int ret = insertTotalVerifyRec(m_recPtr, m_validMeterNum);
 	if (ret != OPERATE_DB_OK)
 	{
 		QMessageBox::warning(this, tr("Error"), tr("Error:insert database failed!\n") + tr("Maybe network error!"));
@@ -2127,7 +2055,7 @@ int FlowStandardDlg50::saveAllVerifyRecords()
 }
 
 //请求读表号（所有表、广播地址读表）
-void FlowStandardDlg50::on_btnAllReadNO_clicked()
+void TotalStandardDlg50::on_btnAllReadNO_clicked()
 {
 	qDebug()<<"on_btnAllReadNO_clicked...";
 	int idx = -1;
@@ -2155,7 +2083,7 @@ void FlowStandardDlg50::on_btnAllReadNO_clicked()
 }
 
 //请求读表数据（所有表、广播地址读表）
-void FlowStandardDlg50::on_btnAllReadData_clicked()
+void TotalStandardDlg50::on_btnAllReadData_clicked()
 {
 	qDebug()<<"on_btnAllReadData_clicked...";
 	int idx = -1;
@@ -2183,7 +2111,7 @@ void FlowStandardDlg50::on_btnAllReadData_clicked()
 }
 
 //设置检定状态（所有表）
-void FlowStandardDlg50::on_btnAllVerifyStatus_clicked()
+void TotalStandardDlg50::on_btnAllVerifyStatus_clicked()
 {
 	for (int i=0; i<m_maxMeterNum; i++)
 	{
@@ -2191,82 +2119,12 @@ void FlowStandardDlg50::on_btnAllVerifyStatus_clicked()
 	}
 }
 
-//调整误差（所有表）
-void FlowStandardDlg50::on_btnAllAdjError_clicked()
-{
-	for (int i=0; i<m_maxMeterNum; i++)
-	{
-		slotAdjustError(i);
-	}
-}
-
-//修改表号（所有表）
-void FlowStandardDlg50::on_btnAllModifyNO_clicked()
-{
-	for (int i=0; i<m_maxMeterNum; i++)
-	{
-		slotModifyMeterNO(i);
-	}
-}
-
-/*
-** 修改表号
-** 输入参数：
-	row:行号，由row可以知道当前热表对应的串口、表号、误差等等
-   注意：表号为14位
-*/
-void FlowStandardDlg50::slotModifyMeterNO(const int &row)
-{
-	qDebug()<<"slotModifyMeterNO row ="<<row;
-	int meterPos = row + 1; //表位号
-	int idx = -1;
-	idx = isMeterPosValid(meterPos);
-	qDebug()<<"slotModifyMeterNO idx ="<<idx;
-	if (idx < 0 || !m_writeNO)
-	{
-		return;
-	}
-	if (!m_meterResult[idx])//任一流量点检定结果不合格
-	{
-		return;
-	}
-
-	QString meterNo = m_recPtr[idx].meterNo;
-	QString newMeterNo = m_numPrefix + QString("%1").arg(m_mapMeterPosAndNewNO[meterPos]);
-	m_meterObj[row].askModifyMeterNO(meterNo, newMeterNo);
-	qDebug()<<"slotModifyMeterNO: "<<meterNo<<", "<<newMeterNo;
-	ui.tableWidget->item(row, COLUMN_METER_NUMBER)->setText(newMeterNo.right(8));
-}
-
-/*
-** 调整误差
-** 输入参数：
-	row:行号，由row可以知道当前热表对应的串口、表号、误差等等
-*/
-void FlowStandardDlg50::slotAdjustError(const int &row)
-{
-	qDebug()<<"slotAdjustError row ="<<row;
-	int idx = isMeterPosValid(row+1);
-	if (idx < 0)
-	{	
-		return;
-	}
-	qDebug()<<"slotAdjustError idx ="<<idx;
-	if (qAbs(m_meterErr[idx][0])>MAX_ERROR || qAbs(m_meterErr[idx][1])>MAX_ERROR || qAbs(m_meterErr[idx][2])>MAX_ERROR || qAbs(m_meterErr[idx][3])>MAX_ERROR)
-	{
-		qDebug()<<"slotAdjustError idx ="<<idx<<", 误差过大，不能修正";
-		return;
-	}
-	QString meterNO = m_numPrefix + ui.tableWidget->item(row, COLUMN_METER_NUMBER)->text();
-	m_meterObj[row].askModifyFlowCoe(meterNO, m_meterErr[idx][0], m_meterErr[idx][1], m_meterErr[idx][2], m_meterErr[idx][3], m_oldMeterCoe[idx]);
-}
-
 /*
 ** 读表数据
 ** 输入参数：
-row:行号，由row可以知道当前热表对应的串口、表号、误差等等
+	row:行号，由row可以知道当前热表对应的串口、表号、误差等等
 */
-void FlowStandardDlg50::slotReadData(const int &row)
+void TotalStandardDlg50::slotReadData(const int &row)
 {
 	qDebug()<<"slotReadData row ="<<row;
 	m_meterObj[row].askReadMeterData();
@@ -2275,42 +2133,33 @@ void FlowStandardDlg50::slotReadData(const int &row)
 /*
 ** 检定状态
 ** 输入参数：
-row:行号，由row可以知道当前热表对应的串口、表号、误差等等
+	row:行号，由row可以知道当前热表对应的串口、表号、误差等等
 */
-void FlowStandardDlg50::slotVerifyStatus(const int &row)
+void TotalStandardDlg50::slotVerifyStatus(const int &row)
 {
 	qDebug()<<"slotVerifyStatus row ="<<row;
-	m_meterObj[row].askSetVerifyStatus(VTYPE_FLOW);
+	m_meterObj[row].askSetVerifyStatus(VTYPE_HEAT);
 }
 
+
 /*
-** 读表号
+** 读取表号
 ** 输入参数：
-row:行号，由row可以知道当前热表对应的串口、表号、误差等等
+	row:行号，由row可以知道当前热表对应的串口、表号、误差等等
 */
-void FlowStandardDlg50::slotReadNO(const int &row)
+void TotalStandardDlg50::slotReadNO(const int &row)
 {
 	qDebug()<<"slotReadNO row ="<<row;
 	m_meterObj[row].askReadMeterNO();
 }
 
-/*
-** 保存起始表号
-*/
-void FlowStandardDlg50::saveStartMeterNO()
-{
-	QString filename = getFullIniFileName("verifyparaset.ini");//配置文件的文件名
-	QSettings settings(filename, QSettings::IniFormat);
-	settings.setIniCodec("GB2312");//解决向ini文件中写汉字乱码
-	settings.setValue("Other/meternumber", m_newMeterNO);
-}
 
 /*
 ** 打开4路电动调节阀至设定的开度
 ** 注意：选中的管路，将调节阀开度调整到设定开度；
          未选中的管路，将将调节阀开度调整到50%，用于排气
 */
-void FlowStandardDlg50::openAllRegulator()
+void TotalStandardDlg50::openAllRegulator()
 {
 	int regNO = 0;
 	float opening = 0;
@@ -2375,7 +2224,7 @@ void FlowStandardDlg50::openAllRegulator()
 /*
 ** 关闭4路电动调节阀
 */
-void FlowStandardDlg50::closeAllRegulator()
+void TotalStandardDlg50::closeAllRegulator()
 {
 	if (ui.spinBoxOpeningSmall->value()!=0)
 	{
@@ -2399,7 +2248,7 @@ void FlowStandardDlg50::closeAllRegulator()
 	}
 }
 
-void FlowStandardDlg50::setRegulatorOpening(int regNO, int opening)
+void TotalStandardDlg50::setRegulatorOpening(int regNO, int opening)
 {
 	if (regNO == m_portsetinfo.regSmallNo) //小调节阀
 	{
@@ -2424,35 +2273,35 @@ void FlowStandardDlg50::setRegulatorOpening(int regNO, int opening)
 }
 
 //电动调节阀
-void FlowStandardDlg50::on_btnRegulateSmall_clicked() //调节阀1-DN3
+void TotalStandardDlg50::on_btnRegulateSmall_clicked() //调节阀1-DN3
 {
 	m_smallOpening = ui.ThermoSmall->value();
 	askControlRegulate(m_portsetinfo.regSmallNo, ui.spinBoxOpeningSmall->value());
 	m_regSmallTimer->start(REGULATE_FRESH_TIME);
 }
 
-void FlowStandardDlg50::on_btnRegulateMid1_clicked() //调节阀2-DN10
+void TotalStandardDlg50::on_btnRegulateMid1_clicked() //调节阀2-DN10
 {
 	m_mid1Opening = ui.ThermoMid1->value();
 	askControlRegulate(m_portsetinfo.regMid1No, ui.spinBoxOpeningMid1->value());
 	m_regMid1Timer->start(REGULATE_FRESH_TIME);
 }
 
-void FlowStandardDlg50::on_btnRegulateMid2_clicked() //调节阀3-DN25
+void TotalStandardDlg50::on_btnRegulateMid2_clicked() //调节阀3-DN25
 {
 	m_mid2Opening = ui.ThermoMid2->value();
 	askControlRegulate(m_portsetinfo.regMid2No, ui.spinBoxOpeningMid2->value());
 	m_regMid2Timer->start(REGULATE_FRESH_TIME);
 }
 
-void FlowStandardDlg50::on_btnRegulateBig_clicked() //调节阀4-DN50
+void TotalStandardDlg50::on_btnRegulateBig_clicked() //调节阀4-DN50
 {
 	m_bigOpening = ui.ThermoBig->value();
 	askControlRegulate(m_portsetinfo.regBigNo, ui.spinBoxOpeningBig->value());
 	m_regBigTimer->start(REGULATE_FRESH_TIME);
 }
 
-void FlowStandardDlg50::askControlRegulate(int regNO, int opening)
+void TotalStandardDlg50::askControlRegulate(int regNO, int opening)
 {
 	if (regNO>=1 && regNO<=3)
 	{
@@ -2464,27 +2313,27 @@ void FlowStandardDlg50::askControlRegulate(int regNO, int opening)
 	}
 }
 
-void FlowStandardDlg50::on_lineEditOpeningSmall_textChanged(const QString & text)
+void TotalStandardDlg50::on_lineEditOpeningSmall_textChanged(const QString & text)
 {
 	ui.ThermoSmall->setValue(text.toFloat());
 }
 
-void FlowStandardDlg50::on_lineEditOpeningMid1_textChanged(const QString & text)
+void TotalStandardDlg50::on_lineEditOpeningMid1_textChanged(const QString & text)
 {
 	ui.ThermoMid1->setValue(text.toFloat());
 }
 
-void FlowStandardDlg50::on_lineEditOpeningMid2_textChanged(const QString & text)
+void TotalStandardDlg50::on_lineEditOpeningMid2_textChanged(const QString & text)
 {
 	ui.ThermoMid2->setValue(text.toFloat());
 }
 
-void FlowStandardDlg50::on_lineEditOpeningBig_textChanged(const QString & text)
+void TotalStandardDlg50::on_lineEditOpeningBig_textChanged(const QString & text)
 {
 	ui.ThermoBig->setValue(text.toFloat());
 }
 
-void FlowStandardDlg50::slotFreshSmallRegOpening()
+void TotalStandardDlg50::slotFreshSmallRegOpening()
 {
 	if (ui.ThermoSmall->value() < ui.spinBoxOpeningSmall->value())
 	{
@@ -2501,7 +2350,7 @@ void FlowStandardDlg50::slotFreshSmallRegOpening()
 	}
 }
 
-void FlowStandardDlg50::slotFreshMid1RegOpening()
+void TotalStandardDlg50::slotFreshMid1RegOpening()
 {
 	if (ui.ThermoMid1->value() < ui.spinBoxOpeningMid1->value())
 	{
@@ -2518,7 +2367,7 @@ void FlowStandardDlg50::slotFreshMid1RegOpening()
 	}
 }
 
-void FlowStandardDlg50::slotFreshMid2RegOpening()
+void TotalStandardDlg50::slotFreshMid2RegOpening()
 {
 	if (ui.ThermoMid2->value() < ui.spinBoxOpeningMid2->value())
 	{
@@ -2535,7 +2384,7 @@ void FlowStandardDlg50::slotFreshMid2RegOpening()
 	}
 }
 
-void FlowStandardDlg50::slotFreshBigRegOpening()
+void TotalStandardDlg50::slotFreshBigRegOpening()
 {
 	if (ui.ThermoBig->value() < ui.spinBoxOpeningBig->value())
 	{

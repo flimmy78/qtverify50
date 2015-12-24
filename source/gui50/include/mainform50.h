@@ -16,7 +16,7 @@ class CAlgorithm;
 class FlowWeightDlg50;
 class FlowStandardDlg50;
 class TotalWeightDlg50;
-// class TotalStandardDlg;
+class TotalStandardDlg50;
 class CalcDlg;
 class CmbVerifyDlg;
 class StdMtrParaSet;
@@ -34,6 +34,7 @@ class RegisterDlg;
 class AdjustRateDlg;
 class UserManageDlg;
 class WaterWeightDlg50;
+class WaterStandardDlg50;
 
 class MainForm50 : public QMainWindow
 {
@@ -57,14 +58,15 @@ public:
 	FlowWeightDlg50 *m_flowWeightDlg;      //流量检定(质量法)
  	FlowStandardDlg50 *m_flowStandardDlg;  //流量检定(标准表法)
 	TotalWeightDlg50 *m_totalWeightDlg;    //总量检定(标准表法)
-// 	TotalStandardDlg50 *m_totalStandardDlg;//总量检定(标准表法)
+ 	TotalStandardDlg50 *m_totalStandardDlg;//总量检定(标准表法)
+	WaterWeightDlg50 *m_waterWeight50;     //水表检定（质量法）
+	WaterStandardDlg50 *m_waterStandard50; //水表检定（标准表法）
+
 
 	CalcDlg *m_calcDlg; //计算器检定
 	CmbVerifyDlg *m_cmbVerifyDlg; //组合检定
 	tvercompDlg *m_tvercompDlg; //温度检定(比较法)
 	tverparamDlg *m_tverparaDlg; //温度检定(参数法)
-
-	WaterWeightDlg50 *m_waterWeight50; //水表检定（质量法）
 
 	StdMtrParaSet *m_stdParaSet; //标准表参数设定
 	StdMtrCoeCorrect *m_stdCoeCorrect; //标准表系数标定
@@ -107,10 +109,11 @@ public slots:
 
 	//水表检定
 	void on_actionWaterWeight_triggered();
+	void on_actionWaterStandard_triggered();
 
 	//Total Verify
 	void on_actionTotalWeight_triggered();
-// 	void on_actionTotalStandard_triggered();
+	void on_actionTotalStandard_triggered();
 
 	//Data Query
 	void on_actionFlowResult_triggered();
