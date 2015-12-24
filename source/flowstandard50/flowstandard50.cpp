@@ -328,11 +328,11 @@ void FlowStandardDlg50::closeEvent( QCloseEvent * event)
 		m_regBigTimer = NULL;
 	}
 
-// 	if (m_stdMeterReader)
-// 	{
-// 		delete m_stdMeterReader;
-// 		m_stdMeterReader = NULL;
-// 	}
+	if (m_stdMeterReader)
+	{
+		delete m_stdMeterReader;
+		m_stdMeterReader = NULL;
+	}
 
 	emit signalClosed();
 }
