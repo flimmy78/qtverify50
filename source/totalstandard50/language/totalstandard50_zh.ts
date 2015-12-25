@@ -613,7 +613,7 @@ t</source>
         <location filename="../totalstandard50.cpp" line="1082"/>
         <location filename="../totalstandard50.cpp" line="1147"/>
         <source>Question</source>
-        <translation>问题</translation>
+        <translation>询问</translation>
     </message>
     <message>
         <location filename="../totalstandard50.cpp" line="200"/>
@@ -767,7 +767,7 @@ click &apos;Yes&apos; to read meter again;or click &apos;No&apos; to continue ve
     <message>
         <location filename="../totalstandard50.cpp" line="1593"/>
         <source>export excel file successful!</source>
-        <translation>导出报告成功!</translation>
+        <translation>导出报表成功!</translation>
     </message>
     <message>
         <location filename="../totalstandard50.cpp" line="2052"/>

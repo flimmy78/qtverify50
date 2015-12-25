@@ -10,6 +10,7 @@
 **  内容包含:
 **  说明:		
 **  更新记录:   
+
 ***********************************************/
 
 #include <QtGui/QMessageBox>
@@ -186,7 +187,6 @@ TotalStandardDlg50::TotalStandardDlg50(QWidget *parent, Qt::WFlags flags)
 
 TotalStandardDlg50::~TotalStandardDlg50()
 {
-	qDebug()<<"TotalStandardDlg50::showEvent";
 }
 
 void TotalStandardDlg50::showEvent(QShowEvent * event)
@@ -859,7 +859,9 @@ int TotalStandardDlg50::setAllMeterVerifyStatus()
 	return true;
 }
 
-//打开所有阀门和水泵
+/*
+** 打开所有阀门和水泵（关闭大、小天平进水阀，因为标准表法不需要使用天平）
+*/
 int TotalStandardDlg50::openAllValveAndPump()
 {
 	openValve(m_portsetinfo.bigWaterOutNo); //大天平放水阀
@@ -1069,11 +1071,6 @@ void TotalStandardDlg50::on_btnGoOn_clicked()
 {
 	ui.btnGoOn->hide();
 	startVerify();
-}
-
-//点击"重新计算"按钮
-void TotalStandardDlg50::on_btnReCalc_clicked()
-{
 }
 
 //点击"终止检测"按钮
@@ -1502,7 +1499,6 @@ int TotalStandardDlg50::calcMeterError(int idx)
 	{
 		ui.tableWidget->item(row, COLUMN_DISP_ERROR)->setForeground(QBrush(Qt::red));
 		ui.tableWidget->item(row, COLUMN_METER_NUMBER)->setForeground(QBrush(Qt::red));
-		ui.tableWidget->cellWidget(row, COLUMN_ADJUST_ERROR)->setStyleSheet("color: rgb(255, 0, 0);");
 	}
 	QString meterNoStr = m_numPrefix + QString("%1").arg(ui.tableWidget->item(row, 0)->text(), 8, '0');
 
@@ -1577,7 +1573,6 @@ int TotalStandardDlg50::calcVerifyResult()
 
 	return ret;
 }
-
 
 void TotalStandardDlg50::exportReport()
 {
@@ -2398,5 +2393,15 @@ void TotalStandardDlg50::slotFreshBigRegOpening()
 	if (ui.lineEditOpeningBig->text().toInt() == ui.spinBoxOpeningBig->value())
 	{
 		m_regBigTimer->stop();
+	}
+}
+
+void TotalStandardDlg50::on_lineEditStdMeter_textChanged(const QString &text)
+{
+	bool ok;
+	float value = text.toFloat(&ok);
+	if (ok)
+	{
+		ui.lcdAccumStdMeter->display(text);
 	}
 }
