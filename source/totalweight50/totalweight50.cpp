@@ -2019,9 +2019,9 @@ void TotalWeightDlg50::exportReport()
 	QString xlsname = QDateTime::fromString(m_timeStamp, "yyyy-MM-dd HH:mm:ss.zzz").toString("yyyy-MM-dd_hh-mm-ss") + ".xls";
 	try
 	{
-		QString defaultPath = QProcessEnvironment::systemEnvironment().value("ADEHOME") + "\\report\\total\\";
+		QString defaultPath = QProcessEnvironment::systemEnvironment().value("ADEHOME") + "\\report\\total\\mass\\";
 		CReport rpt(sqlCondition);
-		rpt.setIniName("rptconfig_total.ini");
+		rpt.setIniName("rptconfig_total_mass.ini");
 		rpt.writeRpt();
 		rpt.saveTo(defaultPath + xlsname);
 		ui.labelHintProcess->setText(tr("Verify has Stoped!") + "\n" + tr("export excel file successful!"));
