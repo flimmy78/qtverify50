@@ -38,19 +38,6 @@ WaterStandardDlg50::WaterStandardDlg50(QWidget *parent, Qt::WFlags flags)
 	qDebug()<<"WaterStandardDlg50 thread:"<<QThread::currentThreadId();
 	ui.setupUi(this);
 
-	//不同等级的热量表对应的标准误差,单位%
-	m_gradeErrA[1] = 1.00f;
-	m_gradeErrA[2] = 2.00f;
-	m_gradeErrA[3] = 3.00f;
-
-	m_gradeErrB[1] = 0.01f;
-	m_gradeErrB[2] = 0.02f;
-	m_gradeErrB[3] = 0.05f;
-
-	m_mapNormalFlow[0] = 1.5f; //DN15常用流量 1.5
-	m_mapNormalFlow[1] = 2.5f; //DN20常用流量 2.5
-	m_mapNormalFlow[2] = 3.5f; //DN25常用流量 3.5
-
 	///////////////////////////////// 原showEvent()函数的内容 begin 
 	//否则每次最小化再显示时，会调用showEvent函数，导致内容清空等现象
 	ui.btnExhaust->hide();
@@ -1013,10 +1000,10 @@ void WaterStandardDlg50::stopVerify()
 		m_stopFlag = true;
 		m_exaustTimer->stop();//停止排气定时器
 		closeAllValveAndPumpOpenOutValve();
+		ui.labelHintProcess->setText(tr("Verify has Stoped!"));
 	}
 	closeAllRegulator();
 
-	ui.labelHintProcess->setText(tr("Verify has Stoped!"));
 	m_state = STATE_INIT; //重置初始状态
 
 	ui.tableWidget->setEnabled(true);
@@ -1081,8 +1068,8 @@ void WaterStandardDlg50::startVerify()
 		delete []m_recPtr;
 		m_recPtr = NULL;
 	}
-	m_recPtr = new Flow_Verify_Record_STR[m_validMeterNum];
-	memset(m_recPtr, 0, sizeof(Flow_Verify_Record_STR)*m_validMeterNum);
+	m_recPtr = new Water_Verify_Record_STR[m_validMeterNum];
+	memset(m_recPtr, 0, sizeof(Water_Verify_Record_STR)*m_validMeterNum);
 
 	m_state = STATE_INIT; //初始状态
 
@@ -1254,13 +1241,13 @@ int WaterStandardDlg50::prepareVerifyFlowPoint(int order)
 	int i=0;
 	if (m_resetZero) //初值回零
 	{
-		ui.labelHintPoint->setText(tr("Reset Zero"));
-		while (i < RESET_ZERO_TIME && !m_stopFlag) //等待被检表初值回零
-		{
-			ui.labelHintProcess->setText(tr("please wait <font color=DarkGreen size=6><b>%1</b></font> seconds for reset zero").arg(RESET_ZERO_TIME-i));
-			i++;
-			wait(CYCLE_TIME); 
-		}
+			ui.labelHintPoint->setText(tr("Reset Zero"));
+			while (i < RESET_ZERO_TIME && !m_stopFlag) //等待被检表初值回零
+			{
+				ui.labelHintProcess->setText(tr("please wait <font color=DarkGreen size=6><b>%1</b></font> seconds for reset zero").arg(RESET_ZERO_TIME-i));
+				i++;
+				wait(CYCLE_TIME); 
+			}
 	}
 // 	else //初值不回零
 // 	{
@@ -1316,7 +1303,6 @@ int WaterStandardDlg50::startVerifyFlowPoint(int order)
 	float verifyQuantity = m_paraSetReader->getFpBySeq(order).fp_quantity; //第order次检定对应的检定量
 	float frequence = m_paraSetReader->getFpBySeq(order).fp_freq; //order对应的频率
 	m_controlObj->askSetDriverFreq(frequence);
-
 	while (m_RegSpinBox[regNO]->value() != m_RegLineEdit[regNO]->text().toInt()) //调节阀未到位
 	{
 		ui.labelHintProcess->setText(tr("please wait for regulator..."));
@@ -1325,7 +1311,6 @@ int WaterStandardDlg50::startVerifyFlowPoint(int order)
 	}
 
 	m_stdStartVol = ui.lcdAccumStdMeter->value();//记录标准表初始体积(L)
-	//m_stdStartVol = ui.lcdAccumStdMeter->value();
 	qDebug() << "start volumn: " << m_stdStartVol;
 	float stdStartT = m_pipeOutTemper;//标准表初始温度, 现采集管路出口的平均温度.(不准确需要更精确的修正)
 	float stdStartDen = m_chkAlg->getDensityByQuery(stdStartT);//标准表初始平均密度(kg/L)
@@ -1364,7 +1349,6 @@ int WaterStandardDlg50::startVerifyFlowPoint(int order)
 			wait(BALANCE_STABLE_TIME); //等待3秒钟，让天平数值稳定
 
 			m_stdEndVol = ui.lcdAccumStdMeter->value();//记录标准表最终体积(L)
-			//m_stdEndVol = ui.lcdAccumStdMeter->value();
 			float stdEndT = m_pipeOutTemper;//标准表最终温度, 现采集管路出口的平均温度.(不准确需要更精确的修正)
 			float stdEndDen = m_chkAlg->getDensityByQuery(stdEndT);//标准表最终平均密度(kg/L)
 			qDebug() << "end volumn: " << m_stdEndVol;
@@ -1433,7 +1417,8 @@ int WaterStandardDlg50::calcMeterError(int idx)
 	int valveIdx = m_paraSetReader->getFpBySeq(m_nowOrder).fp_valve_idx; //0:大 1:中二 2:中一 3:小
 	m_meterErr[idx][valveIdx] = m_meterError[idx];
 	ui.tableWidget->item(row, COLUMN_DISP_ERROR)->setText(QString::number(m_meterError[idx], 'f', ERR_PRECISION)); //示值误差
-	float stdError = m_flowSC*(m_gradeErrA[m_nowParams->m_grade] + m_gradeErrB[m_nowParams->m_grade]*m_mapNormalFlow[m_standard]/m_realFlow); //标准误差=规程要求误差*流量安全系数
+	float Q2 = m_nowParams->Q2BiQ1 * m_nowParams->Q3 / m_nowParams->Q3BiQ1;
+	float stdError = m_flowSC*getWaterMeterStdError(Q2, m_nowParams->m_grade , m_meterTemper[idx], m_realFlow); //标准误差=规程要求误差*流量安全系数
 	ui.tableWidget->item(row, COLUMN_STD_ERROR)->setText("±" + QString::number(stdError, 'f', ERR_PRECISION)); //标准误差
 	if (fabs(m_meterError[idx]) > stdError)
 	{
@@ -1477,6 +1462,10 @@ int WaterStandardDlg50::calcMeterError(int idx)
 	m_recPtr[idx].envHumidity = m_nowParams->m_humidity.toFloat();
 	m_recPtr[idx].flowcoe = m_nowParams->sc_flow;
 	m_recPtr[idx].deviceInfoId = m_readComConfig->getDeviceInfoID();
+	m_recPtr[idx].waterPress = 0.6;
+	m_recPtr[idx].Q3BiQ1 = m_nowParams->Q3BiQ1;
+	m_recPtr[idx].Q3 = m_nowParams->Q3;
+	m_recPtr[idx].Q2BiQ1 = m_nowParams->Q2BiQ1;
 
 	return 1; 
 }
@@ -1558,9 +1547,9 @@ void WaterStandardDlg50::exportReport()
 	QString xlsname = QDateTime::fromString(m_timeStamp, "yyyy-MM-dd HH:mm:ss.zzz").toString("yyyy-MM-dd_hh-mm-ss") + ".xls";
 	try
 	{
-		QString defaultPath = QProcessEnvironment::systemEnvironment().value("ADEHOME") + "\\report\\flow\\std\\";
+		QString defaultPath = QProcessEnvironment::systemEnvironment().value("ADEHOME") + "\\report\\water\\std\\";
 		CReport rpt(sqlCondition);
-		rpt.setIniName("rptconfig_flow_std.ini");
+		rpt.setIniName("rptconfig_water_std.ini");
 		rpt.writeRpt();
 		rpt.saveTo(defaultPath + xlsname);
 		ui.labelHintProcess->setText(tr("Verify has Stoped!") + "\n" + tr("export excel file successful!"));
@@ -1874,6 +1863,7 @@ void WaterStandardDlg50::on_btnParaSet_clicked()
 		m_paraSetDlg = new ParaSetDlg();
 	}
 	connect(m_paraSetDlg, SIGNAL(saveSuccessSignal()), this, SLOT(readNowParaConfig()));
+	m_paraSetDlg->showWaterPara();
 	m_paraSetDlg->show();
 }
 
@@ -2112,7 +2102,7 @@ void WaterStandardDlg50::on_tableWidget_cellChanged(int row, int column)
 */
 int WaterStandardDlg50::saveAllVerifyRecords()
 {
-	int ret = insertFlowVerifyRec(m_recPtr, m_validMeterNum);
+	int ret = insertWaterVerifyRec(m_recPtr, m_validMeterNum);
 	if (ret != OPERATE_DB_OK)
 	{
 		QMessageBox::warning(this, tr("Error"), tr("Error:insert database failed!\n") + tr("Maybe network error!"));

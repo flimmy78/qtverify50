@@ -570,7 +570,7 @@ click &apos;Yes&apos; to read meter again;or click &apos;No&apos; to continue ve
         <location filename="../flowweight50.cpp" line="2430"/>
         <location filename="../flowweight50.cpp" line="2436"/>
         <source>please input start value of heat meter</source>
-        <translation>请输入表初值</translation>
+        <translation>请输入被检表的初值</translation>
     </message>
     <message>
         <location filename="../flowweight50.cpp" line="1774"/>
@@ -601,7 +601,7 @@ click &apos;Yes&apos; to read meter again;or click &apos;No&apos; to continue ve
         <location filename="../flowweight50.cpp" line="1986"/>
         <location filename="../flowweight50.cpp" line="2458"/>
         <source>please input end value of heat meter</source>
-        <translation>请输入表终值</translation>
+        <translation>请输入被检表的终值</translation>
     </message>
     <message>
         <location filename="../flowweight50.cpp" line="2003"/>

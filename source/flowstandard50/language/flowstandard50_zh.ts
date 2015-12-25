@@ -565,7 +565,7 @@ Please wait for about %1 second</source>
     <message>
         <location filename="../flowstandard50.cpp" line="200"/>
         <source>release pipe pressure...</source>
-        <translation>释放管路压力...</translation>
+        <translation>正在释放管路压力...</translation>
     </message>
     <message>
         <source>Open Valve</source>
@@ -722,7 +722,7 @@ Please wait for about %1 second</source>
         <location filename="../flowstandard50.cpp" line="1576"/>
         <location filename="../flowstandard50.cpp" line="2124"/>
         <source>Error</source>
-        <translation>误差</translation>
+        <translation>错误</translation>
     </message>
     <message>
         <location filename="../flowstandard50.cpp" line="1062"/>
@@ -756,7 +756,7 @@ click &apos;Yes&apos; to read meter again;or click &apos;No&apos; to continue ve
         <location filename="../flowstandard50.cpp" line="1999"/>
         <location filename="../flowstandard50.cpp" line="2005"/>
         <source>please input start value of heat meter</source>
-        <translation>请输入表的初始值</translation>
+        <translation>请输入被检表的初值</translation>
     </message>
     <message>
         <location filename="../flowstandard50.cpp" line="1503"/>
@@ -789,7 +789,7 @@ click &apos;Yes&apos; to read meter again;or click &apos;No&apos; to continue ve
         <location filename="../flowstandard50.cpp" line="1555"/>
         <location filename="../flowstandard50.cpp" line="2027"/>
         <source>please input end value of heat meter</source>
-        <translation>请输入被检表终止热值</translation>
+        <translation>请输入被检表的终值</translation>
     </message>
     <message>
         <source>please click &quot;Next&quot; button to verify next flow point</source>

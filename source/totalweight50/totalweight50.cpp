@@ -1421,6 +1421,7 @@ void TotalWeightDlg50::on_btnStop_clicked()
 
 void TotalWeightDlg50::on_btnExit_clicked()
 {
+	stopVerify();
 	this->close();
 }
 
@@ -1434,10 +1435,10 @@ void TotalWeightDlg50::stopVerify()
 		m_stopFlag = true; //不再检查天平质量
 		m_exaustTimer->stop();//停止排气定时器
 		closeAllValveAndPumpOpenOutValve();
+		ui.labelHintProcess->setText(tr("Verify has Stoped!"));
 	}
 	closeAllRegulator();
 
-	ui.labelHintProcess->setText(tr("Verify has Stoped!"));
 	m_state = STATE_INIT; //重置初始状态
 
 	ui.tableWidget->setEnabled(true);

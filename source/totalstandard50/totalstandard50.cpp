@@ -1102,10 +1102,10 @@ void TotalStandardDlg50::stopVerify()
 		m_stopFlag = true;
 		m_exaustTimer->stop();//Í£Ö¹ÅÅÆø¶¨Ê±Æ÷
 		closeAllValveAndPumpOpenOutValve();
+		ui.labelHintProcess->setText(tr("Verify has Stoped!"));
 	}
 	closeAllRegulator();
 
-	ui.labelHintProcess->setText(tr("Verify has Stoped!"));
 	m_state = STATE_INIT; //ÖØÖÃ³õÊ¼×´Ì¬
 
 	ui.tableWidget->setEnabled(true);

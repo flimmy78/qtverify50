@@ -49,6 +49,7 @@
 #include "usermanagedlg.h"
 #include "logindialog.h"
 #include "waterweight50.h"
+#include "waterstandard50.h"
 
 MainForm50::MainForm50(bool licenseOK, int validDays, QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
@@ -600,17 +601,17 @@ void MainForm50::on_actionWaterWeight_triggered()
 //水表检定（质量法）
 void MainForm50::on_actionWaterStandard_triggered()
 {
-// 	if (NULL == m_waterStandard50)
-// 	{
-// 		m_waterStandard50 = new WaterStandardDlg50();
-// 	}
-// 	else //目的是执行WaterStandardDlg50的构造函数
-// 	{
-// 		delete m_waterStandard50;
-// 		m_waterStandard50 = NULL;
-// 		m_waterStandard50 = new WaterStandardDlg50();
-// 	}
-// 	m_waterStandard50->showMaximized();
+	if (NULL == m_waterStandard50)
+	{
+		m_waterStandard50 = new WaterStandardDlg50();
+	}
+	else //目的是执行WaterStandardDlg50的构造函数
+	{
+		delete m_waterStandard50;
+		m_waterStandard50 = NULL;
+		m_waterStandard50 = new WaterStandardDlg50();
+	}
+	m_waterStandard50->showMaximized();
 }
 
 //总量检定（质量法）

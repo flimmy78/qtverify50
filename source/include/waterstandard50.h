@@ -1,49 +1,45 @@
-#ifndef WATERWEIGHT50_H
-#define WATERWEIGHT50_H
+#ifndef WATERSTANDARD50_H
+#define WATERSTANDARD50_H
 
-#ifdef WATERWEIGHT50_DLL
+#ifdef WATERSTANDARD50_DLL
 #  ifdef WIN32
-#  define WATERWEIGHT50_EXPORT __declspec(dllexport)
+#  define WATERSTANDARD50_EXPORT __declspec(dllexport)
 #  else
-#  define WATERWEIGHT50_EXPORT
+#  define WATERSTANDARD50_EXPORT
 #  endif
 #else
 #  ifdef WIN32
-#  define WATERWEIGHT50_EXPORT __declspec(dllimport)
+#  define WATERSTANDARD50_EXPORT __declspec(dllimport)
 #  else
-#  define WATERWEIGHT50_EXPORT
+#  define WATERSTANDARD50_EXPORT
 #  endif
 #endif
 
 #include <QtGui/QWidget>
+#include <QByteArray>
+#include <QSettings>
 #include <QtGui/QDataWidgetMapper>
 
-#include "ui_waterweight50.h"
+#include "ui_waterstandard50.h"
 #include "comobject.h"
 
 class CAlgorithm;
 class ParaSetDlg;
 class ParaSetReader;
 class ReadComConfig;
+class CStdMeterReader;
 
-
-class WATERWEIGHT50_EXPORT WaterWeightDlg50 : public QWidget
+class WATERSTANDARD50_EXPORT WaterStandardDlg50 : public QWidget
 {
 	Q_OBJECT
 
 public:
-	WaterWeightDlg50(QWidget *parent = 0, Qt::WFlags flags = 0);
-	~WaterWeightDlg50();
+	WaterStandardDlg50(QWidget *parent = 0, Qt::WFlags flags = 0);
+	~WaterStandardDlg50();
 
 	QDataWidgetMapper *m_meterStdMapper;
 
 	QTimer *m_exaustTimer; //排气定时器
-
-	ComThread m_balanceThread; //天平采集线程
-	BalanceComObject *m_balanceObj;
-
-	ComThread m_balanceThread2; //天平采集线程2
-	BalanceComObject *m_balanceObj2;
 
 	ComThread m_tempThread;  //温度采集线程
 	TempComObject *m_tempObj;
@@ -97,8 +93,10 @@ public:
 	float *m_meterDensity;    //被检表的密度
 	float *m_meterStdValue;   //被检表的标准值
 	float *m_meterError;	  //被检表的误差(当前流量点不同表位的误差)
-	float m_balStartV;        //天平初值
-	float m_balEndV;          //天平终值
+	float m_stdStartVol;	  //标准表体积初值
+	float m_stdEndVol;		  //标准表体积终值
+	float m_StdStartMass;     //经温度修正的标准表质量初值
+	float m_StdEndMass;       //经温度修正的标准表质量终值
 	float m_pipeInTemper;     //入口温度
 	float m_pipeOutTemper;    //出口温度
 	float m_realFlow;		  //流速(m3/h）
@@ -120,21 +118,6 @@ public:
 	ReadComConfig *m_readComConfig; //读串口设置
 	PortSet_Ini_STR m_portsetinfo;  //端口配置
 
-	//计算流速用
-	uint m_totalcount;  //计数器
-	float m_startWeight;//天平初值
-	float m_endWeight;  //天平终值
-	float m_deltaWeight[FLOW_SAMPLE_NUM];
-	QTimer *m_flowRateTimer;  //计时器:用于计算流速
-
-	//大天平最大容量和回水底量
-	float m_balMaxWht;
-	float m_balBottomWht;
-
-	//小天平最大容量和回水底量
-	float m_balMaxWht2;
-	float m_balBottomWht2;
-
 	QTimer *m_regSmallTimer; //计时器，用于动态显示小调节阀的开度
 	int m_smallOpening; 
 	QTimer *m_regMid1Timer; //计时器，用于动态显示中一调节阀的开度
@@ -148,8 +131,6 @@ public:
 	QMap<int, QSpinBox*> m_RegSpinBox; //调节阀端口号与调节阀目标开度控件的映射关系
 	int m_lastPortNO; //记录上一个流量点的阀门端口号（一条管路跑多个流量点时使用）
 
-	void initBalanceCom();     //天平串口
-	void initBalanceCom2();    //天平串口2
 	void initTemperatureCom(); //温度采集串口
 	void initControlCom();     //阀门控制串口
 	void initControlCom2();    //阀门控制串口2
@@ -179,20 +160,14 @@ public slots:
 	void on_btnExit_clicked();    //点击"退出"按钮
 	int startExhaustCountDown();  //开始排气倒计时
 	void slotExaustFinished();    //排气时间结束
-	int prepareBigBalanceInitWeight(); //开始检定前，准备大天平初始重量
-	int prepareSmallBalanceInitWeight(); //开始检定前，准备小天平初始重量
 	int readAllMeterFlowCoe();    //读取所有被检表的流量系数
 	int setAllMeterVerifyStatus();//设置热量表进入检定状态
 	int openAllValveAndPump();    //打开所有阀门和水泵
 	int closeAllValveAndPumpOpenOutValve(); //关闭所有阀门和水泵、打开防水阀
 	int closeAllFlowPointValves();//关闭所有流量点阀门
-	int isBigBalanceValueBigger(float targetV, bool flg=true);   //判断大天平质量,flg: true-要求大于目标重量(默认)；false-要求小于目标重量
-	int isSmallBalanceValueBigger(float targetV, bool flg=true); //判断小天平质量,flg: true-要求大于目标重量(默认)；false-要求小于目标重量
-	int judgeBalanceAndCalcAvgTemperAndFlow(float targetV, bool bigFlag); //判断大天平质量，并累加进出口温度，每秒累加一次，用于计算进出口平均温度
+	int judgeTartgetVolAndCalcAvgTemperAndFlow(double initV, double verifyV); //判断是否完成检定量检定量，并累加进出口温度，每秒累加一次，用于计算进出口平均温度
 	void stopVerify();            //停止检定
 	void startVerify();           //开始检定
-	bool judgeBalanceCapacity(int &bigOK, int &smallOK);   //判断天平容量是否能够满足检定用量 连续检定
-	int judgeBalanceCapacitySingle(int order, int &bigBalance); //判断天平容量是否能够满足检定用量 不连续检定
 	int prepareVerifyFlowPoint(int order);     //准备单个流量点的检定
 	int startVerifyFlowPoint(int order);       //开始单个流量点的检定
 	int openValve(UINT8 portno);    //打开控制阀
@@ -208,11 +183,8 @@ public slots:
 	int calcMeterError(int idx);  //计算某个表的误差
 	int calcVerifyResult();       //计算检定结果
 
-	void slotFreshBigBalanceValue(const float& balValue);  //刷新大天平数值
-	void slotFreshSmallBalanceValue(const float& balValue);//刷新小天平数值
 	void slotAskPipeTemperature();//请求管路温度
 	void slotFreshComTempValue(const QString& tempStr); //刷新温度值
-	void slotFreshFlowRate(); //计算流速
 
 	void slotSetValveBtnStatus(const UINT8 &portno, const bool &status); //继电器返回成功对应的槽函数
 	void slotSetRegulateOk();     //调节阀返回成功对应的槽函数
@@ -258,7 +230,7 @@ public slots:
 
 	void saveStartMeterNO(); //保存起始表号
 
-
+	void on_lineEditStdMeter_textChanged(const QString &text);
 	/*******************电动调节阀******************************/
 	void openAllRegulator();  //打开所有调节阀至设定的开度
 	void closeAllRegulator(); //关闭所有调节阀
@@ -287,8 +259,13 @@ signals:
 	void signalClosed();
 
 private:
-	Ui::WaterWeightClass50 ui;
-	void exportReport();//导出报告
+	Ui::WaterStandardClass50 ui;
+	/*******************标准流量计******************************/
+	CStdMeterReader* m_stdMeterReader;
+	QMap<flow_rate_wdg, QLCDNumber *> m_mapInstWdg;
+	QMap<flow_rate_wdg, QLCDNumber *> m_mapAccumWdg;
+	/******************标准流量计end***************************/
+	void exportReport();
 };
 
-#endif //WATERWEIGHT50_H
+#endif //WATERSTANDARD50_H

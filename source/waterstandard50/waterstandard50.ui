@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1575</width>
+    <width>1594</width>
     <height>886</height>
    </rect>
   </property>
@@ -481,13 +481,13 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>180</width>
+         <width>160</width>
          <height>35</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>180</width>
+         <width>160</width>
          <height>35</height>
         </size>
        </property>
@@ -512,7 +512,7 @@
        </property>
        <property name="maximumSize">
         <size>
-         <width>500</width>
+         <width>400</width>
          <height>16777215</height>
         </size>
        </property>
@@ -544,9 +544,15 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="minimumSize">
+           <size>
+            <width>90</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
-            <width>120</width>
+            <width>100</width>
             <height>16777215</height>
            </size>
           </property>
@@ -576,9 +582,15 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="minimumSize">
+           <size>
+            <width>90</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
-            <width>120</width>
+            <width>100</width>
             <height>16777215</height>
            </size>
           </property>
@@ -618,9 +630,15 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="minimumSize">
+           <size>
+            <width>90</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
-            <width>120</width>
+            <width>100</width>
             <height>16777215</height>
            </size>
           </property>
@@ -660,9 +678,15 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="minimumSize">
+           <size>
+            <width>90</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
-            <width>120</width>
+            <width>100</width>
             <height>16777215</height>
            </size>
           </property>

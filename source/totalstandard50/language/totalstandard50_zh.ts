@@ -623,7 +623,7 @@ t</source>
     <message>
         <location filename="../totalstandard50.cpp" line="217"/>
         <source>release pipe pressure...</source>
-        <translation>释放管路压力...</translation>
+        <translation>正在释放管路压力...</translation>
     </message>
     <message>
         <source>ReadMeter</source>
@@ -747,7 +747,7 @@ click &apos;Yes&apos; to read meter again;or click &apos;No&apos; to continue ve
         <location filename="../totalstandard50.cpp" line="1927"/>
         <location filename="../totalstandard50.cpp" line="1933"/>
         <source>please input start value of heat meter</source>
-        <translation>请输入被检表初值</translation>
+        <translation>请输入被检表的初值</translation>
     </message>
     <message>
         <location filename="../totalstandard50.cpp" line="1383"/>
@@ -871,7 +871,7 @@ Please wait for about %1 second</source>
         <location filename="../totalstandard50.cpp" line="1575"/>
         <location filename="../totalstandard50.cpp" line="1955"/>
         <source>please input end value of heat meter</source>
-        <translation>请输入表终值</translation>
+        <translation>请输入被检表的终值</translation>
     </message>
     <message>
         <source>Error: please input digits</source>
