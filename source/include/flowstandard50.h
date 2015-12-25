@@ -161,7 +161,6 @@ public slots:
 	void on_btnGoOn_clicked();    //点击"继续"按钮
 	void on_btnStop_clicked();    //点击"终止检测"按钮
 	void on_btnExit_clicked();    //点击"退出"按钮
-	void on_btnReCalc_clicked();  //点击"重新计算"按钮
 	int startExhaustCountDown();  //开始排气倒计时
 	void slotExaustFinished();    //排气时间结束
 	int readAllMeterFlowCoe();    //读取所有被检表的流量系数
@@ -234,7 +233,7 @@ public slots:
 
 	void saveStartMeterNO(); //保存起始表号
 
-
+	void on_lineEditStdMeter_textChanged(const QString &text);
 	/*******************电动调节阀******************************/
 	void openAllRegulator();  //打开所有调节阀至设定的开度
 	void closeAllRegulator(); //关闭所有调节阀

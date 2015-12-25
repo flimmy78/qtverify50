@@ -675,7 +675,7 @@ Please wait for about %1 second</source>
         <location filename="../totalweight50.cpp" line="1412"/>
         <location filename="../totalweight50.cpp" line="1476"/>
         <source>Question</source>
-        <translation>提问</translation>
+        <translation>询问</translation>
     </message>
     <message>
         <location filename="../totalweight50.cpp" line="203"/>
@@ -818,7 +818,7 @@ click &apos;Yes&apos; to read meter again;or click &apos;No&apos; to continue ve
     <message>
         <location filename="../totalweight50.cpp" line="2026"/>
         <source>export excel file successful!</source>
-        <translation>导出Excel报表成功!</translation>
+        <translation>导出报表成功!</translation>
     </message>
     <message>
         <location filename="../totalweight50.cpp" line="2485"/>

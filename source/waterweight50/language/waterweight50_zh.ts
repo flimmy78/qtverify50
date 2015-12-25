@@ -616,7 +616,7 @@ Error</source>
         <location filename="../waterweight50.cpp" line="1296"/>
         <location filename="../waterweight50.cpp" line="1369"/>
         <source>Question</source>
-        <translation>提问</translation>
+        <translation>询问</translation>
     </message>
     <message>
         <location filename="../waterweight50.cpp" line="167"/>
@@ -736,7 +736,7 @@ Error</source>
     <message>
         <location filename="../waterweight50.cpp" line="1982"/>
         <source>export excel file successful!</source>
-        <translation>导出Excel报表成功!</translation>
+        <translation>导出报表成功!</translation>
     </message>
     <message>
         <source>&lt;font color=red size=4&gt;&lt;b&gt;Please input meter number, then click &quot;GoOn&quot; button!&lt;/b&gt;&lt;/font&gt;</source>

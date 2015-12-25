@@ -171,7 +171,6 @@ public slots:
 	void on_btnGoOn_clicked();    //点击"继续"按钮
 	void on_btnStop_clicked();    //点击"终止检测"按钮
 	void on_btnExit_clicked();    //点击"退出"按钮
-	void on_btnReCalc_clicked();  //点击"重新计算"按钮
 	int startExhaustCountDown();  //开始排气倒计时
 	void slotExaustFinished();    //排气时间结束
 	int setAllMeterVerifyStatus();//设置热量表进入检定状态
@@ -243,6 +242,8 @@ public slots:
 	void slot_btnGroupInstallPos_clicked(int id);
 
 	void slotAskStdTemperature();
+
+	void on_lineEditStdMeter_textChanged(const QString &text);
 
 	/*******************电动调节阀******************************/
 	void openAllRegulator();  //打开所有调节阀至设定的开度
