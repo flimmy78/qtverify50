@@ -328,11 +328,11 @@ void FlowStandardDlg50::closeEvent( QCloseEvent * event)
 		m_regBigTimer = NULL;
 	}
 
-	if (m_stdMeterReader)
-	{
-		delete m_stdMeterReader;
-		m_stdMeterReader = NULL;
-	}
+// 	if (m_stdMeterReader)
+// 	{
+// 		delete m_stdMeterReader;
+// 		m_stdMeterReader = NULL;
+// 	}
 
 	emit signalClosed();
 }
@@ -983,11 +983,6 @@ void FlowStandardDlg50::on_btnGoOn_clicked()
 {
 	ui.btnGoOn->hide();
 	startVerify();
-}
-
-//点击"重新计算"按钮
-void FlowStandardDlg50::on_btnReCalc_clicked()
-{
 }
 
 //点击"终止检测"按钮
@@ -2549,5 +2544,15 @@ void FlowStandardDlg50::slotFreshBigRegOpening()
 	if (ui.lineEditOpeningBig->text().toInt() == ui.spinBoxOpeningBig->value())
 	{
 		m_regBigTimer->stop();
+	}
+}
+
+void FlowStandardDlg50::on_lineEditStdMeter_textChanged(const QString &text)
+{
+	bool ok;
+	float value = text.toFloat(&ok);
+	if (ok)
+	{
+		ui.lcdAccumStdMeter->display(text);
 	}
 }

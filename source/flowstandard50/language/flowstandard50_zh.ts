@@ -555,7 +555,7 @@ Please wait for about %1 second</source>
         <location filename="../flowstandard50.cpp" line="996"/>
         <location filename="../flowstandard50.cpp" line="1070"/>
         <source>Question</source>
-        <translation>确定</translation>
+        <translation>询问</translation>
     </message>
     <message>
         <location filename="../flowstandard50.cpp" line="183"/>
@@ -663,7 +663,7 @@ Please wait for about %1 second</source>
         <source>Please input meter number!
  then click &quot;GoOn&quot; button!</source>
         <translation>请输入表号!
- 然后点击&quot;确定&quot;按钮!</translation>
+ 然后点击&quot;继续&quot;按钮!</translation>
     </message>
     <message>
         <location filename="../flowstandard50.cpp" line="1266"/>
@@ -683,7 +683,7 @@ Please wait for about %1 second</source>
     <message>
         <location filename="../flowstandard50.cpp" line="1572"/>
         <source>export excel file successful!</source>
-        <translation>导出表格成功!</translation>
+        <translation>导出报表成功!</translation>
     </message>
     <message>
         <location filename="../flowstandard50.cpp" line="2124"/>
