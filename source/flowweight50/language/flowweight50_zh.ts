@@ -606,7 +606,7 @@ click &apos;Yes&apos; to read meter again;or click &apos;No&apos; to continue ve
     <message>
         <location filename="../flowweight50.cpp" line="2003"/>
         <source>export excel file successful!</source>
-        <translation>导出Excel文件成功！</translation>
+        <translation>导出报表成功！</translation>
     </message>
     <message>
         <location filename="../flowweight50.cpp" line="2555"/>
