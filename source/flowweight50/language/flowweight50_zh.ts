@@ -542,7 +542,7 @@ Please input meter number, then click &quot;GoOn&quot; button!</source>
         <source>meter count maybe error ! read meter number again?
 click &apos;Yes&apos; to read meter again;or click &apos;No&apos; to continue verify</source>
         <translation>被检表数量可能有误！是否重新读取表号？
-点击“是”重新读取表号；点击“否”继续检定</translation>
+点击“Yes”重新读取表号；点击“No”继续检定</translation>
     </message>
     <message>
         <location filename="../flowweight50.cpp" line="1507"/>
