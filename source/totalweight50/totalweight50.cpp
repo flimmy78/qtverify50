@@ -181,6 +181,8 @@ TotalWeightDlg50::TotalWeightDlg50(QWidget *parent, Qt::WFlags flags)
 
 	ui.lcdInTemper->display(50);
 	ui.lcdOutTemper->display(40);
+	ui.lnEditInStdTemp->setText("25");
+	ui.lnEditOutStdTemp->setText("20");
 
 	m_stdMeterReader = NULL;
 	m_stdMeterReader = new CStdMeterReader();
@@ -1400,11 +1402,6 @@ void TotalWeightDlg50::on_btnGoOn_clicked()
 	startVerify();
 }
 
-//点击"重新计算"按钮
-void TotalWeightDlg50::on_btnReCalc_clicked()
-{
-}
-
 //点击"终止检测"按钮
 void TotalWeightDlg50::on_btnStop_clicked()
 {
@@ -1882,7 +1879,8 @@ int TotalWeightDlg50::startVerifyFlowPoint(int order)
 			{
 				m_meterTemper[m] = m_chkAlg->getMeterTempByPos(m_pipeInTemper, m_pipeOutTemper, m_meterPosMap[m]);//计算每个被检表的温度
 				m_meterDensity[m] = m_chkAlg->getDensityByQuery(m_meterTemper[m]);//计算每个被检表的密度
-				m_meterStdValue[m] = m_chkAlg->calcStdEnergyByEnthalpy(m_stdInTemper, m_stdOutTemper, m_balEndV-m_balStartV, m_unit); //计算每个被检表的热量标准值
+				 //计算每个被检表的热量标准值
+				m_meterStdValue[m] = m_chkAlg->calcStdEnergyByEnthalpy(m_stdInTemper, m_stdOutTemper, m_balEndV-m_balStartV, m_unit, WEIGHT_METHOD, bigFlag);
 
 				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_FLOW_POINT)->setText(QString::number(m_realFlow, 'f', 3));//流量点
 				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_METER_END)->setText("");//表终值

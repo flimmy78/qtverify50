@@ -189,7 +189,6 @@ public slots:
 	void on_btnGoOn_clicked();    //点击"继续"按钮
 	void on_btnStop_clicked();    //点击"终止检测"按钮
 	void on_btnExit_clicked();    //点击"退出"按钮
-	void on_btnReCalc_clicked();  //点击"重新计算"按钮
 	int startExhaustCountDown();  //开始排气倒计时
 	void slotExaustFinished();    //排气时间结束
 	int prepareBigBalanceInitWeight(); //开始检定前，准备大天平初始重量
