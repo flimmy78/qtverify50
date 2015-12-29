@@ -138,19 +138,9 @@ WaterStandardDlg50::WaterStandardDlg50(QWidget *parent, Qt::WFlags flags)
 	ui.lcdOutTemper->display(50);
 
 	/***************标准流量计***********************/
-	m_mapInstWdg[FLOW_RATE_BIG]   = ui.lcdInstStdMeter_50;
-	m_mapInstWdg[FLOW_RATE_MID_2] = ui.lcdInstStdMeter_25;
-	m_mapInstWdg[FLOW_RATE_MID_1] = ui.lcdInstStdMeter_10;
-	m_mapInstWdg[FLOW_RATE_SMALL] = ui.lcdInstStdMeter_3;
-
-	m_mapAccumWdg[FLOW_RATE_BIG]   = ui.lcdAccumStdMeter_50;
-	m_mapAccumWdg[FLOW_RATE_MID_2] = ui.lcdAccumStdMeter_25;
-	m_mapAccumWdg[FLOW_RATE_MID_1] = ui.lcdAccumStdMeter_10;
-	m_mapAccumWdg[FLOW_RATE_SMALL] = ui.lcdAccumStdMeter_3;
 	m_stdMeterReader = NULL;
-	m_stdMeterReader = new CStdMeterReader;
-	m_stdMeterReader->mapInstWdg(&m_mapInstWdg, ui.lcdFlowRate);
-	m_stdMeterReader->mapAccumWdg(&m_mapAccumWdg, ui.lcdAccumStdMeter);
+	m_stdMeterReader = new CStdMeterReader();
+
 	m_stdMeterReader->startReadMeter();
 	/***************标准流量计end********************/
 }
@@ -315,11 +305,11 @@ void WaterStandardDlg50::closeEvent( QCloseEvent * event)
 		m_regBigTimer = NULL;
 	}
 
-// 	if (m_stdMeterReader)
-// 	{
-// 		delete m_stdMeterReader;
-// 		m_stdMeterReader = NULL;
-// 	}
+ 	if (m_stdMeterReader)
+ 	{
+ 		delete m_stdMeterReader;
+ 		m_stdMeterReader = NULL;
+ 	}
 
 	emit signalClosed();
 }

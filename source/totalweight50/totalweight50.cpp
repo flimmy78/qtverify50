@@ -183,8 +183,7 @@ TotalWeightDlg50::TotalWeightDlg50(QWidget *parent, Qt::WFlags flags)
 	ui.lcdOutTemper->display(40);
 
 	m_stdMeterReader = NULL;
-	m_stdMeterReader = new CStdMeterReader;
-	m_stdMeterReader->mapInstWdg(NULL, ui.lcdFlowRateStd, true);
+	m_stdMeterReader = new CStdMeterReader();
 	m_stdMeterReader->startReadInstMeter();
 }
 
@@ -389,11 +388,11 @@ void TotalWeightDlg50::closeEvent(QCloseEvent * event)
 		m_regBigTimer = NULL;
 	}
 
-// 	if (m_stdMeterReader)
-// 	{
-// 		delete m_stdMeterReader;
-// 		m_stdMeterReader = NULL;
-// 	}
+	if (m_stdMeterReader)
+	{
+		delete m_stdMeterReader;
+		m_stdMeterReader = NULL;
+	}
 
 	emit signalClosed();
 }

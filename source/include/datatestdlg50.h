@@ -172,7 +172,6 @@ public slots:
 	void on_btnSetAddr1_clicked();//设置一级地址
 	void on_btnSetAddr2_clicked();//设置二级地址
 	
-
 	void on_btnOpenCom_clicked(); //打开串口
 	void on_btnCloseCom_clicked();//关闭串口
 
@@ -188,12 +187,10 @@ public slots:
 
 private:
 	Ui::DataTestDlgClass50 ui;
-	/*******************标准流量计******************************/
-	CStdMeterReader* m_stdMeterReader;
+	CStdMeterReader* m_stdMeterReader;//标准流量计
 	QMap<flow_rate_wdg, QLCDNumber *> m_mapInstWdg;
 	QMap<flow_rate_wdg, QLCDNumber *> m_mapAccumWdg;
-	/******************标准流量计end***************************/
-	
+
 private slots:
 	void openPump();
 	void closePump();
@@ -215,6 +212,13 @@ private slots:
 	void slotFreshMid2RegOpening();
 	void slotFreshBigRegOpening();
 	/******************电动调节阀end***************************/
+
+	/*******************标准流量计******************************/
+	void slotFreshInstFlow(const flow_rate_wdg&, const float&);
+	void slotFreshAccumFlow(const flow_rate_wdg&, const float&);
+	void slotFreshTolInst(const float&);
+	void slotFreshTolAccum(const float&);
+	/******************标准流量计end****************************/
 };
 
 #endif // DATATESTDLG_H

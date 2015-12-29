@@ -268,12 +268,35 @@ void DataTestDlg50::showEvent(QShowEvent *event)
 	m_mapAccumWdg[FLOW_RATE_MID_2] = ui.lcdAccumStdMeter_25;
 	m_mapAccumWdg[FLOW_RATE_MID_1] = ui.lcdAccumStdMeter_10;
 	m_mapAccumWdg[FLOW_RATE_SMALL] = ui.lcdAccumStdMeter_3;
+
 	m_stdMeterReader = NULL;
-	m_stdMeterReader = new CStdMeterReader;
-	m_stdMeterReader->mapInstWdg(&m_mapInstWdg, ui.lcdStdMeterFlowRate);
-	m_stdMeterReader->mapAccumWdg(&m_mapAccumWdg, ui.lcdAccumStdMeter);
+	m_stdMeterReader = new CStdMeterReader();
+	connect(m_stdMeterReader, SIGNAL(signalReadInstReady(const flow_rate_wdg&, const float&)), this, SLOT(slotFreshInstFlow(const flow_rate_wdg&, const float&)));
+	connect(m_stdMeterReader, SIGNAL(signalReadAccumReady(const flow_rate_wdg&, const float&)), this, SLOT(slotFreshAccumFlow(const flow_rate_wdg&, const float&)));
+	connect(m_stdMeterReader, SIGNAL(signalReadTolInstReady(const float&)), this, SLOT(slotFreshTolInst(const flow_rate_wdg&, const float&)));
+	connect(m_stdMeterReader, SIGNAL(signalReadTolAccumReady(const float&)), this, SLOT(slotFreshTolAccum(const flow_rate_wdg&, const float&)));
 	m_stdMeterReader->startReadMeter();
 	/***************标准流量计end********************/
+}
+
+void DataTestDlg50::slotFreshInstFlow(const flow_rate_wdg& idx, const float& value)
+{
+	m_mapInstWdg[idx]->display(value);
+}
+
+void DataTestDlg50::slotFreshAccumFlow(const flow_rate_wdg& idx, const float& value)
+{
+	m_mapAccumWdg[idx]->display(value);
+}
+
+void DataTestDlg50::slotFreshTolInst(const float& value)
+{
+	ui.lcdStdMeterFlowRate->display(value);
+}
+
+void DataTestDlg50::slotFreshTolAccum(const float& value)
+{
+	ui.lcdAccumStdMeter->display(value);
 }
 
 /*

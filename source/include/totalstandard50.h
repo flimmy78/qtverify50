@@ -276,8 +276,6 @@ private:
 	Ui::TotalStandardClass50 ui;
 	/*******************标准流量计******************************/
 	CStdMeterReader* m_stdMeterReader;
-	QMap<flow_rate_wdg, QLCDNumber *> m_mapInstWdg;
-	QMap<flow_rate_wdg, QLCDNumber *> m_mapAccumWdg;
 	/******************标准流量计end***************************/
 	void exportReport();
 };
