@@ -134,8 +134,6 @@ TotalStandardDlg50::TotalStandardDlg50(QWidget *parent, Qt::WFlags flags)
 	m_meterResult = NULL;
 	m_stdStartVol = 0;
 	m_stdEndVol = 0;
-	m_StdStartMass = 0;
-	m_StdEndMass = 0;
 	m_timeStamp = "";
 	m_nowDate = "";
 	m_validDate = "";
@@ -165,7 +163,9 @@ TotalStandardDlg50::TotalStandardDlg50(QWidget *parent, Qt::WFlags flags)
 	///////////////////////////////// 原showEvent()函数的内容 end
 
 	ui.lcdInTemper->display(50);
-	ui.lcdOutTemper->display(50);
+	ui.lcdOutTemper->display(40);
+	ui.lnEditInStdTemp->setText("25");
+	ui.lnEditOutStdTemp->setText("20");
 
 	/***************标准流量计***********************/
 	m_stdMeterReader = NULL;
@@ -1372,15 +1372,7 @@ int TotalStandardDlg50::startVerifyFlowPoint(int order)
 	}
 
 	m_stdStartVol = ui.lcdAccumStdMeter->value();//记录标准表初始体积(L)
-	//m_stdStartVol = ui.lcdAccumStdMeter->value();
 	qDebug() << "start volumn: " << m_stdStartVol;
-	float stdStartT = m_pipeOutTemper;//标准表初始温度, 现采集管路出口的平均温度.(不准确需要更精确的修正)
-	float stdStartDen = m_chkAlg->getDensityByQuery(stdStartT);//标准表初始平均密度(kg/L)
-	if (stdStartDen<0)
-	{
-		return -1;
-	}
-	m_StdStartMass = stdStartDen*m_stdStartVol;
 
 	if (portNo == m_lastPortNO) //同一条管路连续跑
 	{
@@ -1411,15 +1403,14 @@ int TotalStandardDlg50::startVerifyFlowPoint(int order)
 			wait(BALANCE_STABLE_TIME); //等待3秒钟，让天平数值稳定
 
 			m_stdEndVol = ui.lcdAccumStdMeter->value();//记录标准表最终体积(L)
-			//m_stdEndVol = ui.lcdAccumStdMeter->value();
-			float stdEndT = m_pipeOutTemper;//标准表最终温度, 现采集管路出口的平均温度.(不准确需要更精确的修正)
-			float stdEndDen = m_chkAlg->getDensityByQuery(stdEndT);//标准表最终平均密度(kg/L)
 			qDebug() << "end volumn: " << m_stdEndVol;
-			if(stdEndDen<0)
+			float stdAvgDen = m_chkAlg->getDensityByQuery(m_pipeOutTemper);//标准表最终平均密度(kg/L)
+			if(stdAvgDen<0)
 			{
 				return -1;
 			}
-			m_StdEndMass = m_stdEndVol*stdEndDen;
+			float mass = stdAvgDen * (m_stdEndVol - m_stdStartVol);
+
 			if (!m_resetZero && m_nowOrder>=2)
 			{
 				m_state = STATE_END_VALUE;
@@ -1429,14 +1420,13 @@ int TotalStandardDlg50::startVerifyFlowPoint(int order)
 			{
 				m_meterTemper[m] = m_chkAlg->getMeterTempByPos(m_pipeInTemper, m_pipeOutTemper, m_meterPosMap[m]);//计算每个被检表的温度
 				m_meterDensity[m] = m_chkAlg->getDensityByQuery(m_meterTemper[m]);//计算每个被检表的密度
-
 				//计算每个被检表的热量标准值, 如果按照jjg-2010, 需要用质量守恒法将标准表的质量计算到表位上。如果按照jjg-2001则直接计算即可
-				m_meterStdValue[m] = m_chkAlg->calcStdEnergyByEnthalpy(m_stdInTemper, m_stdOutTemper, m_StdEndMass-m_StdStartMass, m_unit); 
+				m_meterStdValue[m] = m_chkAlg->calcStdEnergyByEnthalpy(m_stdInTemper, m_stdOutTemper, mass, m_unit, STANDARD_METHOD); 
 
 				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_FLOW_POINT)->setText(QString::number(m_realFlow, 'f', 3));//流量点
 				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_METER_END)->setText("");//表终值
-				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_BAL_START)->setText(QString::number(m_StdStartMass, 'f', 3));//初值
-				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_BAL_END)->setText(QString::number(m_StdEndMass, 'f', 3));    //终值
+				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_BAL_START)->setText(QString::number(m_stdStartVol, 'f', 3));//初值
+				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_BAL_END)->setText(QString::number(m_stdEndVol, 'f', 3));    //终值
 				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_TEMPER)->setText(QString::number(m_meterTemper[m], 'f', 2));  //温度
 				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_DENSITY)->setText(QString::number(m_meterDensity[m], 'f', 3));//密度
 				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_STD_VALUE)->setText(QString::number(m_meterStdValue[m], 'f', 3));//标准值
@@ -1498,8 +1488,6 @@ int TotalStandardDlg50::calcMeterError(int idx)
 	m_recPtr[idx].methodFlag = STANDARD_METHOD; //标准表法
 	m_recPtr[idx].meterValue0 = m_meterStartValue[idx];
 	m_recPtr[idx].meterValue1 = m_meterEndValue[idx];
-	m_recPtr[idx].balWeight0 = m_StdStartMass;
-	m_recPtr[idx].balWeight1 = m_StdEndMass;
 	m_recPtr[idx].stdMeterV0 = m_stdStartVol;
 	m_recPtr[idx].stdMeterV1 = m_stdEndVol;
 	m_recPtr[idx].pipeTemper = m_meterTemper[idx]; 

@@ -101,8 +101,6 @@ public:
 	float *m_meterError;	  //被检表的误差(当前流量点不同表位的误差)
 	float m_stdStartVol;	  //标准表体积初值
 	float m_stdEndVol;		  //标准表体积终值
-	float m_StdStartMass;     //经温度修正的标准表质量初值
-	float m_StdEndMass;       //经温度修正的标准表质量终值
 	float m_pipeInTemper;     //入口温度
 	float m_pipeOutTemper;    //出口温度
 	float m_realFlow;		  //流速(m3/h）
