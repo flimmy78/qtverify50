@@ -51,12 +51,12 @@
      </column>
      <column>
       <property name="text">
-       <string>BalWeight0(kg)</string>
+       <string>StdMeterVol0(L)</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>BalWeight1(kg)</string>
+       <string>StdMeterVol1(L)</string>
       </property>
      </column>
      <column>
