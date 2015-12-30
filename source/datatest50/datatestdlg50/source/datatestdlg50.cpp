@@ -30,6 +30,7 @@ DataTestDlg50::DataTestDlg50(QWidget *parent, Qt::WFlags flags)
 
 DataTestDlg50::~DataTestDlg50()
 {
+	this->close();
 }
 
 void DataTestDlg50::closeEvent( QCloseEvent * event)
@@ -315,7 +316,7 @@ void DataTestDlg50::initTemperatureCom()
 	//connect(m_tempTimer, SIGNAL(timeout()), m_tempObj, SLOT(writeTemperatureComBuffer()));
 	connect(m_tempTimer, SIGNAL(timeout()), this, SLOT(slotAskPipeTemperature()));
 // 	connect(m_tempTimer, SIGNAL(timeout()), this, SLOT(slotFreshFlow()));
-	
+
 	m_tempTimer->start(TIMEOUT_PIPE_TEMPER); //周期请求温度
 }
 
@@ -341,7 +342,7 @@ void DataTestDlg50::initStdTemperatureCom()
 	m_stdTempCommand = stdTempR1;
 	m_stdTempTimer = new QTimer();
 	connect(m_stdTempTimer, SIGNAL(timeout()), this, SLOT(slotAskStdTemperature()));
-	
+
  	m_stdTempTimer->start(TIMEOUT_STD_TEMPER);
 }
 
@@ -536,7 +537,6 @@ void DataTestDlg50::initRegulateStatus()
 	m_bigOpening = 0;
 	m_regBigTimer = new QTimer();
 	connect(m_regBigTimer, SIGNAL(timeout()), this, SLOT(slotFreshBigRegOpening()));
-
 }
 
 //打开热量表通讯串口
