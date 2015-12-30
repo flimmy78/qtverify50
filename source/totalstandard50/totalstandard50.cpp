@@ -168,8 +168,22 @@ TotalStandardDlg50::TotalStandardDlg50(QWidget *parent, Qt::WFlags flags)
 	ui.lnEditOutStdTemp->setText("20");
 
 	/***************标准流量计***********************/
+	m_mapInstWdg[FLOW_RATE_BIG]   = ui.lcdInstStdMeter_50;
+	m_mapInstWdg[FLOW_RATE_MID_2] = ui.lcdInstStdMeter_25;
+	m_mapInstWdg[FLOW_RATE_MID_1] = ui.lcdInstStdMeter_10;
+	m_mapInstWdg[FLOW_RATE_SMALL] = ui.lcdInstStdMeter_3;
+
+	m_mapAccumWdg[FLOW_RATE_BIG]   = ui.lcdAccumStdMeter_50;
+	m_mapAccumWdg[FLOW_RATE_MID_2] = ui.lcdAccumStdMeter_25;
+	m_mapAccumWdg[FLOW_RATE_MID_1] = ui.lcdAccumStdMeter_10;
+	m_mapAccumWdg[FLOW_RATE_SMALL] = ui.lcdAccumStdMeter_3;
+
 	m_stdMeterReader = NULL;
 	m_stdMeterReader = new CStdMeterReader();
+	connect(m_stdMeterReader, SIGNAL(signalReadInstReady(const flow_rate_wdg&, const float&)), this, SLOT(slotFreshInstFlow(const flow_rate_wdg&, const float&)));
+	connect(m_stdMeterReader, SIGNAL(signalReadAccumReady(const flow_rate_wdg&, const float&)), this, SLOT(slotFreshAccumFlow(const flow_rate_wdg&, const float&)));
+	connect(m_stdMeterReader, SIGNAL(signalReadTolInstReady(const float&)), this, SLOT(slotFreshTolInst(const float&)));
+	connect(m_stdMeterReader, SIGNAL(signalReadTolAccumReady(const float&)), this, SLOT(slotFreshTolAccum(const float&)));
 	m_stdMeterReader->startReadMeter();
 	/***************标准流量计end********************/
 }
@@ -356,6 +370,26 @@ void TotalStandardDlg50::closeEvent(QCloseEvent * event)
 	}
 
 	emit signalClosed();
+}
+
+void TotalStandardDlg50::slotFreshInstFlow(const flow_rate_wdg& idx, const float& value)
+{
+	m_mapInstWdg[idx]->display(value);
+}
+
+void TotalStandardDlg50::slotFreshAccumFlow(const flow_rate_wdg& idx, const float& value)
+{
+	m_mapAccumWdg[idx]->display(value);
+}
+
+void TotalStandardDlg50::slotFreshTolInst(const float& value)
+{
+	ui.lcdFlowRate->display(value);
+}
+
+void TotalStandardDlg50::slotFreshTolAccum(const float& value)
+{
+	ui.lcdAccumStdMeter->display(value);
 }
 
 void TotalStandardDlg50::resizeEvent(QResizeEvent * event)

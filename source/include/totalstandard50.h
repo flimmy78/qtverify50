@@ -266,7 +266,12 @@ public slots:
 	/******************电动调节阀end***************************/
 
 private slots:
-
+	/*******************标准流量计******************************/
+	void slotFreshInstFlow(const flow_rate_wdg&, const float&);
+	void slotFreshAccumFlow(const flow_rate_wdg&, const float&);
+	void slotFreshTolInst(const float&);
+	void slotFreshTolAccum(const float&);
+	/******************标准流量计end****************************/
 signals:
 	void signalClosed();
 
@@ -274,6 +279,8 @@ private:
 	Ui::TotalStandardClass50 ui;
 	/*******************标准流量计******************************/
 	CStdMeterReader* m_stdMeterReader;
+	QMap<flow_rate_wdg, QLCDNumber *> m_mapInstWdg;
+	QMap<flow_rate_wdg, QLCDNumber *> m_mapAccumWdg;
 	/******************标准流量计end***************************/
 	void exportReport();
 };

@@ -25,7 +25,7 @@ class CAlgorithm;
 class ParaSetDlg;
 class ParaSetReader;
 class ReadComConfig;
-
+class CStdMeterReader;
 
 class WATERWEIGHT50_EXPORT WaterWeightDlg50 : public QWidget
 {
@@ -282,12 +282,14 @@ public slots:
 	/******************电动调节阀end***************************/
 
 private slots:
-
+	void slotFreshTolInst(const float&);
 signals:
 	void signalClosed();
 
 private:
 	Ui::WaterWeightClass50 ui;
+	CStdMeterReader* m_stdMeterReader;//标准流量计
+
 	void exportReport();//导出报告
 };
 

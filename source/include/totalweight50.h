@@ -293,7 +293,7 @@ public slots:
 	/******************电动调节阀end***************************/
 
 private slots:
-
+	void slotFreshTolInst(const float&);
 signals:
 	void signalClosed();
 
