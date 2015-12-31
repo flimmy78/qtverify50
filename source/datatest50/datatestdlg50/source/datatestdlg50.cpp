@@ -100,10 +100,6 @@ void DataTestDlg50::closeEvent( QCloseEvent * event)
 /*--------------------------------------------------------------*/
 	if (m_tempTimer) //读温度计时器
 	{
-		if (m_tempTimer->isActive())
-		{
-			m_tempTimer->stop();
-		}
 		delete m_tempTimer;
 		m_tempTimer = NULL;
 	}
@@ -120,11 +116,7 @@ void DataTestDlg50::closeEvent( QCloseEvent * event)
 /*--------------------------------------------------------------*/
 	if (m_stdTempTimer) //读标准温度计时器
 	{
-		if (m_stdTempTimer->isActive())
-		{
-			m_stdTempTimer->stop();
-		}
-		delete m_stdTempTimer;
+		delete m_stdTempTimer;//~QTimer() will stop the timer
 		m_stdTempTimer = NULL;
 	}
 	if (m_stdTempThread.isRunning())
@@ -134,17 +126,11 @@ void DataTestDlg50::closeEvent( QCloseEvent * event)
 		{
 			delete m_stdTempObj;
 			m_stdTempObj = NULL;
-
-			m_stdTempThread.exit();
 		}
-	}	
+	}
 /*--------------------------------------------------------------*/
 	if (m_flowRateTimer) //计算流量计时器
 	{
-		if (m_flowRateTimer->isActive())
-		{
-			m_flowRateTimer->stop();
-		}
 		delete m_flowRateTimer;
 		m_flowRateTimer = NULL;
 	}
@@ -159,40 +145,24 @@ void DataTestDlg50::closeEvent( QCloseEvent * event)
 	//计时器，用于动态显示调节阀开度
 	if (m_regSmallTimer)
 	{
-		if (m_regSmallTimer->isActive())
-		{
-			m_regSmallTimer->stop();
-		}
 		delete m_regSmallTimer;
 		m_regSmallTimer = NULL;
 	}
 
 	if (m_regMid1Timer)
 	{
-		if (m_regMid1Timer->isActive())
-		{
-			m_regMid1Timer->stop();
-		}
 		delete m_regMid1Timer;
 		m_regMid1Timer = NULL;
 	}
 
 	if (m_regMid2Timer)
 	{
-		if (m_regMid2Timer->isActive())
-		{
-			m_regMid2Timer->stop();
-		}
 		delete m_regMid2Timer;
 		m_regMid2Timer = NULL;
 	}
 
 	if (m_regBigTimer)
 	{
-		if (m_regBigTimer->isActive())
-		{
-			m_regBigTimer->stop();
-		}
 		delete m_regBigTimer;
 		m_regBigTimer = NULL;
 	}
@@ -342,12 +312,12 @@ void DataTestDlg50::initStdTemperatureCom()
 	m_stdTempCommand = stdTempR1;
 	m_stdTempTimer = new QTimer();
 	connect(m_stdTempTimer, SIGNAL(timeout()), this, SLOT(slotAskStdTemperature()));
-
  	m_stdTempTimer->start(TIMEOUT_STD_TEMPER);
 }
 
 void DataTestDlg50::slotAskStdTemperature()
 {
+	qDebug() << "I am stdTimer timeout!";
 	m_stdTempObj->writeStdTempComBuffer(m_stdTempCommand);
 }
 
