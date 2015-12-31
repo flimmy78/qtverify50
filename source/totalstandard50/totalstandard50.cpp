@@ -215,7 +215,17 @@ void TotalStandardDlg50::closeEvent(QCloseEvent * event)
 	{
 		stopVerify();
 	}
-	openValve(m_portsetinfo.bigWaterOutNo);
+
+	if (m_stdTempTimer) //标准温度采集计时器, 必须先于串口对象停掉
+	{
+		if (m_stdTempTimer->isActive())
+		{
+			m_stdTempTimer->stop();
+		}
+		delete m_stdTempTimer;
+		m_stdTempTimer = NULL;
+	}
+
 	ui.labelHintPoint->clear();
 	ui.labelHintProcess->setText(tr("release pipe pressure..."));
 	openValve(m_portsetinfo.bigNo); //打开大流量点阀门，释放管路压力
@@ -258,16 +268,6 @@ void TotalStandardDlg50::closeEvent(QCloseEvent * event)
 		}
 		delete m_tempTimer;
 		m_tempTimer = NULL;
-	}
-
-	if (m_stdTempTimer) //标准温度采集计时器, 必须先于串口对象停掉
-	{
-		if (m_stdTempTimer->isActive())
-		{
-			m_stdTempTimer->stop();
-		}
-		delete m_stdTempTimer;
-		m_stdTempTimer = NULL;
 	}
 
 	if (m_stdTempObj)  // 标准温度采集

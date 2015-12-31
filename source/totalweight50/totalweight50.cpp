@@ -222,7 +222,17 @@ void TotalWeightDlg50::closeEvent(QCloseEvent * event)
 	{
 		stopVerify();
 	}
-	openValve(m_portsetinfo.bigWaterOutNo);
+
+	if (m_stdTempTimer) //标准温度采集计时器, 必须先于串口对象停掉
+	{
+		if (m_stdTempTimer->isActive())
+		{
+			m_stdTempTimer->stop();
+		}
+		delete m_stdTempTimer;
+		m_stdTempTimer = NULL;
+	}
+
 	ui.labelHintPoint->clear();
 	ui.labelHintProcess->setText(tr("release pipe pressure..."));
 	openValve(m_portsetinfo.bigNo); //打开大流量点阀门，释放管路压力
@@ -265,16 +275,6 @@ void TotalWeightDlg50::closeEvent(QCloseEvent * event)
 		}
 		delete m_tempTimer;
 		m_tempTimer = NULL;
-	}
-
-	if (m_stdTempTimer) //标准温度采集计时器, 必须先于串口对象停掉
-	{
-		if (m_stdTempTimer->isActive())
-		{
-			m_stdTempTimer->stop();
-		}
-		delete m_stdTempTimer;
-		m_stdTempTimer = NULL;
 	}
 
 	if (m_stdTempObj)  // 标准温度采集
@@ -396,11 +396,11 @@ void TotalWeightDlg50::closeEvent(QCloseEvent * event)
 		m_regBigTimer = NULL;
 	}
 
-	if (m_stdMeterReader)
-	{
-		delete m_stdMeterReader;
-		m_stdMeterReader = NULL;
-	}
+// 	if (m_stdMeterReader)
+// 	{
+// 		delete m_stdMeterReader;
+// 		m_stdMeterReader = NULL;
+// 	}
 
 	emit signalClosed();
 }
@@ -414,7 +414,7 @@ void TotalWeightDlg50::resizeEvent(QResizeEvent * event)
 	int hh = ui.tableWidget->horizontalHeader()->size().height();
 	int vw = ui.tableWidget->verticalHeader()->size().width();
 	int vSize = (int)((th-hh-10)/(m_maxMeterNum<=0 ? 12 : m_maxMeterNum));
-	int hSize = (int)((tw-vw-10)/(COLUMN_TOTAL_COUNT-1)); //隐藏了"密度"列
+	int hSize = (int)((tw-vw-10)/(COLUMN_TOTAL_COUNT)); //隐藏了"密度"列
 	ui.tableWidget->verticalHeader()->setDefaultSectionSize(vSize);
 	ui.tableWidget->horizontalHeader()->setDefaultSectionSize(hSize);
 }
@@ -897,7 +897,7 @@ void TotalWeightDlg50::initTableWidget()
 
 	ui.tableWidget->setVerticalHeaderLabels(vLabels);
 	ui.tableWidget->setFont(QFont("Times", 13, QFont::DemiBold, true));
-	ui.tableWidget->hideColumn(COLUMN_DENSITY); //隐藏"密度"列
+// 	ui.tableWidget->hideColumn(COLUMN_DENSITY); //隐藏"密度"列
 // 	ui.tableWidget->resizeColumnsToContents();
 // 	ui.tableWidget->setColumnWidth(COLUMN_METER_NUMBER, 125);
 }
@@ -1434,7 +1434,7 @@ void TotalWeightDlg50::stopVerify()
 	if (!m_stopFlag)
 	{
 		ui.labelHintProcess->setText(tr("stopping verify...please wait a minute"));
-		m_stopFlag = true; //不再检查天平质量
+		m_stopFlag = true;
 		m_exaustTimer->stop();//停止排气定时器
 		closeAllValveAndPumpOpenOutValve();
 		ui.labelHintProcess->setText(tr("Verify has Stoped!"));
@@ -1893,7 +1893,7 @@ int TotalWeightDlg50::startVerifyFlowPoint(int order)
 				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_BAL_START)->setText(QString::number(m_balStartV, 'f', 3));//天平初值
 				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_BAL_END)->setText(QString::number(m_balEndV, 'f', 3));    //天平终值
 				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_TEMPER)->setText(QString::number(m_meterTemper[m], 'f', 2));  //温度
-				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_DENSITY)->setText(QString::number(m_meterDensity[m], 'f', 3));//密度
+				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_DENSITY)->setText(QString::number(m_meterDensity[m], 'f', 5));//密度
 				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_STD_VALUE)->setText(QString::number(m_meterStdValue[m], 'f', 3));//标准值
 				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_DISP_ERROR)->setText("");//示值误差
 				ui.tableWidget->item(m_meterPosMap[m]-1, COLUMN_DISP_ERROR)->setForeground(QBrush());//示值误差
