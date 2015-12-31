@@ -146,6 +146,8 @@ public slots:
 	void processError(QProcess::ProcessError error);
 	void slotRegisterSuccess();
 
+	void slotOnStdMtrCoeCorrectClosed();
+	void slotOnDataTestDlg50Closed();
 private:
 	Ui::qMainFormClass50 ui;
 };

@@ -219,6 +219,8 @@ private slots:
 	void slotFreshTolInst(const float&);
 	void slotFreshTolAccum(const float&);
 	/******************标准流量计end****************************/
+signals:
+	void signalClosed();
 };
 
 #endif // DATATESTDLG_H

@@ -172,6 +172,8 @@ void DataTestDlg50::closeEvent( QCloseEvent * event)
 		delete m_stdMeterReader;
 		m_stdMeterReader = NULL;
 	}
+
+	emit signalClosed();
 }
 
 void DataTestDlg50::showEvent(QShowEvent *event)

@@ -372,25 +372,18 @@ void MainForm50::on_actionDataTest_triggered()
 	if (NULL == m_datatestdlg)
 	{
 		m_datatestdlg = new DataTestDlg50();
+		connect(m_datatestdlg, SIGNAL(signalClosed()), this, SLOT(slotOnDataTestDlg50Closed()));
+		m_datatestdlg->show();
 	}
-	else //目的是执行DataTestDlg的构造函数
+}
+
+void MainForm50::slotOnDataTestDlg50Closed()
+{
+	if (m_datatestdlg)
 	{
 		delete m_datatestdlg;
 		m_datatestdlg = NULL;
-		m_datatestdlg = new DataTestDlg50();
-	}
-/*	int ah = QApplication::desktop()->availableGeometry().height();
-	int aw = QApplication::desktop()->availableGeometry().width();
-// 	int sh = QApplication::desktop()->screenGeometry().height();
-// 	int sw = QApplication::desktop()->screenGeometry().width();
-// 	m_datatestdlg->resize(800, 800);
-	int wh = m_datatestdlg->height();
-	int ww = m_datatestdlg->width();
-	int x = (aw - ww)/2;
-	int y = (ah - wh - 100)/2;
-	m_datatestdlg->move(x, y);  
-//	m_datatestdlg->move((QApplication::desktop()->width()-m_datatestdlg->width())/2, (QApplication::desktop()->height()-m_datatestdlg->height())/2);  
-*/	m_datatestdlg->show();
+	}	
 }
 
 void MainForm50::on_actionAdjustFlowRate_triggered()
@@ -431,17 +424,21 @@ void MainForm50::on_actionStdMtrParaSet_triggered()
 //标准表系数修正
 void MainForm50::on_actionStdMtrCoeCorrect_triggered()
 {
-	if (NULL == m_stdCoeCorrect)
+	if (m_stdCoeCorrect == NULL)
 	{
 		m_stdCoeCorrect = new StdMtrCoeCorrect();
+		connect(m_stdCoeCorrect, SIGNAL(signalClosed()), this, SLOT(slotOnStdMtrCoeCorrectClosed()));
+		m_stdCoeCorrect->show();
 	}
-	else //目的是执行StdCoeCorrect的构造函数
+}
+
+void MainForm50::slotOnStdMtrCoeCorrectClosed()
+{
+	if (m_stdCoeCorrect)
 	{
 		delete m_stdCoeCorrect;
 		m_stdCoeCorrect = NULL;
-		m_stdCoeCorrect = new StdMtrCoeCorrect();
 	}
-	m_stdCoeCorrect->show();
 }
 
 //标准铂电阻参数设定
