@@ -68,7 +68,7 @@ MainForm50::MainForm50(bool licenseOK, int validDays, QWidget *parent, Qt::WFlag
 	m_registerDlg = NULL;
 	m_scanCodeDlg = NULL;
 	m_setcom = NULL;
-	m_datatestdlg = NULL;
+	m_dataTestDlg50 = NULL;
 	m_adjustRateDlg = NULL;
 	m_portSet = NULL;
 	m_masterslave = NULL;
@@ -180,10 +180,10 @@ void MainForm50::closeEvent( QCloseEvent * event)
 			m_portSet = NULL;
 		}
 
-		if (m_datatestdlg)
+		if (m_dataTestDlg50)
 		{
-			delete m_datatestdlg;
-			m_datatestdlg = NULL;
+			delete m_dataTestDlg50;
+			m_dataTestDlg50 = NULL;
 		}
 
 		if (m_adjustRateDlg)
@@ -323,76 +323,28 @@ void MainForm50::closeEvent( QCloseEvent * event)
 
 void MainForm50::on_actionScanCode_triggered()
 {
-	if (NULL == m_scanCodeDlg)
-	{
-		m_scanCodeDlg = new ScanCodeDlg();
-	}
-	else //目的是执行ScanCodeDlg的构造函数
-	{
-		delete m_scanCodeDlg;
-		m_scanCodeDlg = NULL;
-		m_scanCodeDlg = new ScanCodeDlg();
-	}
-	m_scanCodeDlg->show();
+	SHOW_WINDOW(ScanCodeDlg, m_scanCodeDlg)
 }
 
 void MainForm50::on_actionComSet_triggered()
 {
-	if (NULL == m_setcom)
-	{
-		m_setcom = new SetComDlg();
-	}
-	else //目的是执行SetComDlg的构造函数
-	{
-		delete m_setcom;
-		m_setcom = NULL;
-		m_setcom = new SetComDlg();
-	}
-	m_setcom->show();
+	SHOW_WINDOW(SetComDlg, m_setcom)
 }
 
 void MainForm50::on_actionPortSet_triggered()
 {
-	if (NULL == m_portSet)
-	{
-		m_portSet = new SetPortFrm();
-	}
-	else //目的是执行SetPortFrm的构造函数
-	{
-		delete m_portSet;
-		m_portSet = NULL;
-		m_portSet = new SetPortFrm();
-	}
-	m_portSet->show();
+	SHOW_WINDOW(SetPortFrm, m_portSet)
 }
 
 //采集与控制测试程序
 void MainForm50::on_actionDataTest_triggered()
 {
-	if (NULL == m_datatestdlg)
-	{
-		m_datatestdlg = new DataTestDlg50();
-		connect(m_datatestdlg, SIGNAL(signalClosed()), this, SLOT(slotOnDataTestDlg50Closed()));
-		m_datatestdlg->show();
-	}
-}
-
-void MainForm50::slotOnDataTestDlg50Closed()
-{
-	if (m_datatestdlg)
-	{
-		delete m_datatestdlg;
-		m_datatestdlg = NULL;
-	}	
+	SHOW_WINDOW(DataTestDlg50, m_dataTestDlg50)
 }
 
 void MainForm50::on_actionAdjustFlowRate_triggered()
 {
-	if (NULL == m_adjustRateDlg)
-	{
-		m_adjustRateDlg = new AdjustRateDlg();
-	}
-	m_adjustRateDlg->show();
+	SHOW_WINDOW(AdjustRateDlg, m_adjustRateDlg)
 }
 
 //调用串口调试工具
@@ -406,313 +358,129 @@ void MainForm50::on_actionComDebuger_triggered()
 //标准表参数设定
 void MainForm50::on_actionStdMtrParaSet_triggered()
 {
-	if (NULL == m_stdParaSet)
-	{
-		m_stdParaSet = new StdMtrParaSet();
-	}
-	else //目的是执行StdParaSet的构造函数
-	{
-		delete m_stdParaSet;
-		m_stdParaSet = NULL;
-		m_stdParaSet = new StdMtrParaSet();
-	}
+	SHOW_WINDOW(StdMtrParaSet, m_stdParaSet)
 	m_stdParaSet->move((QApplication::desktop()->availableGeometry().width()-m_stdParaSet->width())/2, \
-		(QApplication::desktop()->availableGeometry().height()-m_stdParaSet->height()-100)/2);  
-	m_stdParaSet->show();
+	(QApplication::desktop()->availableGeometry().height()-m_stdParaSet->height()-100)/2);
 }
 
 //标准表系数修正
 void MainForm50::on_actionStdMtrCoeCorrect_triggered()
 {
-	if (m_stdCoeCorrect == NULL)
-	{
-		m_stdCoeCorrect = new StdMtrCoeCorrect();
-		connect(m_stdCoeCorrect, SIGNAL(signalClosed()), this, SLOT(slotOnStdMtrCoeCorrectClosed()));
-		m_stdCoeCorrect->show();
-	}
-}
-
-void MainForm50::slotOnStdMtrCoeCorrectClosed()
-{
-	if (m_stdCoeCorrect)
-	{
-		delete m_stdCoeCorrect;
-		m_stdCoeCorrect = NULL;
-	}
+	SHOW_WINDOW(StdMtrCoeCorrect, m_stdCoeCorrect)
 }
 
 //标准铂电阻参数设定
 void MainForm50::on_actionStdPtParaSet_triggered()
 {
-	if (NULL == m_stdPtParaDlg)
-	{
-		m_stdPtParaDlg = new stdplasensorDlg();
-	}
-	else //目的是执行stdplasensorDlg的构造函数
-	{
-		delete m_stdPtParaDlg;
-		m_stdPtParaDlg = NULL;
-		m_stdPtParaDlg = new stdplasensorDlg();
-	}
-	m_stdPtParaDlg->show();
+	SHOW_WINDOW(stdplasensorDlg, m_stdPtParaDlg)
 }
 
 //被检铂电阻参数设定
 void MainForm50::on_actionPtParaSet_triggered()
 {
-	if (NULL == m_chkPtParaDlg)
-	{
-		m_chkPtParaDlg = new chkplasensorDlg();
-	}
-	else //目的是执行chkplasensorDlg的构造函数
-	{
-		delete m_chkPtParaDlg;
-		m_chkPtParaDlg = NULL;
-		m_chkPtParaDlg = new chkplasensorDlg();
-	}
-	m_chkPtParaDlg->show();
+	SHOW_WINDOW(chkplasensorDlg, m_chkPtParaDlg)
 }
 
 //主机-从机设置
 void MainForm50::on_actionMasterSlaveSet_triggered()
 {
-	if (NULL == m_masterslave)
-	{
-		m_masterslave = new CMasterSlave();
-	}
-	m_masterslave->show();
+	SHOW_WINDOW(CMasterSlave, m_masterslave)
 }
 
 //流量检定(质量法)
 void MainForm50::on_actionFlowWeight_triggered()
 {
-	if (NULL == m_flowWeightDlg)
-	{
-		m_flowWeightDlg = new FlowWeightDlg50();
-	}
-	else //目的是执行FlowWeightDlg50的构造函数
-	{
-		delete m_flowWeightDlg;
-		m_flowWeightDlg = NULL;
-		m_flowWeightDlg = new FlowWeightDlg50();
-	}
-	m_flowWeightDlg->showMaximized();
+	SHOW_MAX_WINDOW(FlowWeightDlg50, m_flowWeightDlg)
 }
 
 //流量检定(标准表法)
 void MainForm50::on_actionFlowStandard_triggered()
 {
-	if (NULL == m_flowStandardDlg)
-	{
-		m_flowStandardDlg = new FlowStandardDlg50();
-	}
-	else //目的是执行FlowStandardDlg50的构造函数
-	{
-		delete m_flowStandardDlg;
-		m_flowStandardDlg = NULL;
-		m_flowStandardDlg = new FlowStandardDlg50();
-	}
-	m_flowStandardDlg->showMaximized();
+	SHOW_MAX_WINDOW(FlowStandardDlg50, m_flowStandardDlg)
 }
 
 //铂电阻检定(比较法)
 void MainForm50::on_actionPtCompare_triggered()
 {
-	if (NULL == m_tvercompDlg)
-	{
-		m_tvercompDlg = new tvercompDlg();
-	}
-	else //目的是执行tvercompDlg的构造函数
-	{
-		delete m_tvercompDlg;
-		m_tvercompDlg = NULL;
-		m_tvercompDlg = new tvercompDlg();
-	}
-	m_tvercompDlg->show();
+	SHOW_WINDOW(tvercompDlg, m_tvercompDlg)
 }
 
 //铂电阻检定(参数法)
 void MainForm50::on_actionPtPara_triggered()
 {
-	if (NULL == m_tverparaDlg)
-	{
-		m_tverparaDlg = new tverparamDlg();
-	}
-	else //目的是执行tverparamDlg的构造函数
-	{
-		delete m_tverparaDlg;
-		m_tverparaDlg = NULL;
-		m_tverparaDlg = new tverparamDlg();
-	}
-	m_tverparaDlg->show();
+	SHOW_WINDOW(tverparamDlg, m_tverparaDlg)
 }
 
 //计算器检定
 void MainForm50::on_actionCalculator_triggered()
 {
-	if (NULL == m_calcDlg)
-	{
-		m_calcDlg = new CalcDlg();
-	}
-	else //目的是执行CalcDlg的构造函数
-	{
-		delete m_calcDlg;
-		m_calcDlg = NULL;
-		m_calcDlg = new CalcDlg();
-	}
-	m_calcDlg->show();
+	SHOW_WINDOW(CalcDlg, m_calcDlg)
 }
 
 //温度/计算器组合检定
 void MainForm50::on_actionCombine_triggered()
 {
-	if (NULL == m_cmbVerifyDlg)
-	{
-		m_cmbVerifyDlg = new CmbVerifyDlg();
-	}
-	else //目的是执行CalcDlg的构造函数
-	{
-		delete m_cmbVerifyDlg;
-		m_cmbVerifyDlg = NULL;
-		m_cmbVerifyDlg = new CmbVerifyDlg();
-	}
-	m_cmbVerifyDlg->showMaximized();
+	SHOW_MAX_WINDOW(CmbVerifyDlg, m_cmbVerifyDlg)
 }
 
 //水表检定（质量法）
 void MainForm50::on_actionWaterWeight_triggered()
 {
-	if (NULL == m_waterWeight50)
-	{
-		m_waterWeight50 = new WaterWeightDlg50();
-	}
-	else //目的是执行WaterWeightDlg50的构造函数
-	{
-		delete m_waterWeight50;
-		m_waterWeight50 = NULL;
-		m_waterWeight50 = new WaterWeightDlg50();
-	}
-	m_waterWeight50->showMaximized();
+	SHOW_MAX_WINDOW(WaterWeightDlg50, m_waterWeight50)
 }
 
-//水表检定（质量法）
+//水表检定（标准表法）
 void MainForm50::on_actionWaterStandard_triggered()
 {
-	if (NULL == m_waterStandard50)
-	{
-		m_waterStandard50 = new WaterStandardDlg50();
-	}
-	else //目的是执行WaterStandardDlg50的构造函数
-	{
-		delete m_waterStandard50;
-		m_waterStandard50 = NULL;
-		m_waterStandard50 = new WaterStandardDlg50();
-	}
-	m_waterStandard50->showMaximized();
+	SHOW_MAX_WINDOW(WaterStandardDlg50, m_waterStandard50)
 }
 
 //总量检定（质量法）
 void MainForm50::on_actionTotalWeight_triggered()
 {
-	if (NULL == m_totalWeightDlg)
-	{
-		m_totalWeightDlg = new TotalWeightDlg50();
-	}
-	else //目的是执行TotalWeightDlg50的构造函数
-	{
-		delete m_totalWeightDlg;
-		m_totalWeightDlg = NULL;
-		m_totalWeightDlg = new TotalWeightDlg50();
-	}
-	m_totalWeightDlg->showMaximized();
+	SHOW_MAX_WINDOW(TotalWeightDlg50, m_totalWeightDlg)
 }
 
 //总量检定（标准表法）
 void MainForm50::on_actionTotalStandard_triggered()
 {
-	if (NULL == m_totalStandardDlg)
-	{
-		m_totalStandardDlg = new TotalStandardDlg50();
-	}
-	else //目的是执行TotalStandardDlg的构造函数
-	{
-		delete m_totalStandardDlg;
-		m_totalStandardDlg = NULL;
-		m_totalStandardDlg = new TotalStandardDlg50();
-	}
-	m_totalStandardDlg->showMaximized();
+	SHOW_MAX_WINDOW(TotalStandardDlg50, m_totalStandardDlg)
 }
 
 //查询流量检定结果（包括质量法和标准表法）
 void MainForm50::on_actionFlowResult_triggered()
 {
-	if (NULL != m_flowResultDlg)
-	{	
-		delete m_flowResultDlg;
-		m_flowResultDlg = NULL;
-	}
-	m_flowResultDlg = new FlowResultDlg();
-	m_flowResultDlg->show();
+	SHOW_WINDOW(FlowResultDlg, m_flowResultDlg)
 }
 
 //查询总量检定结果（包括质量法和标准表法）
 void MainForm50::on_actionTotalResult_triggered()
 {
-	if (NULL != m_TotalResultDlg)
-	{	
-		delete m_TotalResultDlg;
-		m_TotalResultDlg = NULL;
-	}
-	m_TotalResultDlg = new TotalResultDlg();
-	m_TotalResultDlg->show();
+	SHOW_WINDOW(TotalResultDlg, m_TotalResultDlg)
 }
 
 //查询水表检定结果（包括质量法和标准表法）
 void MainForm50::on_actionWaterResult_triggered()
 {
-	if (NULL != m_WaterResultDlg)
-	{	
-		delete m_WaterResultDlg;
-		m_WaterResultDlg = NULL;
-	}
-	m_WaterResultDlg = new WaterResultDlg();
-	m_WaterResultDlg->show();
+	SHOW_WINDOW(WaterResultDlg, m_WaterResultDlg)
 }
 
 //查询温度传感器检定结果
 void MainForm50::on_actionPtResult_triggered()
 {
-	if (NULL != m_PlaResultDlg)
-	{	
-		delete m_PlaResultDlg;
-		m_PlaResultDlg = NULL;
-	}
-	m_PlaResultDlg = new PlaResultDlg();
-	m_PlaResultDlg->show();
+	SHOW_WINDOW(PlaResultDlg, m_PlaResultDlg)
 }
 
 //查询计算器检定结果
 void MainForm50::on_actionCalculatorResult_triggered()
 {
-	if (NULL != m_CalcResultDlg)
-	{	
-		delete m_CalcResultDlg;
-		m_CalcResultDlg = NULL;
-	}
-	m_CalcResultDlg = new CalcResultDlg();
-	m_CalcResultDlg->show();
+	SHOW_WINDOW(CalcResultDlg, m_CalcResultDlg)
 }
 
 //查询温度/计算器组合检定结果
 void MainForm50::on_actionCombineResult_triggered()
 {
-	if (NULL != m_CmbResultDlg)
-	{	
-		delete m_CmbResultDlg;
-		m_CmbResultDlg = NULL;
-	}
-	m_CmbResultDlg = new CmbResultDlg();
-	m_CmbResultDlg->show();
+	SHOW_WINDOW(CmbResultDlg, m_CmbResultDlg)
 }
 
 void MainForm50::on_actionQueryExcel_triggered()
@@ -771,17 +539,7 @@ void MainForm50::on_actionUserManage_triggered()
 		QMessageBox::warning(this, tr("Error"), tr("No right for user manage!"));
 		return;
 	}
-	if (NULL == m_userManageDlg)
-	{
-		m_userManageDlg = new UserManageDlg();
-	}
-	else //目的是执行UserManageDlg的构造函数
-	{
-		delete m_userManageDlg;
-		m_userManageDlg = NULL;
-		m_userManageDlg = new UserManageDlg();
-	}
-	m_userManageDlg->show();
+	SHOW_WINDOW(UserManageDlg, m_userManageDlg)
 }
 
 void MainForm50::on_actionAbout_triggered()
@@ -794,15 +552,10 @@ void MainForm50::on_actionRegister_triggered()
 	if (NULL == m_registerDlg)
 	{
 		m_registerDlg = new RegisterDlg(qGetVolumeInfo());
+		connect(m_registerDlg, SIGNAL(signalClosed()), this, SLOT(slotOnRegisterDlgClosed()));
+		connect(m_registerDlg, SIGNAL(signalRegisterSuccess()), this, SLOT(slotRegisterSuccess()));
+		m_registerDlg->show();
 	}
-	else //目的是执行RegisterDlg的构造函数
-	{
-		delete m_registerDlg;
-		m_registerDlg = NULL;
-		m_registerDlg = new RegisterDlg(qGetVolumeInfo());
-	}
-	connect(m_registerDlg, SIGNAL(signalRegisterSuccess()), this, SLOT(slotRegisterSuccess()));
-	m_registerDlg->show();
 }
 
 //显示风格
@@ -908,3 +661,32 @@ void MainForm50::slotRegisterSuccess()
 	qDebug()<<ui.statusBar->currentMessage();
 	m_probationinfo->setText(tr("Official Version"));
 }
+
+SLOT_ON_CLOSED(FlowResultDlg, m_flowResultDlg)
+SLOT_ON_CLOSED(SetComDlg, m_setcom)
+SLOT_ON_CLOSED(DataTestDlg50, m_dataTestDlg50)
+SLOT_ON_CLOSED(SetPortFrm, m_portSet)
+SLOT_ON_CLOSED(CMasterSlave, m_masterslave)
+SLOT_ON_CLOSED(FlowWeightDlg50, m_flowWeightDlg)
+SLOT_ON_CLOSED(FlowStandardDlg50, m_flowStandardDlg)
+SLOT_ON_CLOSED(TotalWeightDlg50, m_totalWeightDlg)
+SLOT_ON_CLOSED(TotalStandardDlg50, m_totalStandardDlg)
+SLOT_ON_CLOSED(CalcDlg, m_calcDlg)
+SLOT_ON_CLOSED(CmbVerifyDlg, m_cmbVerifyDlg)
+SLOT_ON_CLOSED(StdMtrParaSet, m_stdParaSet)
+SLOT_ON_CLOSED(StdMtrCoeCorrect, m_stdCoeCorrect)
+SLOT_ON_CLOSED(tvercompDlg, m_tvercompDlg)
+SLOT_ON_CLOSED(tverparamDlg, m_tverparaDlg)
+SLOT_ON_CLOSED(stdplasensorDlg, m_stdPtParaDlg)
+SLOT_ON_CLOSED(chkplasensorDlg, m_chkPtParaDlg)
+SLOT_ON_CLOSED(PlaResultDlg, m_PlaResultDlg)
+SLOT_ON_CLOSED(CalcResultDlg, m_CalcResultDlg)
+SLOT_ON_CLOSED(CmbResultDlg, m_CmbResultDlg)
+SLOT_ON_CLOSED(TotalResultDlg, m_TotalResultDlg)
+SLOT_ON_CLOSED(WaterResultDlg, m_WaterResultDlg)
+SLOT_ON_CLOSED(ScanCodeDlg, m_scanCodeDlg)
+SLOT_ON_CLOSED(RegisterDlg, m_registerDlg)
+SLOT_ON_CLOSED(AdjustRateDlg, m_adjustRateDlg)
+SLOT_ON_CLOSED(UserManageDlg, m_userManageDlg)
+SLOT_ON_CLOSED(WaterWeightDlg50, m_waterWeight50)
+SLOT_ON_CLOSED(WaterStandardDlg50, m_waterStandard50)

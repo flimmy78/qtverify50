@@ -7,6 +7,32 @@
 
 #include "ui_mainform50.h"
 
+
+//响应窗口关闭的槽函数实现
+#define SLOT_ON_CLOSED(className, ptr)	void MainForm50::slotOn##className##Closed()\
+										{\
+											if (ptr)\
+											{\
+												delete ptr;\
+												ptr = NULL;\
+											}\
+										}
+
+//打开窗口
+#define SHOW_WINDOW(className, ptr)		if (NULL == ptr)\
+											{\
+												ptr = new className##();\
+												connect(ptr, SIGNAL(signalClosed()), this, SLOT(slotOn##className##Closed()));\
+												ptr->show();\
+											}
+//打开最大窗口
+#define SHOW_MAX_WINDOW(className, ptr)		if (NULL == ptr)\
+											{\
+												ptr = new className##();\
+												connect(ptr, SIGNAL(signalClosed()), this, SLOT(slotOn##className##Closed()));\
+												ptr->showMaximized();\
+											}
+
 class FlowResultDlg;
 class SetComDlg;
 class DataTestDlg50;
@@ -51,7 +77,7 @@ public:
 	RegisterDlg *m_registerDlg; //注册管理
 	ScanCodeDlg *m_scanCodeDlg; //扫码写表号
 	SetComDlg *m_setcom; //串口参数设置
-	DataTestDlg50 *m_datatestdlg; //采集与控制测试程序
+	DataTestDlg50 *m_dataTestDlg50; //采集与控制测试程序
 	AdjustRateDlg *m_adjustRateDlg;//自动调整流速
 	SetPortFrm *m_portSet; //端口模块设置
 	CMasterSlave *m_masterslave; //主机-从机设置
@@ -146,8 +172,35 @@ public slots:
 	void processError(QProcess::ProcessError error);
 	void slotRegisterSuccess();
 
-	void slotOnStdMtrCoeCorrectClosed();
 	void slotOnDataTestDlg50Closed();
+	void slotOnFlowResultDlgClosed();
+	void slotOnSetComDlgClosed();
+	void slotOnSetPortFrmClosed();
+	void slotOnCMasterSlaveClosed();
+	void slotOnFlowWeightDlg50Closed();
+	void slotOnFlowStandardDlg50Closed();
+	void slotOnTotalWeightDlg50Closed();
+	void slotOnTotalStandardDlg50Closed();
+	void slotOnCalcDlgClosed();
+	void slotOnCmbVerifyDlgClosed();
+	void slotOnStdMtrParaSetClosed();
+	void slotOnStdMtrCoeCorrectClosed();
+	void slotOntvercompDlgClosed();
+	void slotOntverparamDlgClosed();
+	void slotOnstdplasensorDlgClosed();
+	void slotOnchkplasensorDlgClosed();
+	void slotOnPlaResultDlgClosed();
+	void slotOnCalcResultDlgClosed();
+	void slotOnCmbResultDlgClosed();
+	void slotOnTotalResultDlgClosed();
+	void slotOnWaterResultDlgClosed();
+	void slotOnScanCodeDlgClosed();
+	void slotOnRegisterDlgClosed();
+	void slotOnAdjustRateDlgClosed();
+	void slotOnUserManageDlgClosed();
+	void slotOnWaterWeightDlg50Closed();
+	void slotOnWaterStandardDlg50Closed();
+
 private:
 	Ui::qMainFormClass50 ui;
 };

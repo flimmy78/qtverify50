@@ -60,6 +60,7 @@ RegisterDlg::~RegisterDlg()
 
 void RegisterDlg::closeEvent( QCloseEvent * event)
 {
+	emit signalClosed();
 }
 
 void RegisterDlg::on_btnProbation_clicked()

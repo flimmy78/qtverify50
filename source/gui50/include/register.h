@@ -15,10 +15,8 @@ public:
 	RegisterDlg(QString code="", QWidget *parent = 0, Qt::WFlags flags = 0);
 	~RegisterDlg();
 
-void closeEvent(QCloseEvent * event);
-
 public slots:
-
+	void closeEvent(QCloseEvent * event);
 private:
 	Ui::RegisterDlgClass ui;
 
@@ -30,6 +28,7 @@ private slots:
 signals:
 	void signalRegisterSuccess();
 	void signalRegisterFailed();
+	void signalClosed();
 };
 
 #endif // REGISTER_H
