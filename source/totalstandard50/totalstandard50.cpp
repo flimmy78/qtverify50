@@ -1334,7 +1334,7 @@ int TotalStandardDlg50::prepareVerifyFlowPoint(int order)
 		ui.labelHintPoint->setText(tr("Reset Zero"));
 		while (i < RESET_ZERO_TIME && !m_stopFlag) //等待被检表初值回零
 		{
-			ui.labelHintProcess->setText(tr("please wait <font color=DarkGreen size=4><b>%1</b></font> seconds for reset zero").arg(RESET_ZERO_TIME-i));
+			ui.labelHintProcess->setText(tr("please wait <font color=DarkGreen size=6><b>%1</b></font> seconds for reset zero").arg(RESET_ZERO_TIME-i));
 			i++;
 			wait(CYCLE_TIME); 
 		}
