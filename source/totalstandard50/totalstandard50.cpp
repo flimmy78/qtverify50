@@ -441,10 +441,18 @@ void TotalStandardDlg50::initStdTemperatureCom()
 	m_stdTempObj->moveToThread(&m_stdTempThread);
 	m_stdTempThread.start();
 	m_stdTempObj->openTemperatureCom(&tempStruct);
-	m_stdTempObj->setStdTempVersion(stdconfig.value("in_use/model").toInt());
+	int valueType = stdconfig.value("in_use/valueType").toInt();
+	m_stdTempObj->setStdTempVersion(stdconfig.value("in_use/model").toInt(), valueType);
 	connect(m_stdTempObj, SIGNAL(temperatureIsReady(const QString &)), this, SLOT(slotFreshStdTempValue(const QString &)));
 
-	m_stdTempCommand = stdTempR1;
+	if (valueType == STD_RESIST)
+	{
+		m_stdTempCommand = stdTempR1;
+	}
+	else
+	{
+		m_stdTempCommand = stdTempT1;
+	}
 	m_stdTempTimer = new QTimer();
 	connect(m_stdTempTimer, SIGNAL(timeout()), this, SLOT(slotAskStdTemperature()));
 	
@@ -607,12 +615,14 @@ void TotalStandardDlg50::slotFreshStdTempValue(const QString& stdTempStr)
 // 	qDebug()<<"stdTempStr ="<<stdTempStr<<"; m_stdTempCommand ="<<m_stdTempCommand;
 	switch (m_stdTempCommand)
 	{
-// 	case stdTempT1: 
-// 		ui.lnEditOutStdResist->setText(stdTempStr);
-// 		break;
-// 	case stdTempT2: 
-// 		ui.lnEditInStdTemp->setText(stdTempStr);
-// 		break;
+	case stdTempT1: 
+		ui.lnEditInStdTemp->setText(stdTempStr);
+		m_stdTempCommand = stdTempT2;
+		break;
+	case stdTempT2: 
+		ui.lnEditOutStdTemp->setText(stdTempStr);
+		m_stdTempCommand = stdTempT1;
+		break;
 	case stdTempR1: 
 		ui.lnEditInStdResist->setText(stdTempStr);
 		m_stdTempCommand = stdTempR2;
