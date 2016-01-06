@@ -1579,7 +1579,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>㎏</string>
+             <string>L</string>
             </property>
            </widget>
           </item>
