@@ -319,7 +319,6 @@ void DataTestDlg50::initStdTemperatureCom()
 
 void DataTestDlg50::slotAskStdTemperature()
 {
-	qDebug() << "I am stdTimer timeout!";
 	m_stdTempObj->writeStdTempComBuffer(m_stdTempCommand);
 }
 
