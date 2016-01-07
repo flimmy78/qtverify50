@@ -145,8 +145,8 @@ FlowStandardDlg50::FlowStandardDlg50(QWidget *parent, Qt::WFlags flags)
 
 	///////////////////////////////// 原showEvent()函数的内容 end
 
-	ui.lcdInTemper->display(50);
-	ui.lcdOutTemper->display(50);
+// 	ui.lcdInTemper->display(50);
+// 	ui.lcdOutTemper->display(50);
 
 	/***************标准流量计***********************/
 	m_mapInstWdg[FLOW_RATE_BIG]   = ui.lcdInstStdMeter_50;

@@ -179,10 +179,10 @@ TotalWeightDlg50::TotalWeightDlg50(QWidget *parent, Qt::WFlags flags)
 
 	///////////////////////////////// 原showEvent()函数的内容 end
 
-	ui.lcdInTemper->display(50);
-	ui.lcdOutTemper->display(40);
-	ui.lnEditInStdTemp->setText("25");
-	ui.lnEditOutStdTemp->setText("20");
+// 	ui.lcdInTemper->display(50);
+// 	ui.lcdOutTemper->display(40);
+// 	ui.lnEditInStdTemp->setText("25");
+// 	ui.lnEditOutStdTemp->setText("20");
 
 	m_stdMeterReader = NULL;
 	m_stdMeterReader = new CStdMeterReader();
