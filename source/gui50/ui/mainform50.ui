@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>1243</width>
-     <height>26</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSystemSet">
@@ -100,6 +100,7 @@
     </property>
     <addaction name="actionFlowResult"/>
     <addaction name="actionTotalResult"/>
+    <addaction name="actionWaterResult"/>
     <addaction name="actionPtResult"/>
     <addaction name="actionCalculatorResult"/>
     <addaction name="actionCombineResult"/>
