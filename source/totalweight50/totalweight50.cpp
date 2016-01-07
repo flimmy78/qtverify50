@@ -192,7 +192,7 @@ TotalWeightDlg50::TotalWeightDlg50(QWidget *parent, Qt::WFlags flags)
 
 void TotalWeightDlg50::slotFreshTolInst(const float& value)
 {
-	ui.lcdFlowRateStd->display(value);
+	ui.lcdFlowRateStd->display(QString::number(value, 'f', 4));
 }
 
 TotalWeightDlg50::~TotalWeightDlg50()

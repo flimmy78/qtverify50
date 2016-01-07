@@ -159,21 +159,54 @@ WaterStandardDlg50::WaterStandardDlg50(QWidget *parent, Qt::WFlags flags)
 void WaterStandardDlg50::slotFreshInstFlow(const flow_rate_wdg& idx, const float& value)
 {
 	m_mapInstWdg[idx]->display(value);
+	switch (idx)
+	{
+	case FLOW_RATE_BIG:
+		m_mapInstWdg[idx]->display(QString::number(value, 'f', 2));
+		break;
+	case FLOW_RATE_MID_2:
+		m_mapInstWdg[idx]->display(QString::number(value, 'f', 2));
+		break;
+	case FLOW_RATE_MID_1:
+		m_mapInstWdg[idx]->display(QString::number(value, 'f', 3));
+		break;
+	case FLOW_RATE_SMALL:
+		m_mapInstWdg[idx]->display(QString::number(value, 'f', 4));
+		break;
+	default:
+		break;
+	}
 }
 
 void WaterStandardDlg50::slotFreshAccumFlow(const flow_rate_wdg& idx, const float& value)
 {
-	m_mapAccumWdg[idx]->display(value);
+	switch (idx)
+	{
+	case FLOW_RATE_BIG:
+		m_mapAccumWdg[idx]->display(QString::number(value, 'f', 2));
+		break;
+	case FLOW_RATE_MID_2:
+		m_mapAccumWdg[idx]->display(QString::number(value, 'f', 2));
+		break;
+	case FLOW_RATE_MID_1:
+		m_mapAccumWdg[idx]->display(QString::number(value, 'f', 3));
+		break;
+	case FLOW_RATE_SMALL:
+		m_mapAccumWdg[idx]->display(QString::number(value, 'f', 4));
+		break;
+	default:
+		break;
+	}
 }
 
 void WaterStandardDlg50::slotFreshTolInst(const float& value)
 {
-	ui.lcdFlowRate->display(value);
+	ui.lcdFlowRate->display(QString::number(value, 'f', 4));
 }
 
 void WaterStandardDlg50::slotFreshTolAccum(const float& value)
 {
-	ui.lcdAccumStdMeter->display(value);
+	ui.lcdAccumStdMeter->display(QString::number(value, 'f', 4));
 }
 
 WaterStandardDlg50::~WaterStandardDlg50()

@@ -255,21 +255,54 @@ void DataTestDlg50::showEvent(QShowEvent *event)
 void DataTestDlg50::slotFreshInstFlow(const flow_rate_wdg& idx, const float& value)
 {
 	m_mapInstWdg[idx]->display(value);
+	switch (idx)
+	{
+	case FLOW_RATE_BIG:
+		m_mapInstWdg[idx]->display(QString::number(value, 'f', 2));
+		break;
+	case FLOW_RATE_MID_2:
+		m_mapInstWdg[idx]->display(QString::number(value, 'f', 2));
+		break;
+	case FLOW_RATE_MID_1:
+		m_mapInstWdg[idx]->display(QString::number(value, 'f', 3));
+		break;
+	case FLOW_RATE_SMALL:
+		m_mapInstWdg[idx]->display(QString::number(value, 'f', 4));
+		break;
+	default:
+		break;
+	}
 }
 
 void DataTestDlg50::slotFreshAccumFlow(const flow_rate_wdg& idx, const float& value)
 {
-	m_mapAccumWdg[idx]->display(value);
+	switch (idx)
+	{
+	case FLOW_RATE_BIG:
+		m_mapAccumWdg[idx]->display(QString::number(value, 'f', 2));
+		break;
+	case FLOW_RATE_MID_2:
+		m_mapAccumWdg[idx]->display(QString::number(value, 'f', 2));
+		break;
+	case FLOW_RATE_MID_1:
+		m_mapAccumWdg[idx]->display(QString::number(value, 'f', 3));
+		break;
+	case FLOW_RATE_SMALL:
+		m_mapAccumWdg[idx]->display(QString::number(value, 'f', 4));
+		break;
+	default:
+		break;
+	}
 }
 
 void DataTestDlg50::slotFreshTolInst(const float& value)
 {
-	ui.lcdStdMeterFlowRate->display(value);
+	ui.lcdStdMeterFlowRate->display(QString::number(value, 'f', 4));
 }
 
 void DataTestDlg50::slotFreshTolAccum(const float& value)
 {
-	ui.lcdAccumStdMeter->display(value);
+	ui.lcdAccumStdMeter->display(QString::number(value, 'f', 4));
 }
 
 /*
