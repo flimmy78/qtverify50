@@ -89,9 +89,6 @@ public:
 	int m_oldMaxMeterNum;     //上次被检表的最大个数
 	int m_validMeterNum;          //实际被检表的个数
 	QMap<int, int> m_meterPosMap; //被检表下标与表位号的映射关系
-	QMap<int, float> m_gradeErrA;  //不同等级热表对应的标准误差参数A
-	QMap<int, float> m_gradeErrB;  //不同等级热表对应的标准误差参数B
-	QMap<int, float> m_mapNormalFlow;  //不同规格热表对应的常用流量
 
 	float *m_meterStartValue; //被检表的初值
 	float *m_meterEndValue;   //被检表的终值

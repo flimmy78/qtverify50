@@ -38,19 +38,6 @@ TotalWeightDlg50::TotalWeightDlg50(QWidget *parent, Qt::WFlags flags)
 	qDebug()<<"TotalWeightDlg50 thread:"<<QThread::currentThreadId();
 	ui.setupUi(this);
 	
-	//不同等级的热量表对应的标准误差,单位%
-	m_gradeErrA[1] = 2.00f;
-	m_gradeErrA[2] = 3.00f;
-	m_gradeErrA[3] = 4.00f;
-
-	m_gradeErrB[1] = 0.01f;
-	m_gradeErrB[2] = 0.02f;
-	m_gradeErrB[3] = 0.05f;
-
-	m_mapNormalFlow[0] = 1.5f; //DN15常用流量 1.5
-	m_mapNormalFlow[1] = 2.5f; //DN20常用流量 2.5
-	m_mapNormalFlow[2] = 3.5f; //DN25常用流量 3.5
-
 	///////////////////////////////// 原showEvent()函数的内容 begin 
 	//否则每次最小化再显示时，会调用showEvent函数，导致内容清空等现象
 	ui.btnExhaust->hide();
@@ -1938,7 +1925,7 @@ int TotalWeightDlg50::calcMeterError(int idx)
 	bool ok;
 	int row = m_meterPosMap[idx] - 1;
 	float endV = ui.tableWidget->item(row, COLUMN_METER_END)->text().toFloat(&ok);
-	if (/*m_meterEndValue[idx] <= 0 ||*/ ui.tableWidget->item(row, COLUMN_METER_END)->text().isEmpty() || !ok)
+	if (ui.tableWidget->item(row, COLUMN_METER_END)->text().isEmpty() || !ok)
 	{
 // 		ui.tableWidget->setCurrentCell(row, COLUMN_METER_END);
 		return 0;
@@ -1947,7 +1934,8 @@ int TotalWeightDlg50::calcMeterError(int idx)
 	int valveIdx = m_paraSetReader->getFpBySeq(m_nowOrder).fp_valve_idx; //0:大 1:中二 2:中一 3:小
 	m_meterErr[idx][valveIdx] = m_meterError[idx];
 	ui.tableWidget->item(row, COLUMN_DISP_ERROR)->setText(QString::number(m_meterError[idx], 'f', ERR_PRECISION)); //示值误差
-	float stdError = m_totalSC*(m_gradeErrA[m_nowParams->m_grade] + 4*m_minDeltaT/(m_stdInTemper-m_stdOutTemper) + m_gradeErrB[m_nowParams->m_grade]*m_mapNormalFlow[m_standard]/m_realFlow); //标准误差=规程要求误差*总量安全系数
+	float normalFlow = getNormalFlowByStandard(m_standard);
+	float stdError = m_totalSC*calcMeterHeatErrLmt(m_nowParams->m_grade, m_minDeltaT, m_stdInTemper-m_stdOutTemper, normalFlow, m_realFlow); //标准误差=规程要求误差*总量安全系数
 	ui.tableWidget->item(row, COLUMN_STD_ERROR)->setText("±" + QString::number(stdError, 'f', ERR_PRECISION)); //标准误差
 	if (fabs(m_meterError[idx]) > stdError)
 	{

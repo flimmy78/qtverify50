@@ -363,7 +363,7 @@
       <item row="0" column="0">
        <layout class="QGridLayout" name="gridLayout_25">
         <item row="0" column="0" colspan="2">
-         <widget class="QwtThermo" name="ThermoSmall" native="true">
+         <widget class="QwtThermo" name="ThermoSmall">
           <property name="maximumSize">
            <size>
             <width>60</width>
@@ -447,7 +447,7 @@
       <item row="0" column="2">
        <layout class="QGridLayout" name="gridLayout_26">
         <item row="0" column="0" colspan="2">
-         <widget class="QwtThermo" name="ThermoMid1" native="true">
+         <widget class="QwtThermo" name="ThermoMid1">
           <property name="maximumSize">
            <size>
             <width>60</width>
@@ -547,7 +547,7 @@
       <item row="2" column="0">
        <layout class="QGridLayout" name="gridLayout_27">
         <item row="0" column="0" colspan="2">
-         <widget class="QwtThermo" name="ThermoMid2" native="true">
+         <widget class="QwtThermo" name="ThermoMid2">
           <property name="maximumSize">
            <size>
             <width>60</width>
@@ -631,7 +631,7 @@
       <item row="2" column="2">
        <layout class="QGridLayout" name="gridLayout_28">
         <item row="0" column="0" colspan="2">
-         <widget class="QwtThermo" name="ThermoBig" native="true">
+         <widget class="QwtThermo" name="ThermoBig">
           <property name="maximumSize">
            <size>
             <width>60</width>
@@ -1776,6 +1776,9 @@
             <property name="segmentStyle">
              <enum>QLCDNumber::Flat</enum>
             </property>
+            <property name="value" stdset="0">
+             <double>50.000000000000000</double>
+            </property>
            </widget>
           </item>
           <item row="3" column="2">
@@ -1941,6 +1944,9 @@
             </property>
             <property name="segmentStyle">
              <enum>QLCDNumber::Flat</enum>
+            </property>
+            <property name="value" stdset="0">
+             <double>45.000000000000000</double>
             </property>
            </widget>
           </item>

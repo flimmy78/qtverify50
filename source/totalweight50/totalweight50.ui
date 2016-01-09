@@ -1748,6 +1748,9 @@ t</string>
         <property name="segmentStyle">
          <enum>QLCDNumber::Flat</enum>
         </property>
+        <property name="value" stdset="0">
+         <double>50.000000000000000</double>
+        </property>
        </widget>
       </item>
       <item row="4" column="4">
@@ -1913,6 +1916,9 @@ t</string>
         </property>
         <property name="segmentStyle">
          <enum>QLCDNumber::Flat</enum>
+        </property>
+        <property name="value" stdset="0">
+         <double>45.000000000000000</double>
         </property>
        </widget>
       </item>
