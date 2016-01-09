@@ -1572,7 +1572,7 @@ void TotalWeightDlg50::startVerify()
 		m_meterResult[p] = 1;
 	}
 
-  int bigOK = 0, smallOK = 0;
+	int bigOK = 0, smallOK = 0;
 	int bigNum = 0, smallNum = 0;
 	if (m_continueVerify) //Á¬Ðø¼ì¶¨
 	{
