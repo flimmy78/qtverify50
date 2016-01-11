@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>993</width>
-    <height>861</height>
+    <width>1070</width>
+    <height>863</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
    <iconset resource="../datatestdlg50.qrc">
     <normaloff>:/datatestdlg/images/datatest.png</normaloff>:/datatestdlg/images/datatest.png</iconset>
   </property>
-  <layout class="QGridLayout" name="gridLayout_25">
+  <layout class="QGridLayout" name="gridLayout_26">
    <item row="0" column="0" colspan="9">
     <widget class="QGroupBox" name="groupBox_5">
      <property name="title">
@@ -814,14 +814,14 @@ p</string>
    <item row="1" column="2" rowspan="2">
     <layout class="QGridLayout" name="gridLayout_24">
      <item row="0" column="0" colspan="2">
-      <widget class="QwtThermo" name="ThermoSmall" native="true">
+      <widget class="QwtThermo" name="ThermoSmall">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="value" stdset="0">
+       <property name="value">
         <double>0.000000000000000</double>
        </property>
       </widget>
@@ -927,14 +927,14 @@ p</string>
    <item row="1" column="4" rowspan="2">
     <layout class="QGridLayout" name="gridLayout_12">
      <item row="0" column="0" colspan="2">
-      <widget class="QwtThermo" name="ThermoMid1" native="true">
+      <widget class="QwtThermo" name="ThermoMid1">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="value" stdset="0">
+       <property name="value">
         <double>0.000000000000000</double>
        </property>
       </widget>
@@ -1035,14 +1035,14 @@ p</string>
    <item row="1" column="6" rowspan="2">
     <layout class="QGridLayout" name="gridLayout_11">
      <item row="0" column="0" colspan="2">
-      <widget class="QwtThermo" name="ThermoMid2" native="true">
+      <widget class="QwtThermo" name="ThermoMid2">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="value" stdset="0">
+       <property name="value">
         <double>0.000000000000000</double>
        </property>
       </widget>
@@ -1143,14 +1143,14 @@ p</string>
    <item row="1" column="8" rowspan="2">
     <layout class="QGridLayout" name="gridLayout_5">
      <item row="0" column="0" colspan="2">
-      <widget class="QwtThermo" name="ThermoBig" native="true">
+      <widget class="QwtThermo" name="ThermoBig">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="value" stdset="0">
+       <property name="value">
         <double>0.000000000000000</double>
        </property>
       </widget>
@@ -1803,7 +1803,7 @@ p</string>
      <property name="flat">
       <bool>false</bool>
      </property>
-     <layout class="QGridLayout" name="gridLayout_22">
+     <layout class="QGridLayout" name="gridLayout_25">
       <item row="0" column="0">
        <layout class="QGridLayout" name="gridLayout_10">
         <item row="0" column="0">
@@ -1835,7 +1835,7 @@ p</string>
           </property>
           <property name="maximumSize">
            <size>
-            <width>160</width>
+            <width>170</width>
             <height>16777215</height>
            </size>
           </property>
@@ -2020,7 +2020,7 @@ p</string>
           </property>
           <property name="maximumSize">
            <size>
-            <width>160</width>
+            <width>170</width>
             <height>16777215</height>
            </size>
           </property>
@@ -2093,7 +2093,7 @@ p</string>
           </property>
           <property name="maximumSize">
            <size>
-            <width>160</width>
+            <width>170</width>
             <height>16777215</height>
            </size>
           </property>
@@ -2151,7 +2151,7 @@ p</string>
           </property>
           <property name="maximumSize">
            <size>
-            <width>160</width>
+            <width>170</width>
             <height>16777215</height>
            </size>
           </property>
@@ -2201,7 +2201,7 @@ p</string>
           </property>
           <property name="maximumSize">
            <size>
-            <width>160</width>
+            <width>170</width>
             <height>16777215</height>
            </size>
           </property>
@@ -2232,13 +2232,13 @@ p</string>
           </property>
           <property name="minimumSize">
            <size>
-            <width>90</width>
+            <width>110</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>90</width>
+            <width>110</width>
             <height>16777215</height>
            </size>
           </property>
@@ -2257,13 +2257,13 @@ p</string>
           </property>
           <property name="minimumSize">
            <size>
-            <width>90</width>
+            <width>110</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>90</width>
+            <width>110</width>
             <height>16777215</height>
            </size>
           </property>
@@ -2274,8 +2274,30 @@ p</string>
         </item>
        </layout>
       </item>
-      <item row="0" column="1" rowspan="2">
+      <item row="0" column="1">
+       <spacer name="horizontalSpacer_7">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Preferred</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>17</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="2" rowspan="2">
        <widget class="QGroupBox" name="groupBox_9">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="title">
          <string>MeterInfo:</string>
         </property>
@@ -2441,7 +2463,23 @@ p</string>
         </layout>
        </widget>
       </item>
-      <item row="0" column="2" rowspan="2">
+      <item row="0" column="3">
+       <spacer name="horizontalSpacer_8">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Preferred</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>17</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="4" rowspan="2">
        <layout class="QGridLayout" name="gridLayout_21">
         <item row="0" column="0" colspan="5">
          <layout class="QGridLayout" name="gridLayout_8">
@@ -2991,7 +3029,13 @@ Time</string>
          <widget class="QComboBox" name="cmbStandard">
           <property name="minimumSize">
            <size>
-            <width>0</width>
+            <width>110</width>
+            <height>35</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>110</width>
             <height>35</height>
            </size>
           </property>
@@ -3077,13 +3121,13 @@ Time</string>
           </property>
           <property name="minimumSize">
            <size>
-            <width>105</width>
+            <width>110</width>
             <height>35</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>105</width>
+            <width>110</width>
             <height>35</height>
            </size>
           </property>
@@ -3094,152 +3138,188 @@ Time</string>
         </item>
        </layout>
       </item>
-      <item row="2" column="0">
-       <layout class="QGridLayout" name="gridLayout_20">
+      <item row="2" column="0" colspan="5">
+       <layout class="QGridLayout" name="gridLayout_22">
         <item row="0" column="0">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>CurAddr1(1bit):</string>
-          </property>
-         </widget>
+         <layout class="QGridLayout" name="gridLayout_20">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>CurAddr1(1bit):</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lnEditCurAddr1">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>120</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="readOnly">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item row="0" column="1">
-         <widget class="QLineEdit" name="lnEditCurAddr1">
-          <property name="enabled">
-           <bool>true</bool>
+         <spacer name="horizontalSpacer_5">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+          <property name="sizeType">
+           <enum>QSizePolicy::Expanding</enum>
           </property>
-          <property name="maximumSize">
+          <property name="sizeHint" stdset="0">
            <size>
-            <width>120</width>
-            <height>16777215</height>
+            <width>10</width>
+            <height>20</height>
            </size>
           </property>
-          <property name="readOnly">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="2" column="1">
-       <layout class="QGridLayout" name="gridLayout_19">
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_58">
-          <property name="text">
-           <string>NewAddr1(1bit):</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="lnEditAddress1">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>120</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="readOnly">
-           <bool>false</bool>
-          </property>
-         </widget>
+         </spacer>
         </item>
         <item row="0" column="2">
-         <widget class="QPushButton" name="btnSetAddr1">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>25</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>120</width>
-            <height>25</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>SetAddr1</string>
-          </property>
-         </widget>
+         <layout class="QGridLayout" name="gridLayout_19">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_58">
+            <property name="text">
+             <string>NewAddr1(1bit):</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lnEditAddress1">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>120</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="readOnly">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QPushButton" name="btnSetAddr1">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>120</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>SetAddr1</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
-       </layout>
-      </item>
-      <item row="2" column="2">
-       <layout class="QGridLayout" name="gridLayout_18">
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_59">
-          <property name="text">
-           <string>NewAddr2(8bit):</string>
+        <item row="0" column="3">
+         <spacer name="horizontalSpacer_6">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
           </property>
-         </widget>
+          <property name="sizeType">
+           <enum>QSizePolicy::Expanding</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>10</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="lnEditAddress2">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="readOnly">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QPushButton" name="btnSetAddr2">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>25</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>120</width>
-            <height>25</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>SetAddr2</string>
-          </property>
-         </widget>
+        <item row="0" column="4">
+         <layout class="QGridLayout" name="gridLayout_18">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_59">
+            <property name="text">
+             <string>NewAddr2(8bit):</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lnEditAddress2">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="readOnly">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QPushButton" name="btnSetAddr2">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>120</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>SetAddr2</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>
